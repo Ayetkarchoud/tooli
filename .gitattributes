@@ -1,0 +1,7 @@
+# Same line endings on every computer (Windows, Mac, Linux)
+* text=auto eol=lf
+
+# Binary design files
+*.af binary
+*.png binary
+*.jpg binary
