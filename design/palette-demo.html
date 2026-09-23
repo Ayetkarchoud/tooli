@@ -1,0 +1,158 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tooli palette demo</title>
+<style>
+/* ==========================================================
+   tooli design tokens: THE single place to change colours.
+   Change a value here → logo + whole site update.
+   ========================================================== */
+
+:root {
+  /* 1. Brand palette (raw colours) */
+  --brand-ink:        #1E1B4B;  /* navy: text, logo letters */
+  --brand-primary:    #3B5BDB;  /* main colour: cap, buttons, links */
+  --brand-accent:     #FBBF24;  /* second colour: tassel, highlights */
+  --brand-on-primary: #FFFFFF;  /* text on top of primary (buttons) */
+  --brand-white:      #FFFFFF;
+  --brand-night:      #0F0E2A;  /* dark backgrounds */
+
+  /* 2. Semantic tokens (what the site uses) */
+  --color-bg:         #F4F5FB;
+  --color-surface:    var(--brand-white);
+  --color-text:       var(--brand-ink);
+  --color-muted:      #6B6F8A;
+  --color-primary:    var(--brand-primary);
+  --color-on-primary: var(--brand-on-primary);
+  --color-accent:     var(--brand-accent);
+  --color-border:     #E3E5F0;
+
+  /* 3. Logo tokens (used inside tooli-logo-theme.svg) */
+  --logo-ink:     var(--brand-ink);
+  --logo-primary: var(--brand-primary);
+  --logo-accent:  var(--brand-accent);
+  --logo-eye:     var(--brand-white);
+}
+
+/* ==========================================================
+   Colour palettes: <html data-palette="...">
+   Blue is the default (no attribute needed).
+   ========================================================== */
+
+[data-palette="yellow"] {
+  --brand-primary:    #FACC15;
+  --brand-accent:     #3B5BDB;
+  --brand-on-primary: #1E1B4B;  /* dark text: white is unreadable on yellow */
+}
+
+[data-palette="green"] {
+  --brand-primary:    #4ADE80;
+  --brand-accent:     #FBBF24;
+  --brand-on-primary: #1E1B4B;  /* dark text: white is unreadable on light green */
+}
+
+[data-palette="red"] {
+  --brand-primary:    #F43F5E;
+  --brand-accent:     #FBBF24;
+  --brand-on-primary: #FFFFFF;
+}
+
+/* ==========================================================
+   Dark mode: <html data-theme="dark">. Works with every palette.
+   ========================================================== */
+
+[data-palette="violet"] {
+  --brand-primary:    #7C3AED;
+  --brand-accent:     #FBBF24;
+  --brand-on-primary: #FFFFFF;
+}
+
+[data-theme="dark"] {
+  --color-bg:      var(--brand-night);
+  --color-surface: #1A1940;
+  --color-text:    var(--brand-white);
+  --color-muted:   #A5A8C8;
+  --color-border:  #2C2B5A;
+
+  --logo-ink:     var(--brand-white);
+  --logo-eye:     var(--brand-night);
+}
+body{margin:0;font-family:system-ui,sans-serif;background:var(--color-bg);color:var(--color-text)}
+.wrap{max-width:720px;margin:auto;padding:16px}
+.bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.bar button{border:1px solid var(--color-border);background:var(--color-surface);color:var(--color-text);padding:8px 14px;border-radius:10px;cursor:pointer;font:inherit;display:flex;gap:6px;align-items:center}
+.bar i{width:14px;height:14px;border-radius:50%;display:inline-block}
+.card{background:var(--color-surface);border:1px solid var(--color-border);border-radius:16px;padding:20px;margin-bottom:16px}
+.logo{width:100%;max-width:420px;height:auto;display:block;margin:auto}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--color-primary);color:var(--color-on-primary);border:0;padding:10px 18px;border-radius:10px;font:600 15px system-ui}
+.tag{background:var(--color-accent);color:var(--brand-ink);padding:4px 10px;border-radius:99px;font:700 12px system-ui}
+.muted{color:var(--color-muted);font-size:14px}
+.sw{display:flex;gap:10px;flex-wrap:wrap}.sw div{font:12px ui-monospace,monospace;text-align:center}
+.sw span{display:block;width:64px;height:40px;border-radius:8px;border:1px solid var(--color-border);margin-bottom:4px}
+</style>
+<script>/* tooli theme switcher: light/dark mode + colour palette.
+   Uses the tokens in tokens.css.
+   - Dark mode 1st visit: follows the user's system setting.
+   - Choices are remembered for the next visit. */
+
+(function () {
+  const root = document.documentElement;
+  const THEME_KEY = 'tooli-theme';
+  const PALETTE_KEY = 'tooli-palette';
+
+  function load(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+  function save(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) {}
+  }
+
+  function applyTheme(theme) {
+    if (theme === 'dark') root.dataset.theme = 'dark';
+    else delete root.dataset.theme;
+  }
+
+  // "blue" is the default palette, so it needs no attribute
+  function applyPalette(palette) {
+    if (palette && palette !== 'blue') root.dataset.palette = palette;
+    else delete root.dataset.palette;
+  }
+
+  // Run immediately so the page doesn't flash the wrong colours
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(load(THEME_KEY) || (systemDark ? 'dark' : 'light'));
+  applyPalette(load(PALETTE_KEY));
+
+  document.addEventListener('click', function (e) {
+    //
+    // <button data-theme-toggle>: switches light/dark
+    if (e.target.closest('[data-theme-toggle]')) {
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
+      save(THEME_KEY, next);
+    }
+
+    // <button data-palette-set="green">: picks a palette (blue, yellow, green, red, violet)
+    const pick = e.target.closest('[data-palette-set]');
+    if (pick) {
+      applyPalette(pick.dataset.paletteSet);
+      save(PALETTE_KEY, pick.dataset.paletteSet);
+    }
+  });
+})();</script>
+</head><body><div class="wrap">
+<div class="bar">
+<button data-palette-set="blue"><i style="background:#3B5BDB"></i>Blue</button>
+<button data-palette-set="yellow"><i style="background:#FACC15"></i>Yellow</button>
+<button data-palette-set="green"><i style="background:#4ADE80"></i>Light green</button>
+<button data-palette-set="red"><i style="background:#F43F5E"></i>Red</button>
+<button data-palette-set="violet"><i style="background:#7C3AED"></i>Violet</button>
+<button data-theme-toggle>🌙 Dark / ☀️ Light</button>
+</div>
+<div class="card"><svg class="logo" viewBox="0 0 600 320" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:affinity="https://www.affinity.studio/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;"><rect id="Artboard1" x="0" y="0" width="600" height="320" style="fill:none;"/><g id="Artboard11" affinity:id="Artboard1"><g><rect x="421" y="59.8" width="45.08" height="170.2" style="fill:var(--logo-ink,#1e1b4b);fill-rule:nonzero;"/><path d="M514.61,89.01c-7.973,0 -14.375,-2.185 -19.205,-6.555c-4.83,-4.37 -7.245,-9.852 -7.245,-16.445c0,-6.747 2.415,-12.343 7.245,-16.79c4.83,-4.447 11.232,-6.67 19.205,-6.67c7.82,0 14.145,2.223 18.975,6.67c4.83,4.447 7.245,10.043 7.245,16.79c0,6.593 -2.415,12.075 -7.245,16.445c-4.83,4.37 -11.155,6.555 -18.975,6.555Zm22.31,11.96l0,129.03l-45.08,0l0,-129.03l45.08,0Z" style="fill:var(--logo-primary,#3b5bdb);fill-rule:nonzero;"/></g><path d="M107.87,191.59l0,38.41l-19.55,0c-32.967,0 -49.45,-16.33 -49.45,-48.99l0,-42.55l-15.87,0l0,-37.49l15.87,0l0,-31.28l45.31,0l0,31.28l23.46,0l0,37.49l-23.46,0l0,43.24c0,3.527 0.805,6.057 2.415,7.59c1.61,1.533 4.332,2.3 8.165,2.3l13.11,0Z" style="fill:var(--logo-ink,#1e1b4b);fill-rule:nonzero;"/><g id="eyes"><circle cx="190" cy="167" r="64" style="fill:var(--logo-eye,#ffffff);"/><path d="M190,103c35.323,0 64,28.677 64,64c0,35.323 -28.677,64 -64,64c-35.323,0 -64,-28.677 -64,-64c0,-35.323 28.677,-64 64,-64Zm0,32c-17.661,0 -32,14.339 -32,32c0,17.661 14.339,32 32,32c17.661,0 32,-14.339 32,-32c0,-17.661 -14.339,-32 -32,-32Z" style="fill:var(--logo-ink,#1e1b4b);"/><circle cx="336" cy="167" r="64" style="fill:var(--logo-eye,#ffffff);"/><path d="M336,103c35.323,0 64,28.677 64,64c0,35.323 -28.677,64 -64,64c-35.323,0 -64,-28.677 -64,-64c0,-35.323 28.677,-64 64,-64Zm0,32c-17.661,0 -32,14.339 -32,32c0,17.661 14.339,32 32,32c17.661,0 32,-14.339 32,-32c0,-17.661 -14.339,-32 -32,-32Z" style="fill:var(--logo-ink,#1e1b4b);"/><circle cx="200" cy="156" r="17" style="fill:var(--logo-primary,#3b5bdb);"/><circle cx="206" cy="150" r="5" style="fill:var(--logo-eye,#ffffff);"/><circle cx="346" cy="156" r="17" style="fill:var(--logo-primary,#3b5bdb);"/><circle cx="352" cy="150" r="5" style="fill:var(--logo-eye,#ffffff);"/></g><g id="cap"><path id="cap1" affinity:id="cap" d="M134,74l129,-46l137,44l-137,40l-129,-38Z" style="fill:var(--logo-primary,#3b5bdb);stroke:var(--logo-primary,#3b5bdb);stroke-width:14px;"/><g id="cap2" affinity:id="cap"><path d="M400,74l0,30" style="fill:none;stroke:var(--logo-accent,#fbbf24);stroke-width:10px;"/><circle cx="400" cy="112" r="12" style="fill:var(--logo-accent,#fbbf24);"/></g></g><path id="smile" d="M212,260c14.918,12.669 30.265,18.912 45.989,19.498c18.192,0.678 36.889,-6.218 56.011,-19.498" style="fill:none;stroke:var(--logo-primary,#3b5bdb);stroke-width:18px;"/></g></svg></div>
+<div class="card"><div class="row"><button class="btn">Ask the AI tutor</button><span class="tag">VIP</span><a href="#" style="color:var(--color-text);text-decoration-color:var(--color-primary);text-decoration-thickness:3px">Partner courses →</a></div>
+<p class="muted">Same logo, same page. The palette buttons only change 3 values in tokens.css.</p></div>
+<div class="card"><div class="sw" id="sw"></div></div>
+</div><script>
+function sw(){const cs=getComputedStyle(document.documentElement);document.getElementById('sw').innerHTML=['ink','primary','accent','on-primary'].map(v=>'<div><span style="background:var(--brand-'+v+')"></span>'+v+'<br>'+cs.getPropertyValue('--brand-'+v).trim()+'</div>').join('')}
+document.addEventListener('click',()=>setTimeout(sw));sw();
+</script></body></html>

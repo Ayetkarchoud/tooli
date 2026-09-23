@@ -1,0 +1,24 @@
+# Dependencies (everyone runs npm install)
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Secrets: never commit passwords, API keys, database URLs
+.env
+.env.*
+!.env.example
+
+# Affinity lock files (created while a file is open)
+*.af~lock~
+
+# System / editor junk
+desktop.ini
+Thumbs.db
+.DS_Store
+.vscode/
+
+# Logs
+*.log
+npm-debug.log*

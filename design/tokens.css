@@ -1,0 +1,74 @@
+/* ==========================================================
+   tooli design tokens: THE single place to change colours.
+   Change a value here → logo + whole site update.
+   ========================================================== */
+
+:root {
+  /* 1. Brand palette (raw colours) */
+  --brand-ink:        #1E1B4B;  /* navy: text, logo letters */
+  --brand-primary:    #3B5BDB;  /* main colour: cap, buttons, links */
+  --brand-accent:     #FBBF24;  /* second colour: tassel, highlights */
+  --brand-on-primary: #FFFFFF;  /* text on top of primary (buttons) */
+  --brand-white:      #FFFFFF;
+  --brand-night:      #0F0E2A;  /* dark backgrounds */
+
+  /* 2. Semantic tokens (what the site uses) */
+  --color-bg:         #F4F5FB;
+  --color-surface:    var(--brand-white);
+  --color-text:       var(--brand-ink);
+  --color-muted:      #6B6F8A;
+  --color-primary:    var(--brand-primary);
+  --color-on-primary: var(--brand-on-primary);
+  --color-accent:     var(--brand-accent);
+  --color-border:     #E3E5F0;
+
+  /* 3. Logo tokens (used inside tooli-logo-theme.svg) */
+  --logo-ink:     var(--brand-ink);
+  --logo-primary: var(--brand-primary);
+  --logo-accent:  var(--brand-accent);
+  --logo-eye:     var(--brand-white);
+}
+
+/* ==========================================================
+   Colour palettes: <html data-palette="...">
+   Blue is the default (no attribute needed).
+   ========================================================== */
+
+[data-palette="yellow"] {
+  --brand-primary:    #FACC15;
+  --brand-accent:     #3B5BDB;
+  --brand-on-primary: #1E1B4B;  /* dark text: white is unreadable on yellow */
+}
+
+[data-palette="green"] {
+  --brand-primary:    #4ADE80;
+  --brand-accent:     #FBBF24;
+  --brand-on-primary: #1E1B4B;  /* dark text: white is unreadable on light green */
+}
+
+[data-palette="red"] {
+  --brand-primary:    #F43F5E;
+  --brand-accent:     #FBBF24;
+  --brand-on-primary: #FFFFFF;
+}
+
+[data-palette="violet"] {
+  --brand-primary:    #7C3AED;
+  --brand-accent:     #FBBF24;
+  --brand-on-primary: #FFFFFF;
+}
+
+/* ==========================================================
+   Dark mode: <html data-theme="dark">. Works with every palette.
+   ========================================================== */
+
+[data-theme="dark"] {
+  --color-bg:      var(--brand-night);
+  --color-surface: #1A1940;
+  --color-text:    var(--brand-white);
+  --color-muted:   #A5A8C8;
+  --color-border:  #2C2B5A;
+
+  --logo-ink:     var(--brand-white);
+  --logo-eye:     var(--brand-night);
+}
