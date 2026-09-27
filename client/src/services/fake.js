@@ -15,6 +15,5 @@ export const daysAgo = (days) => minutesAgo(days * 24 * 60)
 // Return copies, so pages can't accidentally change the fake "database"
 export const copy = (value) => structuredClone(value)
 
-// Case- and accent-insensitive text match ("prepa" finds "Prépa")
-const normalise = (text) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
-export const matches = (text, query) => normalise(text).includes(normalise(query.trim()))
+// Text search helper, shared with the pages
+export { matches } from '../lib/text.js'

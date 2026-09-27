@@ -12,7 +12,6 @@ const Login = lazy(() => import('./pages/auth/Login.jsx'))
 const Signup = lazy(() => import('./pages/auth/Signup.jsx'))
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
 const Tutor = lazy(() => import('./pages/tutor/Tutor.jsx'))
-const TutorChat = lazy(() => import('./pages/tutor/TutorChat.jsx'))
 const Courses = lazy(() => import('./pages/courses/Courses.jsx'))
 const CourseDetail = lazy(() => import('./pages/courses/CourseDetail.jsx'))
 const Professors = lazy(() => import('./pages/professors/Professors.jsx'))
@@ -44,8 +43,8 @@ export default function App() {
         <Route path="dashboard" element={<PrivateRoute />}>
           <Route element={<AppLayout />}>
             <Route index element={<Dashboard />} />
-            <Route path="tutor" element={<Tutor />} />
-            <Route path="tutor/:chatId" element={<TutorChat />} />
+            {/* one route for both, so the page stays mounted when a new chat gets its id */}
+            <Route path="tutor/:chatId?" element={<Tutor />} />
             <Route path="courses" element={<Courses />} />
             <Route path="courses/:courseId" element={<CourseDetail />} />
             <Route path="professors" element={<Professors />} />

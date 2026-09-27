@@ -273,7 +273,19 @@ Errors: `404` unknown professor, `409` if the slot isn't free anymore
 ## AI tutor
 
 A **message**: `{ "id": "m2", "role": "user" | "tutor", "text": "…", "createdAt": "…" }`.
-`text` is plain text; line breaks (`\n`) and numbered steps (`1.`, `2.`) are fine.
+Tutor answers are plain text with a little formatting the frontend understands. Please ask the AI
+to answer in this style (nothing fancier, like tables or headings):
+
+| Write | Shows as |
+|---|---|
+| a line break (`\n`) | a new line; a blank line starts a new paragraph |
+| `1. `, `2. ` at the start of lines | numbered steps |
+| `- ` at the start of lines | a bullet list |
+| `**words**` | bold |
+| `` `x = 4` `` | inline code |
+| lines between two ```` ``` ```` lines (optionally ```` ```python ````) | a code block |
+
+Anything else (HTML included) is shown as plain text, never interpreted.
 
 ### GET `/api/tutor/chats`
 
@@ -322,7 +334,7 @@ Response `200`:
 }
 ```
 
-Errors: `400` empty question, `404` unknown `chatId`. The answer can take a few seconds (AI call);
+Errors: `400` empty question or longer than **1000 characters**, `404` unknown `chatId`. The answer can take a few seconds (AI call);
 the frontend shows a "thinking" state meanwhile.
 
 ### GET `/api/tips?q=`

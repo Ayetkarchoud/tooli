@@ -1,6 +1,6 @@
 // Member area frame: sidebar + top bar (desktop), top bar + bottom tab bar + slide-in menu (mobile).
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Bell, Crown, Menu, Search } from 'lucide-react'
 import { useAsync } from '@/lib/useAsync'
@@ -174,9 +174,25 @@ function NotificationBell() {
   )
 }
 
+// One page key per page, except the tutor: switching chats must not fade/remount the page
+const memberPageKey = (pathname) => (pathname.startsWith('/dashboard/tutor') ? '/dashboard/tutor' : pathname)
+
 export default function AppLayout() {
+  const rootRef = useRef(null)
+  const headerRef = useRef(null)
+
+  // Share the top bar's height as --app-header-h, for full-height pages (the tutor chat)
+  useEffect(() => {
+    const header = headerRef.current
+    const observer = new ResizeObserver(() => {
+      rootRef.current?.style.setProperty('--app-header-h', `${header.offsetHeight}px`)
+    })
+    observer.observe(header)
+    return () => observer.disconnect()
+  }, [])
+
   return (
-    <div className="grid min-h-screen grid-cols-[240px_minmax(0,1fr)] max-nav:grid-cols-[minmax(0,1fr)]">
+    <div ref={rootRef} className="grid min-h-screen grid-cols-[240px_minmax(0,1fr)] max-nav:grid-cols-[minmax(0,1fr)]">
       {/* Desktop sidebar */}
       <aside className="sticky top-0 flex h-screen flex-col gap-6 overflow-y-auto border-r border-border bg-card px-4 py-5 max-nav:hidden">
         <SidebarContent />
@@ -184,7 +200,7 @@ export default function AppLayout() {
 
       <div className="flex min-w-0 flex-col">
         {/* Mobile: row 1 = menu + logo + actions, row 2 = full-width search */}
-        <header className="sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-card px-6 py-3 max-nav:flex-wrap max-nav:gap-x-3 max-nav:gap-y-2.5 max-nav:px-4 max-nav:py-2.5">
+        <header ref={headerRef} className="sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-card px-6 py-3 max-nav:flex-wrap max-nav:gap-x-3 max-nav:gap-y-2.5 max-nav:px-4 max-nav:py-2.5">
           <MobileMenu />
           <Link to="/dashboard" className="hidden rounded-lg max-nav:inline-flex" aria-label="tooli dashboard">
             <Logo height={28} />
@@ -200,7 +216,7 @@ export default function AppLayout() {
         </header>
 
         <main className="flex-1 max-nav:pb-[calc(72px+env(safe-area-inset-bottom))]">
-          <AnimatedOutlet />
+          <AnimatedOutlet pageKey={memberPageKey} />
         </main>
       </div>
 
