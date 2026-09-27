@@ -42,6 +42,12 @@ const NOTIFICATIONS = [
   },
 ]
 
+// FAKE only: lets other fake services create a notification (e.g. after a booking).
+// The real backend creates these itself, so there is no endpoint for it.
+export function addNotification({ type, title, body, link = null }) {
+  NOTIFICATIONS.push({ id: `n${Date.now()}`, type, read: false, createdAt: new Date().toISOString(), title, body, link })
+}
+
 // Newest first
 // TODO(backend): api.get('/notifications')
 export async function listNotifications() {

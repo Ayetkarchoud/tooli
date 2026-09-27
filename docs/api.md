@@ -53,8 +53,11 @@ If something here is awkward to build, tell me and we'll change the contract tog
 | GET | `/api/courses/:courseId` | One course with its lessons |
 | PUT | `/api/courses/:courseId/lessons/:lessonId` | Mark a lesson done / not done |
 | GET | `/api/professors` | Professor list (filters) |
+| GET | `/api/professors/filters` | Subjects, cities and languages for the filters |
 | GET | `/api/professors/top` | Best rated professors |
 | GET | `/api/professors/:profId` | One professor |
+| GET | `/api/professors/:profId/availability` | Free times for the next 7 days |
+| GET | `/api/professors/:profId/reviews` | Student reviews |
 | POST | `/api/professors/:profId/bookings` | Book a class |
 | GET | `/api/tutor/chats` | The user's tutor chats |
 | GET | `/api/tutor/chats/:chatId` | One chat with its messages |
@@ -216,7 +219,7 @@ The values for the filter chips, in display order:
 ```
 
 > Express tip: register `/courses/filters` and `/courses/continue` **before** `/courses/:courseId`,
-> otherwise Express treats `filters` as a course id. Same for `/professors/top`.
+> otherwise Express treats `filters` as a course id. Same for `/professors/top` and `/professors/filters`.
 
 ### GET `/api/courses/continue`
 
@@ -253,21 +256,65 @@ The **professor** object:
   "rating": 4.9,
   "reviews": 128,
   "pricePerHour": 45,
-  "slots": [
-    { "day": "mon", "times": ["17:00", "18:30"] },
-    { "day": "sat", "times": ["09:00", "10:30", "14:00"] }
-  ]
+  "nextSlot": { "date": "2026-09-28", "time": "17:00" }
 }
 ```
 
-- `title`: `"Prof."` or `"Dr."`. `pricePerHour` in TND.
-- `slots`: the free times **for the current week**. `day` is `mon` … `sun`, `time` is `HH:MM` in Tunisia time.
-  Booked times must not appear here.
+- `title`: `"Prof."` or `"Dr."`. `pricePerHour` in TND. All professors on tooli are VIP.
+- `nextSlot`: the first free time in the next 7 days, or `null` when fully booked.
+  Dates are `YYYY-MM-DD`, times `HH:MM`, both in Tunisia time.
+- How you store the weekly schedule is up to you; the frontend only needs `nextSlot` and the
+  availability endpoint below.
 
 ### GET `/api/professors`
 
-Query parameters (optional): `subject`, `city` (exact), `q` (text search in name, subject and city,
-ignoring case and accents). Response `200`: array of professors.
+Query parameters (all optional, combine freely):
+
+| Param | Example | Meaning |
+|---|---|---|
+| `subject` | `Physics` | Exact subject |
+| `city` | `Monastir` | Exact city |
+| `language` | `English` | Teaches in this language |
+| `price` | `under-40` | `under-40` (< 40 TND), `40-50` (40 to 50), `over-50` (> 50) |
+| `available` | `1` | Only professors with at least one free time in the next 7 days |
+| `q` | `sousse` | Text search in name, subject and city (ignore case and accents) |
+
+Response `200`: array of professors, best rated first.
+
+### GET `/api/professors/filters`
+
+```json
+{
+  "subjects": ["Biology", "Chemistry", "Computer science", "English", "French", "Mathematics", "Physics"],
+  "cities": ["Bizerte", "Monastir", "Nabeul", "Sfax", "Sousse", "Tunis"],
+  "languages": ["Arabic", "English", "French"]
+}
+```
+
+### GET `/api/professors/:profId/availability?days=7`
+
+Free times for the next `days` days, starting today, **one entry per day** (days without a free time
+have an empty list). Leave out times already booked and, for today, times already past.
+
+```json
+[
+  { "date": "2026-09-27", "times": [] },
+  { "date": "2026-09-28", "times": ["17:00", "18:30"] },
+  { "date": "2026-09-29", "times": [] }
+]
+```
+
+`404` if the professor doesn't exist.
+
+### GET `/api/professors/:profId/reviews`
+
+Newest first:
+
+```json
+[{ "id": "r_1", "author": "Yasmine B.", "rating": 5, "text": "Super clear and patient…", "createdAt": "2026-09-24T10:00:00.000Z" }]
+```
+
+Show only the first name + initial of the author (privacy).
 
 ### GET `/api/professors/top?limit=3`
 
@@ -279,17 +326,30 @@ Response `200`: one professor. `404` if unknown.
 
 ### POST `/api/professors/:profId/bookings`
 
-Request: `{ "day": "sat", "time": "10:30" }`
+Request: `{ "date": "2026-10-03", "time": "10:30", "durationMinutes": 90 }`
+(`durationMinutes` is `60`, `90` or `120`.)
 
 Response `201`:
 
 ```json
-{ "id": "bk_61a0", "profId": "amel-exemple", "day": "sat", "time": "10:30", "price": 45, "status": "confirmed" }
+{
+  "id": "bk_61a0",
+  "profId": "amel-exemple",
+  "date": "2026-10-03",
+  "time": "10:30",
+  "durationMinutes": 90,
+  "price": 67.5,
+  "status": "confirmed"
+}
 ```
 
-Errors: `404` unknown professor, `409` if the slot isn't free anymore
-(`"This time is no longer free. Please pick another one."`). Please also create a notification of type `booking`.
-(Payment isn't part of this yet.)
+`price` = `pricePerHour × durationMinutes / 60`, rounded to 0.1 TND. Compute it on the server; don't trust a
+price sent by the browser.
+
+Errors: `400` invalid date/time/length, `404` unknown professor, `409` if the time isn't free anymore
+(`"This time is no longer free. Please pick another one."`). Please also create a notification of type
+`booking` (`"Class booked"`, with a link to the professor). Payment isn't part of this yet: the student
+pays the professor after the class.
 
 ---
 
@@ -456,7 +516,8 @@ Just a starting point, organise it however you prefer:
 | `courses` | course info, platform (embedded), lessons (embedded) |
 | `progress` | `{ userId, courseId, doneLessonIds: [] }`: used to compute `done` and `progress` |
 | `professors` | profile, price, weekly availability |
-| `bookings` | `{ userId, profId, day, time, price, status, createdAt }` |
+| `bookings` | `{ userId, profId, date, time, durationMinutes, price, status, createdAt }` |
+| `reviews` | `{ profId, userId, rating, text, createdAt }` |
 | `chats` | `{ userId, title, messages: [], updatedAt }` |
 | `tips` | `{ text }` |
 | `notifications` | `{ userId, type, title, body, link, read, createdAt }` |
