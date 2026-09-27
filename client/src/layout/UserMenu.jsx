@@ -13,7 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useAuth } from '../auth/authContext.js'
-import { getInitials } from '../data/mock.js'
+import { getInitials } from '@/lib/people'
 import { SETTINGS_NAV } from './navItems.js'
 
 const itemClass = 'gap-2.5 rounded-md px-3 py-2.5 text-sm font-semibold [&_svg:not([class*=size-])]:size-[18px]'

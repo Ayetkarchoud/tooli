@@ -11,8 +11,11 @@ async function request(path, options = {}) {
     ...options,
   })
   if (!res.ok) {
-    const message = await res.text().catch(() => '')
-    throw new Error(message || `Request failed: ${res.status}`)
+    // The API answers errors as { "error": { "message": "…" } } (see docs/api.md)
+    const body = await res.json().catch(() => null)
+    const error = new Error(body?.error?.message || `Request failed: ${res.status}`)
+    error.status = res.status // e.g. services turn 404 into null
+    throw error
   }
   return res.status === 204 ? null : res.json()
 }

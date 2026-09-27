@@ -1,17 +1,27 @@
 import { lazy } from 'react'
-import { Route, Routes } from 'react-router-dom'
+import { Navigate, Route, Routes } from 'react-router-dom'
 import { PrivateRoute, PublicOnlyRoute } from './auth/RouteGuards.jsx'
 import AnimatedOutlet from './components/AnimatedOutlet.jsx'
 
-// Each page is its own file download, fetched the first time it is visited
-// (the loading dots come from <Suspense> inside AnimatedOutlet).
+// Each page is its own file download, fetched the first time it is visited.
+// While it downloads, <Suspense> inside AnimatedOutlet shows a skeleton (member area) or dots.
 // The member layout too: visitors on the landing page never download the menu/sheet code.
 const AppLayout = lazy(() => import('./layout/AppLayout.jsx'))
 const Landing = lazy(() => import('./pages/Landing.jsx'))
 const Login = lazy(() => import('./pages/auth/Login.jsx'))
 const Signup = lazy(() => import('./pages/auth/Signup.jsx'))
 const Dashboard = lazy(() => import('./pages/Dashboard.jsx'))
-const Placeholder = lazy(() => import('./pages/Placeholder.jsx'))
+const Tutor = lazy(() => import('./pages/tutor/Tutor.jsx'))
+const TutorChat = lazy(() => import('./pages/tutor/TutorChat.jsx'))
+const Courses = lazy(() => import('./pages/courses/Courses.jsx'))
+const CourseDetail = lazy(() => import('./pages/courses/CourseDetail.jsx'))
+const Professors = lazy(() => import('./pages/professors/Professors.jsx'))
+const ProfessorDetail = lazy(() => import('./pages/professors/ProfessorDetail.jsx'))
+const Vip = lazy(() => import('./pages/Vip.jsx'))
+const Notifications = lazy(() => import('./pages/Notifications.jsx'))
+const Search = lazy(() => import('./pages/Search.jsx'))
+const Settings = lazy(() => import('./pages/settings/Settings.jsx'))
+const MissingPage = lazy(() => import('./pages/MissingPage.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
 // Dev-only page: not even built into production
 const MascotPreview = import.meta.env.DEV ? lazy(() => import('./pages/MascotPreview.jsx')) : null
@@ -34,22 +44,19 @@ export default function App() {
         <Route path="dashboard" element={<PrivateRoute />}>
           <Route element={<AppLayout />}>
             <Route index element={<Dashboard />} />
-            <Route
-              path="tutor"
-              element={<Placeholder title="AI tutor" text="Ask any question and get a clear answer, any time." />}
-            />
-            <Route
-              path="courses"
-              element={<Placeholder title="Partner courses" text="The best e-learning platforms, gathered in one place." />}
-            />
-            <Route
-              path="professors"
-              element={<Placeholder title="VIP professors" text="Book private sessions with the best professors in Tunisia." />}
-            />
-            <Route
-              path="settings"
-              element={<Placeholder title="Settings" text="Manage your profile, theme and notifications." />}
-            />
+            <Route path="tutor" element={<Tutor />} />
+            <Route path="tutor/:chatId" element={<TutorChat />} />
+            <Route path="courses" element={<Courses />} />
+            <Route path="courses/:courseId" element={<CourseDetail />} />
+            <Route path="professors" element={<Professors />} />
+            <Route path="professors/:profId" element={<ProfessorDetail />} />
+            <Route path="vip" element={<Vip />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="search" element={<Search />} />
+            <Route path="settings" element={<Navigate to="/dashboard/settings/profile" replace />} />
+            <Route path="settings/:tab" element={<Settings />} />
+            {/* Unknown address inside the member area: friendly "not found", layout stays */}
+            <Route path="*" element={<MissingPage />} />
           </Route>
         </Route>
 
