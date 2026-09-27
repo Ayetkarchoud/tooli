@@ -4,9 +4,16 @@
    ========================================================== */
 
 :root {
+  /* 0. The 5 palette colours (also used by the palette swatches in themeContext.js) */
+  --palette-blue:   #3B5BDB;
+  --palette-yellow: #FACC15;
+  --palette-green:  #4ADE80;
+  --palette-red:    #E11D48;  /* deep enough for white button text (4.7:1) */
+  --palette-violet: #7C3AED;
+
   /* 1. Brand palette (raw colours) */
   --brand-ink:        #1E1B4B;  /* navy: text, logo letters */
-  --brand-primary:    #3B5BDB;  /* main colour: cap, buttons, links */
+  --brand-primary:    var(--palette-blue);  /* main colour: cap, buttons, links */
   --brand-accent:     #FBBF24;  /* second colour: tassel, highlights */
   --brand-on-primary: #FFFFFF;  /* text on top of primary (buttons) */
   --brand-on-accent:  var(--brand-ink);  /* text on top of accent */
@@ -28,10 +35,17 @@
   /* Soft tints (see-through, so they work on any background and in dark mode) */
   --color-primary-soft: color-mix(in srgb, var(--color-primary) 16%, transparent);
   --color-accent-soft:  color-mix(in srgb, var(--color-accent) 18%, transparent);
+  /* Quiet surface (secondary buttons, muted areas): surface nudged toward the text colour */
+  --color-surface-soft: color-mix(in srgb, var(--color-text) 6%, var(--color-surface));
 
   /* Primary for icons/small text on surfaces: pulled toward the text colour
-     so it stays readable on light palettes (yellow, green) and in dark mode */
-  --color-primary-strong: color-mix(in srgb, var(--color-primary) 55%, var(--color-text));
+     so it stays readable on light palettes (yellow, green) and in dark mode.
+     Light palettes pull harder (see --primary-strong-mix in their blocks below). */
+  --primary-strong-mix:   55%;
+  --color-primary-strong: color-mix(in srgb, var(--color-primary) var(--primary-strong-mix), var(--color-text));
+
+  /* Dim layer behind slide-in panels (mobile menu) */
+  --color-overlay: color-mix(in srgb, var(--brand-night) 30%, transparent);
 
   /* Card hover shadow, tinted with the primary colour */
   --shadow-hover: 0 12px 28px -14px color-mix(in srgb, var(--color-primary) 55%, transparent);
@@ -70,8 +84,9 @@
    ========================================================== */
 
 [data-palette="yellow"] {
-  --brand-primary:    #FACC15;
-  --brand-accent:     #3B5BDB;
+  --brand-primary:    var(--palette-yellow);
+  --primary-strong-mix: 38%;  /* keeps yellow links/icons readable (4.5:1) on light backgrounds */
+  --brand-accent:     var(--palette-blue);
   --brand-on-primary: #1E1B4B;  /* dark text: white is unreadable on yellow */
   --brand-on-accent:  var(--brand-white);  /* accent is blue here */
 
@@ -81,19 +96,20 @@
 }
 
 [data-palette="green"] {
-  --brand-primary:    #4ADE80;
+  --brand-primary:    var(--palette-green);
+  --primary-strong-mix: 45%;
   --brand-accent:     #FBBF24;
   --brand-on-primary: #1E1B4B;  /* dark text: white is unreadable on light green */
 }
 
 [data-palette="red"] {
-  --brand-primary:    #F43F5E;
+  --brand-primary:    var(--palette-red);
   --brand-accent:     #FBBF24;
   --brand-on-primary: #FFFFFF;
 }
 
 [data-palette="violet"] {
-  --brand-primary:    #7C3AED;
+  --brand-primary:    var(--palette-violet);
   --brand-accent:     #FBBF24;
   --brand-on-primary: #FFFFFF;
 }

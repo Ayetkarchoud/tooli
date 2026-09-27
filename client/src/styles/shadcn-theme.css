@@ -1,0 +1,45 @@
+/* ==========================================================
+   shadcn/ui colour variables → OUR tokens (tokens.css).
+   No colours are defined here: every line points to a token,
+   so the 5 palettes and dark mode recolour shadcn components too.
+   Import this AFTER tokens.css.
+   ========================================================== */
+
+:root {
+  --background:           var(--color-bg);
+  --foreground:           var(--color-text);
+  --card:                 var(--color-surface);
+  --card-foreground:      var(--color-text);
+  --popover:              var(--color-surface);
+  --popover-foreground:   var(--color-text);
+  --primary:              var(--color-primary);
+  --primary-foreground:   var(--color-on-primary);
+  --secondary:            var(--color-surface-soft);
+  --secondary-foreground: var(--color-text);
+  --muted:                var(--color-surface-soft);
+  --muted-foreground:     var(--color-muted);
+  --accent:               var(--color-primary-soft);
+  --accent-foreground:    var(--color-text);
+  --destructive:          var(--color-danger);
+  --border:               var(--color-border);
+  --input:                var(--color-border);
+  --ring:                 var(--color-primary);
+  --radius:               14px;
+
+  /* Charts */
+  --chart-1: var(--color-primary);
+  --chart-2: var(--color-accent);
+  --chart-3: var(--color-primary-strong);
+  --chart-4: var(--color-muted);
+  --chart-5: var(--color-text);
+
+  /* Sidebar component */
+  --sidebar:                    var(--color-surface);
+  --sidebar-foreground:         var(--color-text);
+  --sidebar-primary:            var(--color-primary);
+  --sidebar-primary-foreground: var(--color-on-primary);
+  --sidebar-accent:             var(--color-primary-soft);
+  --sidebar-accent-foreground:  var(--color-text);
+  --sidebar-border:             var(--color-border);
+  --sidebar-ring:               var(--color-primary);
+}

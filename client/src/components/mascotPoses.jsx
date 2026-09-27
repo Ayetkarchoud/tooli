@@ -12,6 +12,7 @@ const LINE_MOUTH = { fill: 'none', stroke: v('mouth'), strokeWidth: 4.5, strokeL
 // arms: drawn behind the body unless `front`; `wave` marks the arm that rocks.
 // eyes: { ring: [[dx, dy] left, [dx, dy] right] } or { path: 'd' }.
 // lift / capLift: move the body / cap up (negative = up).
+// motion: 'bounce' instead of the gentle float. extrasMotion: 'twinkle' (fade) or 'drift' (float up).
 export const POSES = {
   waving: {
     arms: [ARM_DOWN_LEFT, { d: 'M156,126 Q182,112 182,86', hand: [182, 82], wave: true }],
@@ -49,8 +50,10 @@ export const POSES = {
     mouth: <path d="M86,142 Q100,160 114,142 Z" fill={v('ink')} />,
     lift: -6,
     capLift: -10,
+    motion: 'bounce',
+    extrasMotion: 'twinkle',
     extras: (
-      <g className="mascot-confetti">
+      <g>
         <rect x="36" y="28" width="9" height="4" rx="1" fill={v('tassel')} transform="rotate(-25 40 30)" />
         <rect x="150" y="16" width="9" height="4" rx="1" fill={v('blush')} transform="rotate(35 154 18)" />
         <rect x="170" y="48" width="8" height="4" rx="1" fill={v('sweat')} transform="rotate(-40 174 50)" />
@@ -69,8 +72,9 @@ export const POSES = {
     ],
     eyes: { path: 'M68,120 Q80,128 92,120 M108,120 Q120,128 132,120' },
     mouth: <ellipse cx="100" cy="149" rx="4" ry="3" fill={v('ink')} />,
+    extrasMotion: 'drift',
     extras: (
-      <g className="mascot-zz" fill={v('note')} opacity=".6" fontWeight="700" fontFamily="Poppins, system-ui, sans-serif">
+      <g fill={v('note')} opacity=".6" fontWeight="700" fontFamily="Poppins, system-ui, sans-serif">
         <text x="158" y="44" fontSize="20">z</text>
         <text x="176" y="24" fontSize="15">z</text>
       </g>

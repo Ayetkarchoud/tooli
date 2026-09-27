@@ -1,11 +1,46 @@
 // tooli mascot: a 3D-style pebble with a graduation cap.
 // Colours come only from the --mascot-* tokens in src/styles/tokens.css,
 // so the body follows the active palette and dark mode automatically.
-// Poses live in mascotPoses.jsx.
+// Poses live in mascotPoses.jsx. Animations (float, blink, wave, bounce) use Motion
+// and switch off for users who ask for reduced motion.
 
 import { useId } from 'react'
+import { motion, useReducedMotion } from 'motion/react'
+import { cn } from '@/lib/utils'
 import { POSES, v } from './mascotPoses.jsx'
-import './Mascot.css'
+
+const loop = (duration, extra) => ({ duration, repeat: Infinity, ease: 'easeInOut', ...extra })
+const BOUNCE_EASE = [0.3, 0, 0.4, 1]
+
+// Keyframes for each moving part. Used only while `on` is true.
+const MOVES = {
+  float: { animate: { y: [0, -5, 0] }, transition: loop(3) },
+  bounce: { animate: { y: [0, -10, 1, 0] }, transition: loop(1.2, { times: [0, 0.45, 0.7, 1], ease: BOUNCE_EASE }) },
+  shadowFloat: { animate: { scaleX: [1, 0.86, 1] }, transition: loop(3) },
+  shadowBounce: { animate: { scaleX: [1, 0.86, 1] }, transition: loop(1.2, { ease: BOUNCE_EASE }) },
+  blink: { animate: { scaleY: [1, 1, 0.1, 1] }, transition: loop(4, { times: [0, 0.93, 0.955, 1] }) },
+  // the raised arm rocks around its shoulder (156,126 in the viewBox)
+  wave: {
+    animate: { rotate: [0, -10, 0] },
+    transition: loop(1.6),
+    style: { transformBox: 'view-box', originX: '156px', originY: '126px' },
+  },
+  twinkle: { animate: { opacity: [1, 0.55, 1] }, transition: loop(1.2) },
+  drift: { animate: { y: [0, -4, 0] }, transition: loop(3) },
+}
+
+// A <g> that plays MOVES[name] when `on`, and stays still otherwise
+function Moving({ name, on, style, ...props }) {
+  const move = on && name ? MOVES[name] : null
+  return (
+    <motion.g
+      animate={move?.animate}
+      transition={move?.transition}
+      style={{ ...move?.style, ...style }}
+      {...props}
+    />
+  )
+}
 
 const ARC_EYES = { fill: 'none', stroke: v('ink'), strokeWidth: 7, strokeLinecap: 'round' }
 
@@ -19,13 +54,13 @@ function RingEye({ cx, cy, dx, dy, gradient }) {
   )
 }
 
-function Arm({ arm, handFill }) {
+function Arm({ arm, handFill, on }) {
   const [hx, hy] = arm.hand
   return (
-    <g className={arm.wave ? 'mascot-wave' : undefined}>
+    <Moving name={arm.wave && 'wave'} on={on}>
       <path d={arm.d} fill="none" stroke={v('body-dark')} strokeWidth="14" strokeLinecap="round" />
       <circle cx={hx} cy={hy} r="10" fill={handFill} stroke={v('body-dark')} strokeWidth="2" />
-    </g>
+    </Moving>
   )
 }
 
@@ -38,7 +73,9 @@ export default function Mascot({ pose = 'waving', size = 120, title = 'tooli mas
 
   const backArms = p.arms.filter((a) => !a.front)
   const frontArms = p.arms.filter((a) => a.front)
-  const classes = ['mascot', `mascot--${pose}`, animated && 'is-animated', className].filter(Boolean).join(' ')
+  const reduce = useReducedMotion()
+  const on = animated && !reduce
+  const bounce = p.motion === 'bounce'
 
   return (
     <svg
@@ -47,7 +84,7 @@ export default function Mascot({ pose = 'waving', size = 120, title = 'tooli mas
       height={(size * 226) / 200}
       role="img"
       aria-label={title}
-      className={classes}
+      className={cn('block overflow-visible', className)}
       {...props}
     >
       <defs>
@@ -75,11 +112,19 @@ export default function Mascot({ pose = 'waving', size = 120, title = 'tooli mas
       </defs>
 
       {/* 1. ground shadow (stays on the ground) */}
-      <ellipse className="mascot-shadow" cx="100" cy="216" rx="50" ry="6" fill={v('shadow')} opacity=".14" />
+      <motion.ellipse
+        cx="100"
+        cy="216"
+        rx="50"
+        ry="6"
+        fill={v('shadow')}
+        opacity=".14"
+        {...(on && MOVES[bounce ? 'shadowBounce' : 'shadowFloat'])}
+      />
 
-      {/* 2. the moving mascot: pose lift outside, CSS animation inside */}
+      {/* 2. the moving mascot: pose lift outside, Motion animation inside */}
       <g transform={p.lift ? `translate(0 ${p.lift})` : undefined}>
-        <g className="mascot-move">
+        <Moving name={bounce ? 'bounce' : 'float'} on={on}>
           {/* legs + shoes */}
           <rect x="74" y="172" width="16" height="30" rx="8" fill={v('body-depth')} />
           <rect x="110" y="172" width="16" height="30" rx="8" fill={v('body-depth')} />
@@ -87,7 +132,7 @@ export default function Mascot({ pose = 'waving', size = 120, title = 'tooli mas
           <ellipse cx="120" cy="204" rx="15" ry="8" fill={url('shoe')} />
 
           {backArms.map((arm) => (
-            <Arm key={arm.d} arm={arm} handFill={url('body')} />
+            <Arm key={arm.d} arm={arm} handFill={url('body')} on={on} />
           ))}
 
           {/* body */}
@@ -96,7 +141,7 @@ export default function Mascot({ pose = 'waving', size = 120, title = 'tooli mas
           <ellipse cx="72" cy="80" rx="22" ry="8" fill={v('shine')} opacity=".3" transform="rotate(-18 72 80)" />
 
           {/* face */}
-          <g className={p.eyes.ring ? 'mascot-eyes mascot-blink' : 'mascot-eyes'}>
+          <Moving name={p.eyes.ring && 'blink'} on={on}>
             {p.eyes.ring ? (
               <>
                 <RingEye cx={80} cy={118} dx={p.eyes.ring[0][0]} dy={p.eyes.ring[0][1]} gradient={url('eye')} />
@@ -105,11 +150,11 @@ export default function Mascot({ pose = 'waving', size = 120, title = 'tooli mas
             ) : (
               <path d={p.eyes.path} {...ARC_EYES} />
             )}
-          </g>
+          </Moving>
           {p.mouth}
 
           {frontArms.map((arm) => (
-            <Arm key={arm.d} arm={arm} handFill={url('body')} />
+            <Arm key={arm.d} arm={arm} handFill={url('body')} on={on} />
           ))}
 
           {/* cap */}
@@ -125,11 +170,15 @@ export default function Mascot({ pose = 'waving', size = 120, title = 'tooli mas
             <path d="M141,51 V74" stroke={v('tassel-dark')} strokeWidth="4.5" strokeLinecap="round" />
             <circle cx="141" cy="79" r="7" fill={url('tassel')} />
           </g>
-        </g>
+        </Moving>
       </g>
 
       {/* 3. extras, outside the moving group */}
-      {p.extras}
+      {p.extras && (
+        <Moving name={p.extrasMotion} on={on}>
+          {p.extras}
+        </Moving>
+      )}
     </svg>
   )
 }

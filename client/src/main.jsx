@@ -1,10 +1,13 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
+import { MotionConfig } from 'motion/react'
 import './styles/tokens.css'
-import './styles/global.css'
+import './styles/shadcn-theme.css'
+import './styles/tailwind.css'
 import { ThemeProvider } from './theme/ThemeProvider.jsx'
 import { AuthProvider } from './auth/AuthProvider.jsx'
+import { TooltipProvider } from './components/ui/tooltip.jsx'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
@@ -12,7 +15,13 @@ createRoot(document.getElementById('root')).render(
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
-          <App />
+          {/* shadcn tooltips need one provider around the app;
+              reducedMotion="user": Motion skips movement for people who ask for less motion */}
+          <TooltipProvider>
+            <MotionConfig reducedMotion="user">
+              <App />
+            </MotionConfig>
+          </TooltipProvider>
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
