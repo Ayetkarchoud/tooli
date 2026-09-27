@@ -11,6 +11,7 @@ Built with the **MERN** stack (MongoDB, Express, React, Node).
 | `client/` | React + Vite frontend | frontend |
 | `server/` | Express + Node API, MongoDB | backend |
 | `logo/` | Logo source (Affinity) + `tooli-logo.svg` | design |
+| `docs/` | [API contract](docs/api.md) between frontend and backend | both |
 | `design/` | Old colour palette demo (the real tokens are in `client/src/styles/tokens.css`) | design |
 
 ## Getting started
@@ -24,7 +25,8 @@ npm run dev
 The frontend runs on http://localhost:5173 and forwards every `/api/*` request
 to the backend on http://localhost:5000 (see `client/vite.config.js`).
 
-More details: [client/README.md](client/README.md)
+More details: [client/README.md](client/README.md). Backend: build the routes described in
+[docs/api.md](docs/api.md). Working with Claude Code? The project rules are in [CLAUDE.md](CLAUDE.md).
 
 ## Rules
 

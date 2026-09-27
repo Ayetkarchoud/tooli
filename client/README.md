@@ -14,6 +14,10 @@ Open http://localhost:5173
 
 ## For the backend
 
+- The full API contract (every endpoint with request and response examples) is in [docs/api.md](../docs/api.md).
+- Pages get their data from `src/services/` (courses, professors, tutor, notifications, vip, search, user).
+  For now these return **fake data** after a short delay; each function has a `TODO(backend)` with the
+  real call. Pages never import mock data directly.
 - The frontend calls the API through `src/api/client.js`, always on paths starting with `/api`
   (for example `api.get('/professors')` → `GET /api/professors`).
 - In development, Vite forwards every `/api/*` request to **http://localhost:5000**
@@ -87,12 +91,13 @@ Check the new file for built-in colour classes (`bg-black/50`, `text-white`) and
 src/
   api/          calls to the Express backend
   auth/         who is logged in (fake for now) + route guards
-  components/   reusable UI (Logo, Mascot, ThemeSwitcher, Page, AnimatedOutlet)
+  components/   reusable UI (Logo, Mascot, MascotMessage, LoadState, PageLoader, ThemeSwitcher, …)
     ui/         shadcn/ui components
-  data/         sample data until the API is ready
+  data/         static app content (the list of tooli services)
   layout/       member area frame (sidebar, top bar, mobile menu, tab bar)
-  lib/          motion.js (shared animations), utils.js (cn)
-  pages/        one file per page (auth/ = login + sign up)
+  lib/          motion.js (animations), useAsync.js (load data), people.js, utils.js (cn)
+  pages/        one file per page; folders per area (auth/, tutor/, courses/, professors/, settings/)
+  services/     data functions the pages call (fake for now, see docs/api.md)
   styles/       tokens.css, shadcn-theme.css, tailwind.css
   theme/        ThemeProvider (dark mode + palette)
   App.jsx       routes

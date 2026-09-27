@@ -4,11 +4,11 @@
 // so the landing → sign up → dashboard flow can be tested without a backend.
 // Passwords are never stored or kept anywhere in the frontend.
 //
-// TODO(backend): replace the fake parts with real calls through src/api/client.js:
-//   login   → api.post('/auth/login',  { email, password })                       → returns the user
-//   signup  → api.post('/auth/signup', { firstName, lastName, email, password })  → returns the user
+// TODO(backend): replace the fake parts with real calls through src/api/client.js (contract: docs/api.md):
+//   login   → api.post('/auth/login',  { email, password })                       → { user }
+//   signup  → api.post('/auth/signup', { firstName, lastName, email, password })  → { user }
 //   logout  → api.post('/auth/logout')
-//   on load → api.get('/auth/me') to restore the session (httpOnly cookie), instead of localStorage
+//   on load → api.get('/auth/me') → { user } (or 401) to restore the session (httpOnly cookie), instead of localStorage
 // Once that is done, delete SESSION_KEY / PROFILES_KEY and the read/write helpers below.
 
 import { useCallback, useMemo, useState } from 'react'
@@ -54,7 +54,7 @@ export function AuthProvider({ children }) {
 
   const login = useCallback(
     async ({ email }) => {
-      // TODO(backend): const user = await api.post('/auth/login', { email, password })
+      // TODO(backend): const { user } = await api.post('/auth/login', { email, password })
       await fakeDelay()
       const key = email.trim().toLowerCase()
       const known = read(PROFILES_KEY)?.[key]
@@ -65,7 +65,7 @@ export function AuthProvider({ children }) {
 
   const signup = useCallback(
     async ({ firstName, lastName, email }) => {
-      // TODO(backend): const user = await api.post('/auth/signup', { firstName, lastName, email, password })
+      // TODO(backend): const { user } = await api.post('/auth/signup', { firstName, lastName, email, password })
       await fakeDelay()
       const key = email.trim().toLowerCase()
       const newUser = { firstName: firstName.trim(), lastName: lastName.trim(), email: key }

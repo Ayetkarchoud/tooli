@@ -1,9 +1,11 @@
 // Member area frame: sidebar + top bar (desktop), top bar + bottom tab bar + slide-in menu (mobile).
 
 import { useState } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Bell, Crown, Menu, Search } from 'lucide-react'
+import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
+import { getUnreadCount } from '@/services/notifications'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
@@ -55,7 +57,7 @@ function SidebarContent({ onNavigate }) {
           <strong className="text-[15px]">Go VIP</strong>
           <p className="text-xs leading-normal text-foreground/80">Unlock private sessions with top professors.</p>
           <Button asChild variant="highlight" size="sm" className="mt-1.5 rounded-lg">
-            <Link to="/dashboard/professors" onClick={onNavigate}>
+            <Link to="/dashboard/vip" onClick={onNavigate}>
               Upgrade
             </Link>
           </Button>
@@ -105,11 +107,74 @@ function MobileMenu() {
   )
 }
 
-export default function AppLayout() {
-  // TODO(backend): unread count from the API, e.g. api.get('/notifications/unread-count')
-  const unreadCount = 0
-  const bellLabel = unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'
+// Top-bar search: submits to /dashboard/search?q=… and shows the current query on that page
+function SearchBar() {
+  const navigate = useNavigate()
+  const { pathname } = useLocation()
+  const [params] = useSearchParams()
+  const urlQuery = pathname === '/dashboard/search' ? (params.get('q') ?? '') : ''
+  const [value, setValue] = useState(urlQuery)
+  // Follow the URL when it changes (back button, links), without an effect
+  const [shownQuery, setShownQuery] = useState(urlQuery)
+  if (urlQuery !== shownQuery) {
+    setShownQuery(urlQuery)
+    setValue(urlQuery)
+  }
 
+  const submit = (e) => {
+    e.preventDefault()
+    const q = value.trim()
+    if (q) navigate(`/dashboard/search?q=${encodeURIComponent(q)}`)
+  }
+
+  return (
+    <form
+      className="relative min-w-0 max-w-[420px] flex-1 max-nav:order-3 max-nav:max-w-none max-nav:basis-full"
+      role="search"
+      onSubmit={submit}
+    >
+      <Search
+        size={18}
+        className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-muted-foreground"
+        aria-hidden="true"
+      />
+      <Input
+        type="search"
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        placeholder="Search courses, professors…"
+        aria-label="Search courses, professors and tips"
+        className="h-[42px] rounded-lg bg-background pr-3.5 pl-[42px] text-sm focus-visible:border-primary focus-visible:ring-accent md:text-sm dark:bg-background"
+      />
+    </form>
+  )
+}
+
+// Bell → /dashboard/notifications. The dot shows only when something is unread.
+function NotificationBell() {
+  const { pathname } = useLocation()
+  // Checked again on every page change, so the dot goes away once notifications are read
+  const { data: unreadCount = 0 } = useAsync(getUnreadCount, [pathname])
+  const label = unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button asChild variant="tile" size="icon" className="relative">
+          <Link to="/dashboard/notifications" aria-label={label}>
+            <Bell size={20} aria-hidden="true" />
+            {unreadCount > 0 && (
+              <span className="absolute top-2 right-[9px] size-2 rounded-full bg-highlight shadow-[0_0_0_2px_var(--color-bg)]" />
+            )}
+          </Link>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
+  )
+}
+
+export default function AppLayout() {
   return (
     <div className="grid min-h-screen grid-cols-[240px_minmax(0,1fr)] max-nav:grid-cols-[minmax(0,1fr)]">
       {/* Desktop sidebar */}
@@ -125,37 +190,11 @@ export default function AppLayout() {
             <Logo height={28} />
           </Link>
 
-          <form
-            className="relative min-w-0 max-w-[420px] flex-1 max-nav:order-3 max-nav:max-w-none max-nav:basis-full"
-            role="search"
-            onSubmit={(e) => e.preventDefault()}
-          >
-            <Search
-              size={18}
-              className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <Input
-              type="search"
-              placeholder="Search courses, professors…"
-              aria-label="Search courses and professors"
-              className="h-[42px] rounded-lg bg-background pr-3.5 pl-[42px] text-sm focus-visible:border-primary focus-visible:ring-accent md:text-sm dark:bg-background"
-            />
-          </form>
+          <SearchBar />
 
           <div className="ml-auto flex items-center gap-3 max-nav:gap-2">
             <ThemeSwitcher className="max-nav:gap-1.5 max-nav:[&_[aria-pressed]]:size-5 max-xs:hidden" />
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button variant="tile" size="icon" className="relative" aria-label={bellLabel}>
-                  <Bell size={20} aria-hidden="true" />
-                  {unreadCount > 0 && (
-                    <span className="absolute top-2 right-[9px] size-2 rounded-full bg-highlight shadow-[0_0_0_2px_var(--color-bg)]" />
-                  )}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>{bellLabel}</TooltipContent>
-            </Tooltip>
+            <NotificationBell />
             <UserMenu />
           </div>
         </header>

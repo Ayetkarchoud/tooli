@@ -13,7 +13,7 @@ import { Card } from '@/components/ui/card'
 import Logo from '../components/Logo.jsx'
 import Mascot from '../components/Mascot.jsx'
 import ThemeSwitcher from '../components/ThemeSwitcher.jsx'
-import { SERVICES, servicePath } from '../data/services.js'
+import { SERVICES, servicePath } from '../data/tooliServices.js'
 
 const MotionCard = motion.create(Card)
 

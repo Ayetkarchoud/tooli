@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight, Lightbulb, RefreshCw, SendHorizontal, Star } from 'lucide-react'
+import { fullName, getInitials } from '@/lib/people'
+import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
 import { fadeUp, liftOnHover, stagger, useEntrance } from '@/lib/motion'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -9,11 +11,15 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Skeleton } from '@/components/ui/skeleton'
+import { getContinueLearning } from '@/services/courses'
+import { getTopProfessors } from '@/services/professors'
+import { getLearningTips } from '@/services/tutor'
 import Mascot from '../components/Mascot.jsx'
 import Page from '../components/Page.jsx'
+import { CardGridSkeleton } from '../components/PageLoader.jsx'
 import { useAuth } from '../auth/authContext.js'
-import { continueCourses, getInitials, learningTips, vipProfessors } from '../data/mock.js'
-import { SERVICES, servicePath } from '../data/services.js'
+import { SERVICES, servicePath } from '../data/tooliServices.js'
 
 const MotionLink = motion.create(Link)
 const MotionCard = motion.create(Card)
@@ -26,9 +32,10 @@ function getGreeting(hour) {
   return 'Good evening'
 }
 
-function randomTipIndex(exclude) {
-  let i = Math.floor(Math.random() * learningTips.length)
-  while (learningTips.length > 1 && i === exclude) i = Math.floor(Math.random() * learningTips.length)
+// Random index in [0, length), different from `exclude` when possible
+function randomIndex(length, exclude) {
+  let i = Math.floor(Math.random() * length)
+  while (length > 1 && i === exclude) i = Math.floor(Math.random() * length)
   return i
 }
 
@@ -140,20 +147,65 @@ function ServiceCard({ service, number }) {
   )
 }
 
+// A small error line with a retry button, for one dashboard section
+function SectionError({ onRetry }) {
+  return (
+    <Card className="flex-1 items-start gap-3 p-5" role="alert">
+      <p className="text-muted-foreground">This part didn’t load. Check your connection and try again.</p>
+      <Button type="button" variant="pill" size="sm" onClick={onRetry}>
+        <RefreshCw aria-hidden="true" /> Try again
+      </Button>
+    </Card>
+  )
+}
+
 function ContinueLearning() {
+  const { data: courses, error, loading, reload } = useAsync(getContinueLearning, [])
+
+  if (loading) {
+    return (
+      <Card className="flex-1 gap-0 py-0" aria-busy="true">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="flex flex-col gap-3 border-t border-border px-5 py-[18px] first:border-t-0">
+            <Skeleton className="h-3 w-24" />
+            <Skeleton className="h-4 w-3/4" />
+            <Skeleton className="h-2 w-full rounded-full" />
+          </div>
+        ))}
+        <span className="sr-only" role="status">
+          Loading your courses…
+        </span>
+      </Card>
+    )
+  }
+  if (error) return <SectionError onRetry={reload} />
+  if (courses.length === 0) {
+    return (
+      <Card className="flex-1 items-center gap-3 p-6 text-center">
+        <Mascot pose="explaining" size={72} title="" aria-hidden="true" />
+        <p className="font-semibold">No course in progress yet</p>
+        <Button asChild variant="pill" size="sm">
+          <Link to="/dashboard/courses">
+            Browse courses <ArrowRight aria-hidden="true" />
+          </Link>
+        </Button>
+      </Card>
+    )
+  }
+
   return (
     <Card className="flex-1 gap-0 py-0">
-      {continueCourses.map((c) => (
+      {courses.map((c) => (
         <div
           key={c.id}
           className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-2.5 border-t border-border px-5 py-[18px] first:border-t-0 max-[560px]:p-4"
         >
           <div>
-            <span className="text-xs font-semibold tracking-[0.04em] text-muted-foreground uppercase">{c.platform}</span>
+            <span className="text-xs font-semibold tracking-[0.04em] text-muted-foreground uppercase">{c.platform.name}</span>
             <h3 className="mt-0.5 text-[15px] font-semibold">{c.title}</h3>
           </div>
           <Button asChild variant="pill" size="sm">
-            <Link to={c.to}>
+            <Link to={`/dashboard/courses/${c.id}`} aria-label={`Resume ${c.title}`}>
               Resume <ArrowRight aria-hidden="true" />
             </Link>
           </Button>
@@ -177,7 +229,25 @@ function ContinueLearning() {
 }
 
 function TipOfTheDay() {
-  const [index, setIndex] = useState(() => randomTipIndex())
+  const { data: tips, error, loading, reload } = useAsync(getLearningTips, [])
+  // Which tip is shown; picked at random once the tips arrive
+  const [index, setIndex] = useState(null)
+  if (tips?.length && index === null) setIndex(randomIndex(tips.length))
+  const shown = tips?.[index ?? 0]
+
+  if (loading) {
+    return (
+      <Card className="flex-1 justify-between gap-6 p-6" aria-busy="true">
+        <div className="flex flex-col gap-2.5">
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-11/12" />
+          <Skeleton className="h-4 w-2/3" />
+        </div>
+        <Skeleton className="h-8 w-24 rounded-full" />
+      </Card>
+    )
+  }
+  if (error || !shown) return <SectionError onRetry={reload} />
 
   return (
     <Card className="relative flex-1 justify-between gap-6 overflow-hidden p-6">
@@ -187,21 +257,27 @@ function TipOfTheDay() {
         aria-hidden="true"
       />
       <p className="relative text-base leading-[1.6] font-semibold" aria-live="polite">
-        {learningTips[index]}
+        {shown.text}
       </p>
-      <Button type="button" variant="pill" size="sm" className="self-start" onClick={() => setIndex((i) => randomTipIndex(i))}>
+      <Button
+        type="button"
+        variant="pill"
+        size="sm"
+        className="self-start"
+        onClick={() => setIndex(randomIndex(tips.length, index))}
+      >
         <RefreshCw aria-hidden="true" /> New tip
       </Button>
     </Card>
   )
 }
 
+// The whole card opens the professor's page (stretched link on the name); so does "Book a class"
 function ProfessorCard({ prof }) {
+  const profPath = `/dashboard/professors/${prof.id}`
+
   return (
-    <MotionCard
-      className="h-full items-start gap-3 p-5 transition-shadow hover:shadow-lift"
-      {...liftOnHover}
-    >
+    <MotionCard className="relative h-full items-start gap-3 p-5 transition-shadow hover:shadow-lift" {...liftOnHover}>
       <Avatar className="size-[52px] after:hidden" aria-hidden="true">
         <AvatarFallback className="border border-highlight bg-highlight-soft text-base font-semibold text-foreground">
           {getInitials(prof)}
@@ -209,19 +285,39 @@ function ProfessorCard({ prof }) {
       </Avatar>
       <div>
         <h3 className="text-base font-semibold">
-          {prof.title} {prof.firstName} {prof.lastName}
+          <Link to={profPath} className="text-foreground no-underline after:absolute after:inset-0 after:rounded-2xl">
+            {fullName(prof)}
+          </Link>
         </h3>
-        <p className="mt-0.5 text-sm text-muted-foreground">{prof.subject}</p>
+        <p className="mt-0.5 text-sm text-muted-foreground">
+          {prof.subject} · {prof.city}
+        </p>
       </div>
       <p className="flex items-center gap-1.5 text-sm">
         <Star size={16} className="text-highlight" fill="currentColor" aria-hidden="true" />
         <strong>{prof.rating.toFixed(1)}</strong>
         <span className="text-[13px] text-muted-foreground">({prof.reviews} reviews)</span>
       </p>
-      <Button asChild className="mt-auto w-full">
-        <Link to="/dashboard/professors">Book a class</Link>
+      <Button asChild className="relative z-10 mt-auto w-full">
+        <Link to={profPath} aria-label={`Book a class with ${fullName(prof)}`}>
+          Book a class
+        </Link>
       </Button>
     </MotionCard>
+  )
+}
+
+function TopProfessors() {
+  const { data: professors, error, loading, reload } = useAsync(() => getTopProfessors(3), [])
+
+  if (loading) return <CardGridSkeleton count={3} className="h-[238px]" />
+  if (error) return <SectionError onRetry={reload} />
+  return (
+    <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4">
+      {professors.map((p) => (
+        <ProfessorCard key={p.id} prof={p} />
+      ))}
+    </div>
   )
 }
 
@@ -276,11 +372,7 @@ export default function Dashboard() {
             See all <ArrowRight size={14} aria-hidden="true" />
           </Link>
         </div>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4">
-          {vipProfessors.map((p) => (
-            <ProfessorCard key={p.id} prof={p} />
-          ))}
-        </div>
+        <TopProfessors />
       </motion.section>
     </Page>
   )
