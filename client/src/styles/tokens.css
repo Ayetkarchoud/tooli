@@ -9,6 +9,7 @@
   --brand-primary:    #3B5BDB;  /* main colour: cap, buttons, links */
   --brand-accent:     #FBBF24;  /* second colour: tassel, highlights */
   --brand-on-primary: #FFFFFF;  /* text on top of primary (buttons) */
+  --brand-on-accent:  var(--brand-ink);  /* text on top of accent */
   --brand-white:      #FFFFFF;
   --brand-night:      #0F0E2A;  /* dark backgrounds */
 
@@ -21,12 +22,46 @@
   --color-on-primary: var(--brand-on-primary);
   --color-accent:     var(--brand-accent);
   --color-border:     #E3E5F0;
+  --color-on-accent:  var(--brand-on-accent);
+  --color-danger:     #C8233F;  /* form errors (same on every palette) */
+
+  /* Soft tints (see-through, so they work on any background and in dark mode) */
+  --color-primary-soft: color-mix(in srgb, var(--color-primary) 16%, transparent);
+  --color-accent-soft:  color-mix(in srgb, var(--color-accent) 18%, transparent);
+
+  /* Primary for icons/small text on surfaces: pulled toward the text colour
+     so it stays readable on light palettes (yellow, green) and in dark mode */
+  --color-primary-strong: color-mix(in srgb, var(--color-primary) 55%, var(--color-text));
+
+  /* Card hover shadow, tinted with the primary colour */
+  --shadow-hover: 0 12px 28px -14px color-mix(in srgb, var(--color-primary) 55%, transparent);
 
   /* 3. Logo tokens (used inside tooli-logo-theme.svg) */
   --logo-ink:     var(--brand-ink);
   --logo-primary: var(--brand-primary);
   --logo-accent:  var(--brand-accent);
   --logo-eye:     var(--brand-white);
+
+  /* 4. Mascot tokens (used by src/components/Mascot.jsx).
+     Recolour the mascot by editing only these lines. */
+  --mascot-body:        var(--color-primary);
+  --mascot-body-light:  color-mix(in srgb, var(--mascot-body) 55%, white);
+  --mascot-body-dark:   color-mix(in srgb, var(--mascot-body) 72%, black);
+  --mascot-body-depth:  color-mix(in srgb, var(--mascot-body) 50%, black);
+  --mascot-ink:         var(--brand-ink);          /* eye rings, pupils, mouth */
+  --mascot-eye:         #FFFFFF;
+  --mascot-eye-shade:   #DCE3F7;
+  --mascot-cap:         #3A3680;                   /* cap top highlight */
+  --mascot-cap-dark:    #14123A;                   /* cap band, shoes */
+  --mascot-cap-edge:    var(--mascot-ink);         /* cap outline + bottom of the cap gradient */
+  --mascot-tassel:      #FBBF24;
+  --mascot-tassel-dark: #E0A100;
+  --mascot-blush:       #F43F5E;
+  --mascot-sweat:       #7FD4FF;
+  --mascot-mouth:       var(--brand-on-primary);   /* line mouths: white, or navy on light bodies */
+  --mascot-shine:       white;
+  --mascot-shadow:      black;
+  --mascot-note:        var(--color-text);         /* "..." and "z" floating beside the mascot */
 }
 
 /* ==========================================================
@@ -38,6 +73,11 @@
   --brand-primary:    #FACC15;
   --brand-accent:     #3B5BDB;
   --brand-on-primary: #1E1B4B;  /* dark text: white is unreadable on yellow */
+  --brand-on-accent:  var(--brand-white);  /* accent is blue here */
+
+  /* a gold tassel disappears on a yellow body: use the blue accent, like the logo */
+  --mascot-tassel:      var(--brand-accent);
+  --mascot-tassel-dark: color-mix(in srgb, var(--brand-accent) 70%, black);
 }
 
 [data-palette="green"] {
@@ -68,7 +108,13 @@
   --color-text:    var(--brand-white);
   --color-muted:   #A5A8C8;
   --color-border:  #2C2B5A;
+  --color-danger:  #FF8A9C;
 
   --logo-ink:     var(--brand-white);
   --logo-eye:     var(--brand-night);
+
+  /* lighter cap so it doesn't melt into the night background */
+  --mascot-cap:      #5B55C4;
+  --mascot-cap-dark: #26235F;
+  --mascot-cap-edge: #2F2B78;
 }
