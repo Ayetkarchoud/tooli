@@ -12,3 +12,11 @@ export function timeAgo(iso, now = new Date()) {
   if (minutes < 7 * 24 * 60) return date.toLocaleDateString('en-GB', { weekday: 'short' })
   return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })
 }
+
+// 45 → "45 min", 106 → "1 h 46 min", 120 → "2 h"
+export function formatDuration(minutes) {
+  const h = Math.floor(minutes / 60)
+  const m = minutes % 60
+  if (!h) return `${m} min`
+  return m ? `${h} h ${m} min` : `${h} h`
+}
