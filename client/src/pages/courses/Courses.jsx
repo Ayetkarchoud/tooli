@@ -24,6 +24,7 @@ import MascotMessage, { ErrorState } from '../../components/MascotMessage.jsx'
 import Page from '../../components/Page.jsx'
 import { CardGridSkeleton } from '../../components/PageLoader.jsx'
 import ProgressRing from '../../components/ProgressRing.jsx'
+import ChipGroup from '../../components/ChipGroup.jsx'
 import CourseCard from './CourseCard.jsx'
 
 const SORTS = [
@@ -109,42 +110,6 @@ function SearchBox({ value, onSearch }) {
         aria-label="Search courses"
         className="h-11 rounded-xl bg-card pl-10 text-sm md:text-sm dark:bg-card"
       />
-    </div>
-  )
-}
-
-// ---------- One row of filter chips ----------
-function ChipGroup({ label, options, value, onChange }) {
-  return (
-    <div className="flex items-center gap-3 max-md:flex-col max-md:items-start max-md:gap-1.5">
-      <span className="w-20 shrink-0 text-xs font-semibold tracking-[0.04em] text-muted-foreground uppercase" id={`chips-${label}`}>
-        {label}
-      </span>
-      <div
-        role="group"
-        aria-labelledby={`chips-${label}`}
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0"
-      >
-        {[{ value: '', label: 'All' }, ...options].map((o) => {
-          const active = value === o.value
-          return (
-            <button
-              key={o.value || 'all'}
-              type="button"
-              aria-pressed={active}
-              onClick={() => onChange(o.value)}
-              className={cn(
-                'shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-semibold whitespace-nowrap transition-colors',
-                active
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border bg-card text-foreground hover:border-primary hover:bg-accent',
-              )}
-            >
-              {o.label}
-            </button>
-          )
-        })}
-      </div>
     </div>
   )
 }

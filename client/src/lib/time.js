@@ -20,3 +20,26 @@ export function formatDuration(minutes) {
   if (!h) return `${m} min`
   return m ? `${h} h ${m} min` : `${h} h`
 }
+
+// 'YYYY-MM-DD' → "Today", "Tomorrow", "Sat 3 Oct"
+export function formatSlotDay(isoDate, now = new Date()) {
+  const [y, m, d] = isoDate.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const diff = Math.round((date - today) / 86_400_000)
+  if (diff === 0) return 'Today'
+  if (diff === 1) return 'Tomorrow'
+  return date.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })
+}
+
+// 'YYYY-MM-DD' → { weekday: 'Sat', day: 3, month: 'Oct' } (for day pickers)
+export function dayParts(isoDate) {
+  const [y, m, d] = isoDate.split('-').map(Number)
+  const date = new Date(y, m - 1, d)
+  return {
+    weekday: date.toLocaleDateString('en-GB', { weekday: 'short' }),
+    day: d,
+    month: date.toLocaleDateString('en-GB', { month: 'short' }),
+    long: date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }),
+  }
+}
