@@ -11,7 +11,7 @@ Built with the **MERN** stack (MongoDB, Express, React, Node).
 | `client/` | React + Vite frontend | frontend |
 | `server/` | Express + Node API, MongoDB | backend |
 | `logo/` | Logo source (Affinity) + `tooli-logo.svg` | design |
-| `design/` | Colour palette demo | design |
+| `design/` | Old colour palette demo (the real tokens are in `client/src/styles/tokens.css`) | design |
 
 ## Getting started
 
