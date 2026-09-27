@@ -1,0 +1,465 @@
+/* Public landing page. Colours only through tokens (tokens.css), never raw hex. */
+
+.landing {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: clip;
+}
+
+.landing main {
+  flex: 1;
+}
+
+/* :where() keeps this reset at zero specificity, so any class below overrides it */
+:where(.landing) :is(h1, h2, h3, p) {
+  margin: 0;
+}
+
+.landing-wrap {
+  width: 100%;
+  max-width: 1160px;
+  margin: 0 auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.landing a:focus-visible,
+.landing button:focus-visible {
+  outline: 2px solid var(--color-primary-strong);
+  outline-offset: 2px;
+}
+
+/* ---------- Header ---------- */
+.landing-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: color-mix(in srgb, var(--color-bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.landing-header-row {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.landing-logo {
+  display: inline-flex;
+  border-radius: 10px;
+}
+
+.landing-menu {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.landing-auth {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.menu-btn {
+  display: none;
+  margin-left: auto;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  align-items: center;
+  gap: 40px;
+  padding-top: 64px;
+  padding-bottom: 72px;
+}
+
+.hero-kicker {
+  display: inline-block;
+  margin-bottom: 18px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.hero h1 {
+  font-size: clamp(34px, 5.6vw, 58px);
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+}
+
+/* Brand word underlined with the accent, like the tassel on the logo */
+.hero-brand {
+  color: var(--color-primary-strong);
+  background: linear-gradient(transparent 70%, var(--color-accent-soft) 70%);
+  padding: 0 4px;
+}
+
+.hero-lead {
+  margin-top: 18px;
+  max-width: 520px;
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--color-muted);
+}
+
+.hero-actions {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hero-art {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 300px;
+}
+
+.hero-art svg {
+  position: relative;
+}
+
+.hero-halo {
+  position: absolute;
+  width: min(340px, 100%);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 30%, var(--color-accent-soft), transparent 60%),
+    var(--color-primary-soft);
+}
+
+/* ---------- Sections ---------- */
+.landing-section {
+  padding-top: 40px;
+  padding-bottom: 56px;
+}
+
+.landing-title {
+  font-size: clamp(24px, 3.4vw, 32px);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.landing-sub {
+  margin-top: 6px;
+  margin-bottom: 28px;
+  color: var(--color-muted);
+}
+
+/* Service teasers */
+.teaser-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.teaser {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px;
+}
+
+.teaser.is-soon {
+  border-style: dashed;
+}
+
+.teaser-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.teaser-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.teaser.is-soon .teaser-icon {
+  opacity: 0.7;
+}
+
+.teaser h3 {
+  font-size: 17px;
+}
+
+.teaser p {
+  flex: 1;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+.teaser-link {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: var(--color-primary-soft);
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s;
+}
+
+.teaser-link:hover {
+  background: color-mix(in srgb, var(--color-primary) 28%, transparent);
+}
+
+/* How it works */
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.step {
+  position: relative;
+  padding: 24px 22px;
+  border-radius: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+.step-num {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-weight: 800;
+  font-size: 17px;
+}
+
+.step h3 {
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+
+.step p {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-muted);
+}
+
+/* Call-to-action band */
+.cta-band {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  margin-bottom: 64px;
+  padding: 28px 36px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 90% 10%, var(--color-accent-soft), transparent 45%),
+    var(--color-primary-soft);
+  border: 1px solid var(--color-border);
+}
+
+.cta-band svg {
+  flex-shrink: 0;
+}
+
+.cta-copy {
+  flex: 1;
+}
+
+.cta-copy h2 {
+  font-size: clamp(24px, 3.2vw, 30px);
+  font-weight: 800;
+}
+
+.cta-copy p {
+  margin-top: 6px;
+  color: var(--color-muted);
+}
+
+/* ---------- Footer ---------- */
+.landing-footer {
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+}
+
+.footer-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px 28px;
+  padding-top: 22px;
+  padding-bottom: 22px;
+}
+
+.footer-links {
+  display: flex;
+  gap: 20px;
+}
+
+.footer-links a {
+  color: var(--color-muted);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  color: var(--color-text);
+}
+
+.footer-copy {
+  margin-left: auto;
+  color: var(--color-muted);
+  font-size: 13px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1023px) {
+  .teaser-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  .landing-wrap,
+  .landing-header-row {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  /* Header collapses into a menu button */
+  .landing-header-row {
+    flex-wrap: wrap;
+  }
+
+  .menu-btn {
+    display: grid;
+  }
+
+  .landing-menu {
+    display: none;
+    flex-basis: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 8px 0 12px;
+  }
+
+  .landing-header.is-open .landing-menu {
+    display: flex;
+  }
+
+  .landing-menu .theme-switcher {
+    justify-content: center;
+  }
+
+  .landing-auth {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .landing-auth .btn-text {
+    box-shadow: inset 0 0 0 1.5px var(--color-border);
+  }
+
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding-top: 28px;
+    padding-bottom: 40px;
+    text-align: center;
+  }
+
+  .hero-art {
+    order: -1;
+    min-height: 220px;
+  }
+
+  .hero-art svg {
+    width: 170px;
+    height: auto;
+  }
+
+  .hero-halo {
+    width: 220px;
+  }
+
+  .hero-lead {
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 16px;
+  }
+
+  .hero-actions {
+    justify-content: center;
+  }
+
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cta-band {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+    padding: 28px 20px;
+    margin-bottom: 40px;
+  }
+
+  .footer-row {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .footer-copy {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 479px) {
+  .teaser-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-actions .btn {
+    flex: 1 1 100%;
+  }
+}

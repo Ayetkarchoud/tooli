@@ -1,36 +1,50 @@
-import Logo from './components/Logo.jsx'
-import ThemeSwitcher from './components/ThemeSwitcher.jsx'
-
-// Placeholder home: the real dashboard design comes next
-const SERVICES = [
-  { icon: '💬', title: 'AI tutor', text: 'Ask any question and get an answer.' },
-  { icon: '📚', title: 'Partner courses', text: 'The best e-learning platforms, in one place.' },
-  { icon: '⭐', title: 'VIP professors', text: 'Learn with the best professors in Tunisia.' },
-]
+import { Route, Routes } from 'react-router-dom'
+import { PrivateRoute, PublicOnlyRoute } from './auth/RouteGuards.jsx'
+import AppLayout from './layout/AppLayout.jsx'
+import Dashboard from './pages/Dashboard.jsx'
+import Landing from './pages/Landing.jsx'
+import MascotPreview from './pages/MascotPreview.jsx'
+import NotFound from './pages/NotFound.jsx'
+import Placeholder from './pages/Placeholder.jsx'
+import Login from './pages/auth/Login.jsx'
+import Signup from './pages/auth/Signup.jsx'
 
 export default function App() {
   return (
-    <>
-      <header className="topbar">
-        <Logo height={36} />
-        <ThemeSwitcher />
-      </header>
+    <Routes>
+      {/* Visitors only: logged-in users are sent to /dashboard */}
+      <Route element={<PublicOnlyRoute />}>
+        <Route index element={<Landing />} />
+        <Route path="login" element={<Login />} />
+        <Route path="signup" element={<Signup />} />
+      </Route>
 
-      <main className="page">
-        <h1>Welcome to tooli</h1>
-        <p className="muted">Everything you need to learn, in one place.</p>
+      {/* Members only: visitors are sent to /login?next=... */}
+      <Route path="dashboard" element={<PrivateRoute />}>
+        <Route element={<AppLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route
+            path="tutor"
+            element={<Placeholder title="AI tutor" text="Ask any question and get a clear answer, any time." />}
+          />
+          <Route
+            path="courses"
+            element={<Placeholder title="Partner courses" text="The best e-learning platforms, gathered in one place." />}
+          />
+          <Route
+            path="professors"
+            element={<Placeholder title="VIP professors" text="Book private sessions with the best professors in Tunisia." />}
+          />
+          <Route
+            path="settings"
+            element={<Placeholder title="Settings" text="Manage your profile, theme and notifications." />}
+          />
+        </Route>
+      </Route>
 
-        <div className="services">
-          {SERVICES.map((s) => (
-            <article key={s.title} className="service-card">
-              <span className="service-icon">{s.icon}</span>
-              <h2>{s.title}</h2>
-              <p className="muted">{s.text}</p>
-              <button type="button" className="btn">Open</button>
-            </article>
-          ))}
-        </div>
-      </main>
-    </>
+      {/* dev: preview every mascot pose (public) */}
+      <Route path="mascot" element={<MascotPreview />} />
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   )
 }

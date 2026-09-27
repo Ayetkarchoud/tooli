@@ -1,0 +1,537 @@
+/* Dashboard page. Colours only through tokens (tokens.css), never raw hex. */
+
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 36px;
+  max-width: 1200px;
+}
+
+.dashboard h1,
+.dashboard h2,
+.dashboard h3,
+.dashboard p {
+  margin: 0;
+}
+
+.dashboard .section-title {
+  margin-bottom: 14px;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.see-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--color-primary-strong);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ---------- Fade-in on load ---------- */
+.reveal {
+  animation: fade-up 0.45s ease-out both;
+  animation-delay: calc(var(--i, 0) * 80ms);
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- 1. Greeting ---------- */
+.greeting {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.greeting svg {
+  flex-shrink: 0;
+}
+
+.greeting h1 {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.dashboard .greeting-date {
+  margin-top: 4px;
+  color: var(--color-muted);
+}
+
+/* ---------- 2. Ask tooli anything ---------- */
+.ask-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 28px;
+  border-radius: 16px;
+  border: 1px solid var(--color-primary);
+  background:
+    linear-gradient(135deg, var(--color-primary-soft), var(--color-accent-soft)),
+    var(--color-surface);
+}
+
+.ask-head h2 {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.ask-head .muted {
+  margin-top: 4px;
+}
+
+.ask-form {
+  display: flex;
+  gap: 10px;
+}
+
+.ask-form input {
+  flex: 1;
+  min-width: 0;
+  height: 58px;
+  padding: 0 20px;
+  border-radius: 14px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: 400 16px 'Poppins', system-ui, sans-serif;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.ask-form input::placeholder {
+  color: var(--color-muted);
+}
+
+.ask-form input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-primary-soft);
+}
+
+.ask-send {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 58px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font: 600 15px 'Poppins', system-ui, sans-serif;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+}
+
+.ask-send:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.ask-send:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ask-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: 400 13px 'Poppins', system-ui, sans-serif;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.chip:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+/* ---------- 3. Services ---------- */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.service-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 20px;
+  color: var(--color-text);
+  text-decoration: none;
+  transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+}
+
+.service-card.is-link:hover {
+  transform: translateY(-4px);
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-hover);
+}
+
+.service-card.is-soon {
+  border-style: dashed;
+}
+
+.service-card.is-soon .service-icon {
+  opacity: 0.7;
+}
+
+.service-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.service-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.step-number {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid var(--color-primary-strong);
+  color: var(--color-primary-strong);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+
+.service-body {
+  flex: 1;
+}
+
+.service-body h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.service-body .muted {
+  margin-top: 4px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.service-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-primary-strong);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.service-cta svg {
+  transition: transform 0.2s;
+}
+
+.service-card.is-link:hover .service-cta svg {
+  transform: translateX(4px);
+}
+
+/* ---------- 4. Continue learning + tip ---------- */
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 24px;
+}
+
+.split > section {
+  display: flex;
+  flex-direction: column;
+}
+
+.split .card {
+  flex: 1;
+}
+
+.course-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.course-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px 16px;
+  padding: 18px 20px;
+}
+
+.course-row + .course-row {
+  border-top: 1px solid var(--color-border);
+}
+
+.course-platform {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+.course-info h3 {
+  margin-top: 2px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.progress {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress-track {
+  flex: 1;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--color-primary);
+}
+
+.progress-value {
+  min-width: 38px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Small outlined pill: Resume, New tip */
+.pill-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text);
+  font: 600 13px 'Poppins', system-ui, sans-serif;
+  text-decoration: none;
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.pill-link:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+.tip-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.corner-icon {
+  position: absolute;
+  top: -14px;
+  right: -14px;
+  color: var(--color-primary);
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.tip-text {
+  position: relative;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+
+/* ---------- 5. VIP professors ---------- */
+.prof-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.prof-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 20px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.prof-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-hover);
+}
+
+.prof-avatar {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-accent-soft);
+  border: 1px solid var(--color-accent);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.prof-card h3 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.prof-card .muted {
+  margin-top: 2px;
+  font-size: 14px;
+}
+
+.prof-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.prof-rating .star {
+  color: var(--color-accent);
+}
+
+.prof-rating .muted {
+  margin: 0;
+  font-size: 13px;
+}
+
+.prof-btn {
+  margin-top: auto;
+  width: 100%;
+}
+
+/* ---------- Focus ---------- */
+.dashboard a:focus-visible,
+.dashboard button:focus-visible,
+.dashboard input:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1023px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard {
+    gap: 28px;
+  }
+
+  .greeting {
+    gap: 12px;
+  }
+
+  .greeting svg {
+    width: 52px;
+    height: auto;
+  }
+
+  .greeting h1 {
+    font-size: 22px;
+  }
+
+  .ask-card {
+    padding: 20px;
+  }
+
+  .ask-head h2 {
+    font-size: 19px;
+  }
+
+  .ask-form input,
+  .ask-send {
+    height: 52px;
+  }
+
+  /* Icon-only send button on small phones */
+  .ask-send {
+    width: 52px;
+    padding: 0;
+  }
+
+  .ask-send span {
+    display: none;
+  }
+
+  .course-row {
+    padding: 16px;
+  }
+}
+
+/* ---------- Reduced motion: no fade, no lift, no slide ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
+  }
+
+  .service-card,
+  .service-cta svg,
+  .prof-card,
+  .ask-send {
+    transition: none;
+  }
+
+  .service-card.is-link:hover,
+  .prof-card:hover,
+  .ask-send:hover:not(:disabled),
+  .service-card.is-link:hover .service-cta svg {
+    transform: none;
+  }
+}
