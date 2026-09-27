@@ -2,11 +2,11 @@ import { createContext, useContext } from 'react'
 
 // Must match the [data-palette] blocks in src/styles/tokens.css
 export const PALETTES = [
-  { id: 'blue', label: 'Blue', swatch: '#3B5BDB' },
-  { id: 'yellow', label: 'Yellow', swatch: '#FACC15' },
-  { id: 'green', label: 'Light green', swatch: '#4ADE80' },
-  { id: 'red', label: 'Red', swatch: '#F43F5E' },
-  { id: 'violet', label: 'Violet', swatch: '#7C3AED' },
+  { id: 'blue', label: 'Blue', swatch: 'var(--palette-blue)' },
+  { id: 'yellow', label: 'Yellow', swatch: 'var(--palette-yellow)' },
+  { id: 'green', label: 'Light green', swatch: 'var(--palette-green)' },
+  { id: 'red', label: 'Red', swatch: 'var(--palette-red)' },
+  { id: 'violet', label: 'Violet', swatch: 'var(--palette-violet)' },
 ]
 
 export const ThemeContext = createContext(null)

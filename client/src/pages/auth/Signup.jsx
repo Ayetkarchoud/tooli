@@ -1,5 +1,6 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { safeNext, useAuth } from '../../auth/authContext.js'
+import { Button } from '@/components/ui/button'
 import AuthShell from './AuthShell.jsx'
 import Field, { EMAIL_PATTERN } from './Field.jsx'
 import { useAuthForm } from './useAuthForm.js'
@@ -49,8 +50,8 @@ export default function Signup() {
         </>
       }
     >
-      <form className="auth-form" onSubmit={handleSubmit} noValidate>
-        <div className="field-row">
+      <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
+        <div className="grid grid-cols-2 gap-3 max-xs:grid-cols-1">
           <Field label="First name" autoComplete="given-name" {...field('firstName')} />
           <Field label="Last name" autoComplete="family-name" {...field('lastName')} />
         </div>
@@ -65,14 +66,14 @@ export default function Signup() {
         />
 
         {formError && (
-          <p className="form-error" role="alert">
+          <p className="rounded-md bg-destructive/12 px-3.5 py-2.5 text-sm font-semibold text-destructive" role="alert">
             {formError}
           </p>
         )}
 
-        <button type="submit" className="btn btn-lg auth-submit" disabled={busy}>
+        <Button type="submit" size="lg" className="mt-1 w-full" disabled={busy}>
           {busy ? 'Creating your account…' : 'Create my account'}
-        </button>
+        </Button>
       </form>
     </AuthShell>
   )
