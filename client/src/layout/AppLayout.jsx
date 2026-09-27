@@ -106,6 +106,10 @@ function MobileMenu() {
 }
 
 export default function AppLayout() {
+  // TODO(backend): unread count from the API, e.g. api.get('/notifications/unread-count')
+  const unreadCount = 0
+  const bellLabel = unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'
+
   return (
     <div className="grid min-h-screen grid-cols-[240px_minmax(0,1fr)] max-nav:grid-cols-[minmax(0,1fr)]">
       {/* Desktop sidebar */}
@@ -143,12 +147,14 @@ export default function AppLayout() {
             <ThemeSwitcher className="max-nav:gap-1.5 max-nav:[&_[aria-pressed]]:size-5 max-xs:hidden" />
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="tile" size="icon" className="relative" aria-label="Notifications">
+                <Button variant="tile" size="icon" className="relative" aria-label={bellLabel}>
                   <Bell size={20} aria-hidden="true" />
-                  <span className="absolute top-2 right-[9px] size-2 rounded-full bg-highlight shadow-[0_0_0_2px_var(--color-bg)]" />
+                  {unreadCount > 0 && (
+                    <span className="absolute top-2 right-[9px] size-2 rounded-full bg-highlight shadow-[0_0_0_2px_var(--color-bg)]" />
+                  )}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent>Notifications</TooltipContent>
+              <TooltipContent>{bellLabel}</TooltipContent>
             </Tooltip>
             <UserMenu />
           </div>
