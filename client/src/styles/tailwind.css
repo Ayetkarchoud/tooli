@@ -75,6 +75,12 @@
   }
   html {
     @apply font-sans;
+    /* native scrollbars and form controls follow our light/dark theme, tinted with our tokens */
+    color-scheme: light;
+    scrollbar-color: var(--color-border) transparent;
+  }
+  [data-theme="dark"] {
+    color-scheme: dark;
   }
   body {
     @apply bg-background text-foreground;

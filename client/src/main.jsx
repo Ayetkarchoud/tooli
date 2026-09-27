@@ -7,6 +7,7 @@ import './styles/shadcn-theme.css'
 import './styles/tailwind.css'
 import { ThemeProvider } from './theme/ThemeProvider.jsx'
 import { AuthProvider } from './auth/AuthProvider.jsx'
+import { Toaster } from './components/ui/sonner.jsx'
 import { TooltipProvider } from './components/ui/tooltip.jsx'
 import App from './App.jsx'
 
@@ -20,6 +21,8 @@ createRoot(document.getElementById('root')).render(
           <TooltipProvider>
             <MotionConfig reducedMotion="user">
               <App />
+              {/* toasts: toast('…') from 'sonner'. On phones they sit above the bottom tab bar */}
+              <Toaster position="bottom-center" mobileOffset={{ bottom: 88 }} />
             </MotionConfig>
           </TooltipProvider>
         </BrowserRouter>

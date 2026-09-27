@@ -47,7 +47,8 @@ If something here is awkward to build, tell me and we'll change the contract tog
 | PUT | `/api/users/me/profile` | Update profile details |
 | GET | `/api/users/me/settings/notifications` | Notification preferences |
 | PUT | `/api/users/me/settings/notifications` | Update notification preferences |
-| GET | `/api/courses` | Course catalogue (filters) |
+| GET | `/api/courses` | Course catalogue (filters + sort) |
+| GET | `/api/courses/filters` | Subjects, levels and platforms for the filters |
 | GET | `/api/courses/continue` | Courses the user has started |
 | GET | `/api/courses/:courseId` | One course with its lessons |
 | PUT | `/api/courses/:courseId/lessons/:lessonId` | Mark a lesson done / not done |
@@ -163,12 +164,15 @@ Courses come from 4 partner platforms. The **course** object:
 ```json
 {
   "id": "algebra-basics",
-  "platform": { "id": "learnsphere", "name": "LearnSphere", "cover": "blue" },
+  "platform": { "id": "learnsphere", "name": "LearnSphere", "cover": "blue", "url": "https://learnsphere.example" },
   "title": "Algebra basics: equations and inequalities",
   "subject": "Mathematics",
   "level": "Bac",
   "rating": 4.8,
   "reviews": 412,
+  "publishedAt": "2026-05-30T09:00:00.000Z",
+  "description": "Master the equations and inequalities that come up in every bac maths exam…",
+  "outcomes": ["Solve linear equations and systems with confidence", "Work with inequalities and intervals"],
   "durationMinutes": 106,
   "lessons": [
     { "id": "algebra-basics-l1", "title": "Linear equations", "minutes": 18, "done": true },
@@ -179,6 +183,8 @@ Courses come from 4 partner platforms. The **course** object:
 ```
 
 - `platform.cover` is a palette name (`blue`, `yellow`, `green`, `red`, `violet`): the frontend uses it as the card colour.
+  `platform.url` is where "Start / Resume" will send the student (the course page on the partner's site).
+- `outcomes`: 3–5 short "What you'll learn" bullets. `publishedAt` is used for the "Newest" sort.
 - `lessons[].done` and `progress` are **for the logged-in user**. `progress` is 0–100
   (percentage of lessons done, rounded), or `null` if the user hasn't started the course.
 - `durationMinutes` = sum of the lesson minutes.
@@ -191,9 +197,26 @@ Query parameters (all optional, combine freely):
 |---|---|---|
 | `subject` | `Mathematics` | Exact subject |
 | `level` | `Bac` | Exact level |
+| `platform` | `codenest` | Platform id |
 | `q` | `prepa` | Text search in title, subject and platform name (ignore case and accents: `prepa` finds `Prépa`) |
+| `sort` | `newest` | `popular` (most reviews first, the default), `newest` (`publishedAt`), `shortest` (`durationMinutes`) |
 
 Response `200`: an array of courses (`[]` if nothing matches).
+
+### GET `/api/courses/filters`
+
+The values for the filter chips, in display order:
+
+```json
+{
+  "subjects": ["Biology", "Chemistry", "Computer science", "English", "French", "Mathematics", "Physics"],
+  "levels": ["Bac", "Prépa", "University", "All levels"],
+  "platforms": [{ "id": "learnsphere", "name": "LearnSphere" }, { "id": "codenest", "name": "CodeNest" }]
+}
+```
+
+> Express tip: register `/courses/filters` and `/courses/continue` **before** `/courses/:courseId`,
+> otherwise Express treats `filters` as a course id. Same for `/professors/top`.
 
 ### GET `/api/courses/continue`
 
