@@ -21,7 +21,8 @@ Open http://localhost:5173
 - The frontend calls the API through `src/api/client.js`, always on paths starting with `/api`
   (for example `api.get('/professors')` → `GET /api/professors`).
 - In development, Vite forwards every `/api/*` request to **http://localhost:5000**
-  (see `vite.config.js`). Run Express on port 5000, or change that line.
+  (see `vite.config.js`). Run Express on port 5000, or set `API_PROXY_TARGET` to another address.
+  With Docker (`docker compose up --build` at the repo root) it points to the `server` service automatically.
 
 ## Styling: Tailwind CSS + shadcn/ui + Motion
 

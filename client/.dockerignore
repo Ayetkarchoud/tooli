@@ -1,0 +1,6 @@
+# Not copied into the Docker image (dependencies are installed inside the container)
+node_modules
+dist
+.env
+.env.*
+npm-debug.log*
