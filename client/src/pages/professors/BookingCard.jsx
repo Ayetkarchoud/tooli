@@ -24,6 +24,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useNotifications } from '../../layout/notificationsContext.js'
 
 const LOCAL_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone
 const OUTSIDE_TUNISIA = LOCAL_ZONE !== 'Africa/Tunis'
@@ -69,6 +70,7 @@ function Step({ number, title, children }) {
 }
 
 export default function BookingCard({ prof, onBooked }) {
+  const { refresh: refreshUnread } = useNotifications()
   const [version, setVersion] = useState(0) // bump to reload the free times
   const [duration, setDuration] = useState(60)
   const availability = useAsync(() => getAvailability(prof.id, { durationMinutes: duration }), [prof.id, version, duration])
@@ -94,6 +96,7 @@ export default function BookingCard({ prof, onBooked }) {
     try {
       const booking = await bookSlot(prof.id, { startsAt: selected, durationMinutes: duration })
       setConfirming(false)
+      refreshUnread() // the booking created a notification: update the 🔔 dot
       onBooked(booking)
     } catch (err) {
       setBookingError(err.message)

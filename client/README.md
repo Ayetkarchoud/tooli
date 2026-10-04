@@ -82,9 +82,22 @@ Check the new file for built-in colour classes (`bg-black/50`, `text-white`) and
 
 ## Theme and palette in code
 
-- `useTheme()` (from `src/theme/themeContext.js`) gives: `{ theme, toggleTheme, palette, setPalette }`.
+- `useTheme()` (from `src/theme/themeContext.js`) gives: `{ theme, toggleTheme, themeChoice, setThemeChoice, palette, setPalette }`.
+  `theme` is what's shown (`light` / `dark`); `themeChoice` is `light`, `dark` or `system` (no saved choice:
+  follows the device setting live). Settings → Appearance uses `setThemeChoice` and `setPalette`.
+- **Part of a page in another palette**: put `data-palette="green"` on any element. `tokens.css` recomputes
+  the palette tokens there, so buttons, links and the mascot inside use that palette (Appearance previews).
 - `src/components/Logo.jsx` (logo) and `src/components/Mascot.jsx` (mascot, poses in `mascotPoses.jsx`)
   are inline SVGs; their colours come from the `--logo-*` and `--mascot-*` tokens.
+
+## Shared helpers worth knowing
+
+- `useNotifications()` (member area only): `{ unread, refresh, setUnread }`. The 🔔 dot reads it; call
+  `refresh()` after an action that creates a notification, `setUnread(...)` after marking some as read.
+- `useAuth().updateUser({ firstName, lastName })`: update the logged-in user after the API saved it.
+- `<Highlight text={…} query={q} />` (`src/lib/highlight.jsx`): marks the matching words, ignoring case and
+  accents, as React elements (never HTML strings). `hasWord` / `matches` / `normalise` in `src/lib/text.js`.
+- `api.get(path, { …query })` (`src/api/client.js`) builds the query string and skips empty values.
 
 ## Folders
 

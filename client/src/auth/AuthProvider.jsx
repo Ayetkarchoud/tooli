@@ -75,6 +75,17 @@ export function AuthProvider({ children }) {
     [startSession],
   )
 
+  // Change fields of the logged-in user after the API saved them (e.g. the name in Settings)
+  const updateUser = useCallback((changes) => {
+    setUser((current) => {
+      if (!current) return current
+      const next = { ...current, ...changes }
+      write(SESSION_KEY, next)
+      write(PROFILES_KEY, { ...read(PROFILES_KEY), [next.email]: next }) // FAKE: so a later login keeps the new name
+      return next
+    })
+  }, [])
+
   const logout = useCallback(() => {
     // TODO(backend): await api.post('/auth/logout')
     write(SESSION_KEY, null)
@@ -82,8 +93,8 @@ export function AuthProvider({ children }) {
   }, [])
 
   const value = useMemo(
-    () => ({ user, isLoggedIn: Boolean(user), login, signup, logout }),
-    [user, login, signup, logout],
+    () => ({ user, isLoggedIn: Boolean(user), login, signup, logout, updateUser }),
+    [user, login, signup, logout, updateUser],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

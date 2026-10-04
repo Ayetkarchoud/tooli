@@ -15,7 +15,7 @@ export const isPalette = (id) => PALETTES.some((p) => p.id === id)
 
 export const ThemeContext = createContext(null)
 
-// { theme, toggleTheme, palette, setPalette }
+// { theme (light|dark, what is shown), toggleTheme, themeChoice (light|dark|system), setThemeChoice, palette, setPalette }
 export function useTheme() {
   const ctx = useContext(ThemeContext)
   if (!ctx) throw new Error('useTheme must be used inside <ThemeProvider>')

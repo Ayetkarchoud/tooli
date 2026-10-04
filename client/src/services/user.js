@@ -19,6 +19,16 @@ let notificationSettings = {
   productNews: false,
 }
 
+// Change the user's name (it lives on the user, shown everywhere). Returns the saved names;
+// the page then calls updateUser() from useAuth so the greeting and avatar change at once.
+// TODO(backend): (await api.put('/users/me', { firstName, lastName })).user
+export async function updateName({ firstName, lastName }) {
+  await wait()
+  const clean = { firstName: firstName.trim(), lastName: lastName.trim() }
+  if (!clean.firstName || !clean.lastName) throw new Error('Please enter your first and last name.')
+  return clean
+}
+
 // TODO(backend): api.get('/users/me/profile')
 export async function getProfile() {
   await wait()

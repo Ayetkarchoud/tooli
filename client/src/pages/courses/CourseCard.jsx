@@ -3,6 +3,7 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { Clock, GraduationCap, Star } from 'lucide-react'
+import Highlight from '@/lib/highlight'
 import { fadeUp, liftOnHover } from '@/lib/motion'
 import { formatDuration } from '@/lib/time'
 import { Badge } from '@/components/ui/badge'
@@ -10,7 +11,8 @@ import CourseCover from '../../components/CourseCover.jsx'
 
 const MotionLink = motion.create(Link)
 
-export default function CourseCard({ course }) {
+// `query`: optional, highlights the matching words in the subject and title (search results)
+export default function CourseCard({ course, query }) {
   const { id, title, platform, subject, level, durationMinutes, rating, reviews, progress } = course
 
   return (
@@ -28,8 +30,12 @@ export default function CourseCard({ course }) {
         </div>
 
         <div className="flex flex-1 flex-col gap-2 p-4">
-          <p className="text-xs font-semibold tracking-[0.04em] text-muted-foreground uppercase">{subject}</p>
-          <h3 className="line-clamp-2 text-base leading-snug font-semibold">{title}</h3>
+          <p className="text-xs font-semibold tracking-[0.04em] text-muted-foreground uppercase">
+            <Highlight text={subject} query={query} />
+          </p>
+          <h3 className="line-clamp-2 text-base leading-snug font-semibold">
+            <Highlight text={title} query={query} />
+          </h3>
 
           <p className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-[13px] text-muted-foreground">
             <span className="inline-flex items-center gap-1">

@@ -50,6 +50,7 @@ If something here is awkward to build, tell me and we'll change the contract tog
 | POST | `/api/auth/login` | Log in |
 | POST | `/api/auth/logout` | Log out |
 | GET | `/api/auth/me` | Who is logged in |
+| PUT | `/api/users/me` | Change the name |
 | GET | `/api/users/me/profile` | Profile details |
 | PUT | `/api/users/me/profile` | Update profile details |
 | GET | `/api/users/me/settings/notifications` | Notification preferences |
@@ -76,6 +77,7 @@ If something here is awkward to build, tell me and we'll change the contract tog
 | POST | `/api/notifications/read-all` | Mark all as read |
 | GET | `/api/vip/plans` | VIP plans |
 | GET | `/api/vip/status` | The user's VIP subscription |
+| POST | `/api/vip/waitlist` | "Notify me" when payment opens |
 | POST | `/api/vip/subscribe` | Subscribe to a plan |
 | GET | `/api/search` | Search courses, professors and tips |
 
@@ -131,6 +133,12 @@ Response `200`: `{ "user": { …user } }`, or `401` when not logged in (the app 
 
 ## User profile and settings
 
+### PUT `/api/users/me`
+
+Change the user's name (Settings → Profile). Request: `{ "firstName": "Yasmine", "lastName": "Karchoud" }`
+(both required, trimmed, not empty). Response `200`: `{ "user": { …user } }` (same shape as `/auth/me`).
+Errors: `400` empty name. The email can't be changed here.
+
 ### GET `/api/users/me/profile`
 
 Extra profile details (name and email come from `/auth/me`).
@@ -145,12 +153,18 @@ Extra profile details (name and email come from `/auth/me`).
 }
 ```
 
-`level` is one of `"Bac"`, `"Prépa"`, `"University"`, `"All levels"`.
+The frontend offers these choices (`client/src/data/profileOptions.js`); accept them, plus empty strings:
+
+- `level`: `"Collège"`, `"Bac"`, `"Prépa"`, `"University"`, `"Other"`
+- `section`: `"Mathematics"`, `"Experimental sciences"`, `"Technical sciences"`, `"Computer science"`,
+  `"Economics and management"`, `"Arts and literature"`, `"Sport"`, `"Engineering"`, `"Medicine and health"`, `"Other"`
+- `city`: one of the 24 governorate capitals (`"Tunis"`, `"Sousse"`, `"Monastir"`…)
+- `school`: free text; `bio`: free text, **200 characters max**
 
 ### PUT `/api/users/me/profile`
 
-Request: only the fields that changed, e.g. `{ "city": "Sousse" }`.
-Response `200`: the full profile (same shape as GET).
+Request: only the fields that changed, e.g. `{ "city": "Sousse", "bio": "Bac maths student" }`.
+Response `200`: the full profile (same shape as GET). Errors: `400` unknown level/section/city or bio too long.
 
 ### GET `/api/users/me/settings/notifications`
 
@@ -163,7 +177,8 @@ Response `200`: the full profile (same shape as GET).
 Request: the changed flags, e.g. `{ "dailyTip": false }`. Response `200`: all flags (same shape as GET).
 
 > Theme and colour palette are stored in the browser for now. Later we may add
-> `PUT /api/users/me/settings/appearance` with `{ "theme": "dark", "palette": "green" }`.
+> `PUT /api/users/me/settings/appearance` with `{ "theme": "dark" | "light" | "system", "palette": "green" }`
+> (`"system"` = follow the device setting).
 
 ---
 
@@ -507,6 +522,12 @@ The unread count is fetched on every page change, so keep it cheap (an index on 
 
 `{ "active": false, "planId": null, "renewsOn": null }`, or when subscribed
 `{ "active": true, "planId": "plus", "renewsOn": "2026-10-27" }` (`renewsOn` is a date, no time).
+
+### POST `/api/vip/waitlist`
+
+"Notify me" while online payment isn't ready. Request: `{ "planId": "plus" }`.
+Response `200`: `{ "planId": "plus", "joined": true }` (calling it twice is fine). Errors: `404` unknown plan.
+Later, send an email or a `system` notification when payment opens.
 
 ### POST `/api/vip/subscribe`
 

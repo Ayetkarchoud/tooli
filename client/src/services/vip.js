@@ -41,6 +41,14 @@ export async function getVipStatus() {
   return copy(subscription)
 }
 
+// "Notify me" while online payment isn't ready: remember that the student wants this plan
+// TODO(backend): api.post('/vip/waitlist', { planId })
+export async function joinVipWaitlist(planId) {
+  await wait()
+  if (!PLANS.some((p) => p.id === planId)) throw new Error('This plan does not exist.')
+  return { planId, joined: true }
+}
+
 // Payment is not handled yet: the real API will return a checkout step first.
 // TODO(backend): api.post('/vip/subscribe', { planId })
 export async function subscribe(planId) {

@@ -3,9 +3,11 @@
    No colours are defined here: every line points to a token,
    so the 5 palettes and dark mode recolour shadcn components too.
    Import this AFTER tokens.css.
+   Also on [data-palette] elements, so nested palette previews recolour shadcn components.
    ========================================================== */
 
-:root {
+:root,
+[data-palette] {
   --background:           var(--color-bg);
   --foreground:           var(--color-text);
   --card:                 var(--color-surface);

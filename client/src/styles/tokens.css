@@ -10,11 +10,12 @@
   --palette-green:  #4ADE80;
   --palette-red:    #E11D48;  /* deep enough for white button text (4.7:1) */
   --palette-violet: #7C3AED;
+  --palette-amber:  #FBBF24;  /* the default accent (tassel, highlights) */
 
   /* 1. Brand palette (raw colours) */
   --brand-ink:        #1E1B4B;  /* navy: text, logo letters */
   --brand-primary:    var(--palette-blue);  /* main colour: cap, buttons, links */
-  --brand-accent:     #FBBF24;  /* second colour: tassel, highlights */
+  --brand-accent:     var(--palette-amber);  /* second colour: tassel, highlights */
   --brand-on-primary: #FFFFFF;  /* text on top of primary (buttons) */
   --brand-on-accent:  var(--brand-ink);  /* text on top of accent */
   --brand-white:      #FFFFFF;
@@ -68,7 +69,7 @@
   --mascot-cap:         #3A3680;                   /* cap top highlight */
   --mascot-cap-dark:    #14123A;                   /* cap band, shoes */
   --mascot-cap-edge:    var(--mascot-ink);         /* cap outline + bottom of the cap gradient */
-  --mascot-tassel:      #FBBF24;
+  --mascot-tassel:      var(--palette-amber);
   --mascot-tassel-dark: #E0A100;
   --mascot-blush:       #F43F5E;
   --mascot-sweat:       #7FD4FF;
@@ -81,13 +82,50 @@
 /* ==========================================================
    Colour palettes: <html data-palette="...">
    Blue is the default (no attribute needed).
+
+   A data-palette attribute also works on any element, to show part of the page in another
+   palette (Settings → Appearance previews). Custom properties are computed where they are
+   declared, so the tokens built from the brand colours must be declared again on that element:
+   that's this first block. The palette blocks below then only change the brand colours.
    ========================================================== */
+
+[data-palette] {
+  /* defaults that some palettes change */
+  --brand-accent:       var(--palette-amber);
+  --brand-on-primary:   var(--brand-white);
+  --brand-on-accent:    var(--brand-ink);
+  --primary-strong-mix: 55%;
+  --mascot-tassel:      var(--palette-amber);
+  --mascot-tassel-dark: #E0A100;
+
+  /* tokens built from the brand colours (same formulas as in :root) */
+  --color-primary:        var(--brand-primary);
+  --color-on-primary:     var(--brand-on-primary);
+  --color-accent:         var(--brand-accent);
+  --color-on-accent:      var(--brand-on-accent);
+  --color-primary-soft:   color-mix(in srgb, var(--color-primary) 16%, transparent);
+  --color-accent-soft:    color-mix(in srgb, var(--color-accent) 18%, transparent);
+  --color-primary-strong: color-mix(in srgb, var(--color-primary) var(--primary-strong-mix), var(--color-text));
+  --shadow-hover:         0 12px 28px -14px color-mix(in srgb, var(--color-primary) 55%, transparent);
+  --logo-primary:         var(--brand-primary);
+  --logo-accent:          var(--brand-accent);
+  --mascot-body:          var(--color-primary);
+  --mascot-body-light:    color-mix(in srgb, var(--mascot-body) 55%, white);
+  --mascot-body-dark:     color-mix(in srgb, var(--mascot-body) 72%, black);
+  --mascot-body-depth:    color-mix(in srgb, var(--mascot-body) 50%, black);
+  --mascot-mouth:         var(--brand-on-primary);
+}
+
+/* Blue needs its own block only for nested previews inside another palette */
+[data-palette="blue"] {
+  --brand-primary: var(--palette-blue);
+}
 
 [data-palette="yellow"] {
   --brand-primary:    var(--palette-yellow);
   --primary-strong-mix: 38%;  /* keeps yellow links/icons readable (4.5:1) on light backgrounds */
   --brand-accent:     var(--palette-blue);
-  --brand-on-primary: #1E1B4B;  /* dark text: white is unreadable on yellow */
+  --brand-on-primary: var(--brand-ink);  /* dark text: white is unreadable on yellow */
   --brand-on-accent:  var(--brand-white);  /* accent is blue here */
 
   /* a gold tassel disappears on a yellow body: use the blue accent, like the logo */
@@ -98,20 +136,15 @@
 [data-palette="green"] {
   --brand-primary:    var(--palette-green);
   --primary-strong-mix: 45%;
-  --brand-accent:     #FBBF24;
-  --brand-on-primary: #1E1B4B;  /* dark text: white is unreadable on light green */
+  --brand-on-primary: var(--brand-ink);  /* dark text: white is unreadable on light green */
 }
 
 [data-palette="red"] {
   --brand-primary:    var(--palette-red);
-  --brand-accent:     #FBBF24;
-  --brand-on-primary: #FFFFFF;
 }
 
 [data-palette="violet"] {
   --brand-primary:    var(--palette-violet);
-  --brand-accent:     #FBBF24;
-  --brand-on-primary: #FFFFFF;
 }
 
 /* ==========================================================

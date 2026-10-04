@@ -3,9 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { Bell, Crown, Menu, Search } from 'lucide-react'
-import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
-import { getUnreadCount } from '@/services/notifications'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
@@ -13,7 +11,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import AnimatedOutlet from '../components/AnimatedOutlet.jsx'
 import Logo from '../components/Logo.jsx'
 import ThemeSwitcher from '../components/ThemeSwitcher.jsx'
+import { NotificationsProvider } from './NotificationsProvider.jsx'
 import UserMenu from './UserMenu.jsx'
+import { useNotifications } from './notificationsContext.js'
 import { MAIN_NAV, SETTINGS_NAV } from './navItems.js'
 
 // Text stays foreground on the active link so it is readable on every palette (yellow, green…)
@@ -152,9 +152,8 @@ function SearchBar() {
 
 // Bell → /dashboard/notifications. The dot shows only when something is unread.
 function NotificationBell() {
-  const { pathname } = useLocation()
-  // Checked again on every page change, so the dot goes away once notifications are read
-  const { data: unreadCount = 0 } = useAsync(getUnreadCount, [pathname])
+  // Shared count (NotificationsProvider): marking notifications as read updates the dot instantly
+  const { unread: unreadCount } = useNotifications()
   const label = unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'
 
   return (
@@ -192,46 +191,48 @@ export default function AppLayout() {
   }, [])
 
   return (
-    <div ref={rootRef} className="grid min-h-screen grid-cols-[240px_minmax(0,1fr)] max-nav:grid-cols-[minmax(0,1fr)]">
-      {/* Desktop sidebar */}
-      <aside className="sticky top-0 flex h-screen flex-col gap-6 overflow-y-auto border-r border-border bg-card px-4 py-5 max-nav:hidden">
-        <SidebarContent />
-      </aside>
+    <NotificationsProvider>
+      <div ref={rootRef} className="grid min-h-screen grid-cols-[240px_minmax(0,1fr)] max-nav:grid-cols-[minmax(0,1fr)]">
+        {/* Desktop sidebar */}
+        <aside className="sticky top-0 flex h-screen flex-col gap-6 overflow-y-auto border-r border-border bg-card px-4 py-5 max-nav:hidden">
+          <SidebarContent />
+        </aside>
 
-      <div className="flex min-w-0 flex-col">
-        {/* Mobile: row 1 = menu + logo + actions, row 2 = full-width search */}
-        <header ref={headerRef} className="sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-card px-6 py-3 max-nav:flex-wrap max-nav:gap-x-3 max-nav:gap-y-2.5 max-nav:px-4 max-nav:py-2.5">
-          <MobileMenu />
-          <Link to="/dashboard" className="hidden rounded-lg max-nav:inline-flex" aria-label="tooli dashboard">
-            <Logo height={28} />
-          </Link>
+        <div className="flex min-w-0 flex-col">
+          {/* Mobile: row 1 = menu + logo + actions, row 2 = full-width search */}
+          <header ref={headerRef} className="sticky top-0 z-10 flex items-center gap-4 border-b border-border bg-card px-6 py-3 max-nav:flex-wrap max-nav:gap-x-3 max-nav:gap-y-2.5 max-nav:px-4 max-nav:py-2.5">
+            <MobileMenu />
+            <Link to="/dashboard" className="hidden rounded-lg max-nav:inline-flex" aria-label="tooli dashboard">
+              <Logo height={28} />
+            </Link>
 
-          <SearchBar />
+            <SearchBar />
 
-          <div className="ml-auto flex items-center gap-3 max-nav:gap-2">
-            <ThemeSwitcher className="max-nav:gap-1.5 max-nav:[&_[aria-pressed]]:size-5 max-xs:hidden" />
-            <NotificationBell />
-            <UserMenu />
-          </div>
-        </header>
+            <div className="ml-auto flex items-center gap-3 max-nav:gap-2">
+              <ThemeSwitcher className="max-nav:gap-1.5 max-nav:[&_[aria-pressed]]:size-5 max-xs:hidden" />
+              <NotificationBell />
+              <UserMenu />
+            </div>
+          </header>
 
-        <main className="flex-1 max-nav:pb-[calc(72px+env(safe-area-inset-bottom))]">
-          <AnimatedOutlet pageKey={memberPageKey} />
-        </main>
+          <main className="flex-1 max-nav:pb-[calc(72px+env(safe-area-inset-bottom))]">
+            <AnimatedOutlet pageKey={memberPageKey} />
+          </main>
+        </div>
+
+        {/* Mobile bottom tab bar */}
+        <nav
+          className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-border bg-card px-2 pt-1.5 pb-[calc(6px+env(safe-area-inset-bottom))] nav:hidden"
+          aria-label="Main"
+        >
+          {MAIN_NAV.map(({ to, short, icon: Icon, end }) => (
+            <NavLink key={to} to={to} end={end} className={tabLinkClass}>
+              <Icon size={22} aria-hidden="true" />
+              <span>{short}</span>
+            </NavLink>
+          ))}
+        </nav>
       </div>
-
-      {/* Mobile bottom tab bar */}
-      <nav
-        className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-border bg-card px-2 pt-1.5 pb-[calc(6px+env(safe-area-inset-bottom))] nav:hidden"
-        aria-label="Main"
-      >
-        {MAIN_NAV.map(({ to, short, icon: Icon, end }) => (
-          <NavLink key={to} to={to} end={end} className={tabLinkClass}>
-            <Icon size={22} aria-hidden="true" />
-            <span>{short}</span>
-          </NavLink>
-        ))}
-      </nav>
-    </div>
+    </NotificationsProvider>
   )
 }

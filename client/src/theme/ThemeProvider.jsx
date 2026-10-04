@@ -22,7 +22,8 @@ function read(key) {
 
 function save(key, value) {
   try {
-    localStorage.setItem(key, value)
+    if (value === null) localStorage.removeItem(key)
+    else localStorage.setItem(key, value)
   } catch {
     // storage blocked (private mode): the choice just won't be remembered
   }
@@ -70,6 +71,19 @@ export function ThemeProvider({ children }) {
     save(THEME_KEY, next)
   }, [theme])
 
+  // 'light' | 'dark' | 'system' (System = no saved choice: follow the device setting, live)
+  const themeChoice = chosenTheme ?? 'system'
+  const setThemeChoice = useCallback((choice) => {
+    if (choice === 'system') {
+      setSystemIsDark(systemDark.matches) // may have changed while a choice was saved
+      setChosenTheme(null)
+      save(THEME_KEY, null)
+    } else {
+      setChosenTheme(choice)
+      save(THEME_KEY, choice)
+    }
+  }, [])
+
   const setPalette = useCallback((id) => {
     const next = isPalette(id) ? id : 'blue'
     setPaletteState(next)
@@ -77,8 +91,8 @@ export function ThemeProvider({ children }) {
   }, [])
 
   const value = useMemo(
-    () => ({ theme, toggleTheme, palette, setPalette }),
-    [theme, toggleTheme, palette, setPalette],
+    () => ({ theme, toggleTheme, themeChoice, setThemeChoice, palette, setPalette }),
+    [theme, toggleTheme, themeChoice, setThemeChoice, palette, setPalette],
   )
 
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
