@@ -6,7 +6,7 @@ import { motion } from 'motion/react'
 import { BellRing, Check, Crown } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatTND } from '@/lib/money'
-import { fadeUp, liftOnHover, stagger, useEntrance } from '@/lib/motion'
+import { fadeUp, hoverLift, stagger, useEntrance } from '@/lib/motion'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
 import { getVipPlans, getVipStatus, joinVipWaitlist } from '@/services/vip'
@@ -55,7 +55,7 @@ function PlanCard({ plan, isCurrent, onChoose }) {
   return (
     <motion.li
       variants={fadeUp}
-      {...liftOnHover}
+      {...hoverLift}
       className={cn(
         'relative flex flex-col gap-5 rounded-3xl border bg-card p-6',
         featured ? 'border-2 border-primary shadow-lift' : 'border-border',
@@ -126,7 +126,7 @@ export default function Vip() {
   const currentPlanId = status.data?.active ? status.data.planId : null
 
   return (
-    <Page className="max-w-[1100px]">
+    <Page>
       <motion.section
         className="mb-10 flex flex-col items-center gap-6 rounded-3xl border border-border px-6 py-10 text-center [background:radial-gradient(circle_at_85%_10%,var(--color-accent-soft),transparent_45%),var(--color-primary-soft)] md:flex-row md:text-left"
         variants={stagger(0.08)}

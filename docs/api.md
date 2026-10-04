@@ -51,6 +51,7 @@ If something here is awkward to build, tell me and we'll change the contract tog
 | POST | `/api/auth/logout` | Log out |
 | GET | `/api/auth/me` | Who is logged in |
 | PUT | `/api/users/me` | Change the name |
+| GET | `/api/users/me/week` | "Your week" summary for the dashboard |
 | GET | `/api/users/me/profile` | Profile details |
 | PUT | `/api/users/me/profile` | Update profile details |
 | GET | `/api/users/me/settings/notifications` | Notification preferences |
@@ -132,6 +133,38 @@ Response `200`: `{ "user": { …user } }`, or `401` when not logged in (the app 
 ---
 
 ## User profile and settings
+
+### GET `/api/users/me/week`
+
+The dashboard's "Your week" strip. The week is Monday → Sunday in the student's time zone
+(`Africa/Tunis` is fine for now).
+
+```json
+{
+  "days": [
+    { "date": "2026-09-28", "studied": true },
+    { "date": "2026-09-29", "studied": false },
+    { "date": "2026-10-04", "studied": null }
+  ],
+  "questionsAsked": 3,
+  "lessonsDone": 4,
+  "nextClass": {
+    "id": "bk_61a0",
+    "profId": "amel-exemple",
+    "startsAt": "2026-10-10T10:30:00+01:00",
+    "endsAt": "2026-10-10T11:30:00+01:00",
+    "durationMinutes": 60,
+    "price": 45,
+    "status": "confirmed",
+    "professor": { "id": "amel-exemple", "title": "Prof.", "firstName": "Amel", "lastName": "Exemple", "subject": "Mathematics" }
+  }
+}
+```
+
+- `days`: always 7 entries, Monday first. `studied`: `true` if the student did anything that day (asked the
+  tutor, marked a lesson done, had a class), `false` if not, `null` for days still to come.
+- `questionsAsked` / `lessonsDone`: counts since Monday 00:00.
+- `nextClass`: the next upcoming booking (same shape as a booking, plus a short `professor`), or `null`.
 
 ### PUT `/api/users/me`
 

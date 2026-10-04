@@ -132,6 +132,12 @@ const COURSES = [
   }),
 ]
 
+// FAKE: when lessons were marked done (ms). Starts with 3 lessons earlier this week.
+const LESSONS_DONE_AT = [1, 2, 4].map((d) => Date.now() - d * 86_400_000)
+
+// FAKE only (used by services/week.js)
+export const fakeLessonsDoneSince = (ms) => LESSONS_DONE_AT.filter((t) => t >= ms).length
+
 const SORTS = {
   popular: (a, b) => b.reviews - a.reviews,
   newest: (a, b) => b.publishedAt.localeCompare(a.publishedAt),
@@ -187,5 +193,7 @@ export async function setLessonDone(courseId, lessonId, done) {
   const lesson = found?.lessons.find((l) => l.id === lessonId)
   if (!lesson) throw new Error('Lesson not found.')
   lesson.done = done
+  if (done) LESSONS_DONE_AT.push(Date.now())
+  else LESSONS_DONE_AT.pop()
   return copy(withProgress(found))
 }

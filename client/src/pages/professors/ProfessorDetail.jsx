@@ -158,7 +158,7 @@ function ProfessorView({ prof }) {
   }
 
   return (
-    <Page className="max-w-[1200px]">
+    <Page>
       <nav aria-label="Breadcrumb" className="mb-5 text-sm">
         <ol className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
           <li>

@@ -148,3 +148,8 @@ export async function getLearningTips({ q } = {}) {
   await wait()
   return copy(LEARNING_TIPS.map((text, i) => ({ id: `tip-${i + 1}`, text })).filter((tip) => !q || matches(tip.text, q)))
 }
+
+// FAKE only (used by services/week.js): how many questions the student asked since `ms`
+export function fakeQuestionsSince(ms) {
+  return CHATS.flatMap((c) => c.messages).filter((m) => m.role === 'user' && Date.parse(m.createdAt) >= ms).length
+}

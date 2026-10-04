@@ -1,17 +1,20 @@
 // One course: hero (cover, info, Start/Resume), progress, lessons, what you'll learn, ask the tutor.
+// "Mark as done" on the next lesson updates the progress and celebrates (bigger when the course is complete).
 
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { motion } from 'motion/react'
-import { BookOpen, Check, CheckCircle2, ChevronRight, Clock, Lock, MessagesSquare, Play, PlayCircle, Star } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import { BookOpen, Check, CheckCheck, CheckCircle2, ChevronRight, Clock, Lock, MessagesSquare, Play, PlayCircle, Star } from 'lucide-react'
 import { toast } from 'sonner'
 import { fadeUp, stagger, useEntrance } from '@/lib/motion'
 import { formatDuration } from '@/lib/time'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
-import { getCourse } from '@/services/courses'
+import { getCourse, setLessonDone } from '@/services/courses'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
+import Celebration from '../../components/Celebration.jsx'
 import CourseCover from '../../components/CourseCover.jsx'
 import LoadState from '../../components/LoadState.jsx'
 import Page from '../../components/Page.jsx'
@@ -110,7 +113,10 @@ function Hero({ course, statuses }) {
           </Button>
           <Button asChild size="lg" variant="outline" className="max-xs:flex-[1_1_100%]">
             <Link to={`/dashboard/tutor?q=${encodeURIComponent(tutorQuestion)}`}>
-              <MessagesSquare aria-hidden="true" /> Ask the AI tutor<span className="max-xs:sr-only"> about this course</span>
+              <MessagesSquare aria-hidden="true" />
+              <span>
+                Ask the AI tutor<span className="max-xs:sr-only"> about this course</span>
+              </span>
             </Link>
           </Button>
         </div>
@@ -125,7 +131,7 @@ const STATUS = {
   locked: { icon: Lock, label: 'Locked', className: 'text-muted-foreground' },
 }
 
-function Lessons({ lessons, statuses }) {
+function Lessons({ lessons, statuses, onMarkDone, marking }) {
   return (
     <motion.section variants={fadeUp} aria-labelledby="lessons-title">
       <Card className="gap-0 p-0">
@@ -150,9 +156,21 @@ function Lessons({ lessons, statuses }) {
                   <span className={cn('block font-semibold', statuses[i] === 'locked' && 'text-muted-foreground')}>{lesson.title}</span>
                 </span>
                 {statuses[i] === 'next' && (
-                  <Badge className="shrink-0 text-xs max-xs:hidden">Up next</Badge>
+                  <Badge className="shrink-0 text-xs max-sm:hidden">Up next</Badge>
                 )}
                 <span className="shrink-0 text-sm text-muted-foreground">{lesson.minutes} min</span>
+                {statuses[i] === 'next' && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="shrink-0 bg-card"
+                    onClick={() => onMarkDone(lesson)}
+                    disabled={marking}
+                    aria-label={`Mark “${lesson.title}” as done`}
+                  >
+                    <CheckCheck aria-hidden="true" /> <span className="max-xs:sr-only">Done</span>
+                  </Button>
+                )}
                 <span className="sr-only">({status.label})</span>
               </li>
             )
@@ -185,17 +203,55 @@ function Outcomes({ outcomes }) {
   )
 }
 
-function CourseView({ course }) {
+function CourseView({ course: initial }) {
   const entrance = useEntrance()
+  const [course, setCourse] = useState(initial)
+  const [marking, setMarking] = useState(false)
+  const [celebration, setCelebration] = useState(null) // { title, text, complete }
   const statuses = lessonStatuses(course.lessons)
 
+  const markDone = async (lesson) => {
+    setMarking(true)
+    try {
+      const updated = await setLessonDone(course.id, lesson.id, true)
+      setCourse(updated)
+      const done = updated.lessons.filter((l) => l.done).length
+      setCelebration(
+        updated.progress === 100
+          ? { complete: true, title: 'Course completed! 🎓', text: `You finished all ${done} lessons of “${updated.title}”. Amazing work.` }
+          : { title: 'Lesson done, well played!', text: `“${lesson.title}” ✓ · ${done} of ${updated.lessons.length} lessons, ${updated.progress}% of the course.` },
+      )
+    } catch (err) {
+      toast.error('That didn’t save', { description: err.message })
+    } finally {
+      setMarking(false)
+    }
+  }
+
   return (
-    <Page className="max-w-[1200px]">
+    <Page>
       <Breadcrumb title={course.title} />
       <motion.div className="flex flex-col gap-6" variants={stagger(0.08)} {...entrance}>
         <Hero course={course} statuses={statuses} />
+        <AnimatePresence>
+          {celebration && (
+            <Celebration
+              key={celebration.title + celebration.text}
+              title={celebration.title}
+              text={celebration.text}
+              onClose={() => setCelebration(null)}
+              action={
+                celebration.complete && (
+                  <Button asChild size="sm">
+                    <Link to="/dashboard/courses">Find your next course</Link>
+                  </Button>
+                )
+              }
+            />
+          )}
+        </AnimatePresence>
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
-          <Lessons lessons={course.lessons} statuses={statuses} />
+          <Lessons lessons={course.lessons} statuses={statuses} onMarkDone={markDone} marking={marking} />
           <Outcomes outcomes={course.outcomes} />
         </div>
       </motion.div>

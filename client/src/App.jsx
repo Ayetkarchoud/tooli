@@ -22,6 +22,7 @@ const Search = lazy(() => import('./pages/Search.jsx'))
 const Settings = lazy(() => import('./pages/settings/Settings.jsx'))
 const MissingPage = lazy(() => import('./pages/MissingPage.jsx'))
 const NotFound = lazy(() => import('./pages/NotFound.jsx'))
+const Info = lazy(() => import('./pages/Info.jsx'))
 // Dev-only page: not even built into production
 const MascotPreview = import.meta.env.DEV ? lazy(() => import('./pages/MascotPreview.jsx')) : null
 
@@ -58,6 +59,11 @@ export default function App() {
             <Route path="*" element={<MissingPage />} />
           </Route>
         </Route>
+
+        {/* Public info pages (landing footer), open to everyone */}
+        <Route path="about" element={<Info page="about" />} />
+        <Route path="contact" element={<Info page="contact" />} />
+        <Route path="privacy" element={<Info page="privacy" />} />
 
         {/* dev only: preview every mascot pose (public). Production builds show 404 here */}
         {MascotPreview && <Route path="mascot" element={<MascotPreview />} />}

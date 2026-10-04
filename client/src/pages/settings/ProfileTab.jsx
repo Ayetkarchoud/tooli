@@ -16,10 +16,31 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Skeleton } from '@/components/ui/skeleton'
+import Mascot from '../../components/Mascot.jsx'
 import { ErrorState } from '../../components/MascotMessage.jsx'
 import Field from '../auth/Field.jsx'
 
 const PROFILE_KEYS = ['level', 'section', 'school', 'city', 'bio']
+const FIRST_SAVE_KEY = 'tooli-profile-saved-once'
+
+// The very first save gets a little celebration; later ones a simple toast
+function celebrateSave() {
+  let first = false
+  try {
+    first = !localStorage.getItem(FIRST_SAVE_KEY)
+    localStorage.setItem(FIRST_SAVE_KEY, '1')
+  } catch {
+    // storage blocked: just show the normal toast
+  }
+  if (first) {
+    toast('Your profile is all set! 🎉', {
+      description: 'tooli can now suggest courses and professors that fit you.',
+      icon: <Mascot pose="celebrating" size={30} title="" aria-hidden="true" animated={false} />,
+    })
+  } else {
+    toast.success('Profile saved')
+  }
+}
 
 function validate(form) {
   const errors = {}
@@ -88,7 +109,7 @@ function ProfileForm({ profile, user, updateUser }) {
       setForm(next)
       setSubmitted(false)
       setTouched({})
-      toast.success('Profile saved')
+      celebrateSave()
     } catch (err) {
       toast.error('Your changes weren’t saved', { description: err.message })
     } finally {

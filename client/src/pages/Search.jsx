@@ -19,6 +19,7 @@ import Page from '../components/Page.jsx'
 import { CardGridSkeleton } from '../components/PageLoader.jsx'
 import ProfAvatar from '../components/ProfAvatar.jsx'
 import CourseCard from './courses/CourseCard.jsx'
+import PageHeader from '../components/PageHeader.jsx'
 
 // Big search box: types freely, writes ?q= after a short pause; follows the URL when it changes elsewhere
 function SearchBox({ value, onSearch }) {
@@ -233,8 +234,8 @@ export default function Search() {
   }
 
   return (
-    <Page className="max-w-[1100px]">
-      <h1 className="mb-4 text-[2em] leading-tight font-extrabold">Search</h1>
+    <Page>
+      <PageHeader title="Search" subtitle="Courses, professors and study tips, all at once." className="mb-5" />
       <SearchBox value={q} onSearch={setQuery} />
       <p className="mt-3 mb-8 min-h-5 text-sm text-muted-foreground" aria-live="polite">
         {q && data && !result.loading && `${total} ${total === 1 ? 'result' : 'results'} for “${q}”`}

@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight, Menu, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { fadeUp, liftOnHover, stagger, useEntrance, useInView } from '@/lib/motion'
+import { fadeUp, hoverLift, stagger, useEntrance, useInView } from '@/lib/motion'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -14,6 +14,7 @@ import Logo from '../components/Logo.jsx'
 import Mascot from '../components/Mascot.jsx'
 import ThemeSwitcher from '../components/ThemeSwitcher.jsx'
 import { SERVICES, servicePath } from '../data/tooliServices.js'
+import TutorPreview from './landing/TutorPreview.jsx'
 
 const MotionCard = motion.create(Card)
 
@@ -92,7 +93,7 @@ function ServiceTeaser({ service }) {
   return (
     <MotionCard
       variants={fadeUp}
-      {...liftOnHover}
+      {...hoverLift}
       className={cn('h-full gap-2.5 p-[22px] text-foreground', soon && 'border-dashed')}
     >
       <div className="mb-1.5 flex items-center justify-between">
@@ -141,8 +142,8 @@ export default function Landing() {
         <motion.section
           className={cn(
             WRAP,
-            'grid grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)] items-center gap-10 pt-16 pb-[72px]',
-            'max-md:grid-cols-[minmax(0,1fr)] max-md:gap-2 max-md:pt-7 max-md:pb-10 max-md:text-center',
+            'grid grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] items-center gap-12 pt-16 pb-24',
+            'max-md:grid-cols-[minmax(0,1fr)] max-md:gap-14 max-md:pt-8 max-md:pb-20 max-md:text-center',
           )}
           variants={stagger(0.12)}
           {...entrance}
@@ -152,13 +153,18 @@ export default function Landing() {
               <p>Your study buddy, always on</p>
             </Badge>
             <h1 className="text-[clamp(34px,5.6vw,58px)] leading-[1.08] font-extrabold tracking-[-0.02em]">
-              Learn smarter with{' '}
-              <span className="px-1 text-primary-text [background:linear-gradient(transparent_70%,var(--color-accent-soft)_70%)]">
-                tooli
+              Stuck on homework?{' '}
+              <span className="whitespace-nowrap">
+                Ask{' '}
+                <span className="px-1 text-primary-text [background:linear-gradient(transparent_70%,var(--color-accent-soft)_70%)]">
+                  tooli
+                </span>
+                .
               </span>
             </h1>
             <p className="mt-[18px] max-w-[520px] text-[17px] leading-[1.65] text-muted-foreground max-md:mx-auto max-md:text-base">
-              An AI tutor, courses from our partners and live classes with top professors, all in one friendly place.
+              Clear, step-by-step answers in seconds, the best partner courses and live classes with top professors in
+              Tunisia. All in one friendly place.
             </p>
             <div className="mt-[30px] flex flex-wrap gap-3 max-md:justify-center">
               <Button asChild size="lg" className="max-xs:flex-[1_1_100%]">
@@ -170,12 +176,8 @@ export default function Landing() {
             </div>
           </motion.div>
 
-          <motion.div variants={fadeUp} className="relative grid min-h-[300px] place-items-center max-md:-order-1 max-md:min-h-[220px]">
-            <span
-              className="absolute aspect-square w-[min(340px,100%)] rounded-full [background:radial-gradient(circle_at_30%_30%,var(--color-accent-soft),transparent_60%),var(--color-primary-soft)] max-md:w-[220px]"
-              aria-hidden="true"
-            />
-            <Mascot pose="waving" size={240} title="tooli mascot waving hello" className="relative max-md:h-auto max-md:w-[170px]" />
+          <motion.div variants={fadeUp} className="px-6 max-md:px-2">
+            <TutorPreview />
           </motion.div>
         </motion.section>
 
@@ -195,7 +197,7 @@ export default function Landing() {
               <motion.li
                 key={step.title}
                 variants={fadeUp}
-                {...liftOnHover}
+                {...hoverLift}
                 className="relative rounded-2xl border border-border bg-card px-[22px] py-6"
               >
                 <span
@@ -235,11 +237,10 @@ export default function Landing() {
         <div className={cn(WRAP, 'flex flex-wrap items-center gap-x-7 gap-y-4 py-[22px] max-md:flex-col max-md:text-center')}>
           <Logo height={26} />
           <nav className="flex gap-5" aria-label="Footer">
-            {/* TODO: real pages */}
             {['About', 'Contact', 'Privacy'].map((label) => (
-              <a key={label} href={`#${label.toLowerCase()}`} className="text-sm text-muted-foreground no-underline hover:text-foreground">
+              <Link key={label} to={`/${label.toLowerCase()}`} className="text-sm text-muted-foreground no-underline hover:text-foreground">
                 {label}
-              </a>
+              </Link>
             ))}
           </nav>
           <p className="ml-auto text-[13px] text-muted-foreground max-md:ml-0">© {new Date().getFullYear()} tooli</p>

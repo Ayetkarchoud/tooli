@@ -18,6 +18,7 @@ import ChipGroup from '../components/ChipGroup.jsx'
 import MascotMessage, { ErrorState } from '../components/MascotMessage.jsx'
 import Page from '../components/Page.jsx'
 import { useNotifications } from '../layout/notificationsContext.js'
+import PageHeader from '../components/PageHeader.jsx'
 
 // One icon + palette colour per type, drawn as a soft tinted circle
 const TYPES = {
@@ -152,16 +153,17 @@ export default function Notifications() {
     )
 
   return (
-    <Page className="max-w-[860px]">
-      <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <h1 className="text-[2em] leading-tight font-extrabold">Notifications</h1>
-          {unreadCount > 0 && <Badge className="h-auto px-2.5 py-0.5 text-xs">{unreadCount} unread</Badge>}
-        </div>
-        <Button variant="outline" onClick={markAll} disabled={!unreadCount || markingAll}>
-          <CheckCheck aria-hidden="true" /> Mark all as read
-        </Button>
-      </header>
+    <Page width="narrow">
+      <PageHeader
+        title="Notifications"
+        subtitle="Class bookings, new lessons and study tips, all in one place."
+        badge={unreadCount > 0 && <Badge className="h-auto px-2.5 py-0.5 text-xs">{unreadCount} unread</Badge>}
+        actions={
+          <Button variant="outline" onClick={markAll} disabled={!unreadCount || markingAll}>
+            <CheckCheck aria-hidden="true" /> <span className="max-xs:sr-only">Mark all as read</span>
+          </Button>
+        }
+      />
 
       <div className="mb-6">
         <ChipGroup label="Show" value={onlyUnread ? 'unread' : ''} onChange={setShow} options={[{ value: 'unread', label: 'Unread' }]} />

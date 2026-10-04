@@ -4,14 +4,14 @@ import { cn } from '@/lib/utils'
 // options: [{ value, label }], value: current value ('' = All)
 export default function ChipGroup({ label, options, value, onChange }) {
   return (
-    <div className="flex items-center gap-3 max-md:flex-col max-md:items-start max-md:gap-1.5">
+    <div className="flex min-w-0 items-center gap-3 max-md:flex-col max-md:items-stretch max-md:gap-1.5">
       <span className="w-20 shrink-0 text-xs font-semibold tracking-[0.04em] text-muted-foreground uppercase" id={`chips-${label}`}>
         {label}
       </span>
       <div
         role="group"
         aria-labelledby={`chips-${label}`}
-        className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0"
+        className="-mx-4 flex min-w-0 gap-2 overflow-x-auto px-4 pb-1 md:mx-0 md:flex-wrap md:overflow-visible md:px-0 md:pb-0"
       >
         {[{ value: '', label: 'All' }, ...options].map((o) => {
           const active = value === o.value

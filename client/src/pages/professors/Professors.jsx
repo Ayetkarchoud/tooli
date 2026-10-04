@@ -6,7 +6,7 @@ import { motion } from 'motion/react'
 import { CalendarCheck, CalendarX, Languages, MapPin, RefreshCw, Star, X } from 'lucide-react'
 import { fullName } from '@/lib/people'
 import { formatTND } from '@/lib/money'
-import { fadeUp, liftOnHover, stagger, useEntrance } from '@/lib/motion'
+import { fadeUp, hoverLift, stagger, useEntrance } from '@/lib/motion'
 import { formatSlotStart } from '@/lib/time'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
@@ -14,11 +14,11 @@ import { getProfessorFilters, listProfessors } from '@/services/professors'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import ChipGroup from '../../components/ChipGroup.jsx'
-import Mascot from '../../components/Mascot.jsx'
 import MascotMessage, { ErrorState } from '../../components/MascotMessage.jsx'
 import Page from '../../components/Page.jsx'
 import { CardGridSkeleton } from '../../components/PageLoader.jsx'
 import ProfAvatar from '../../components/ProfAvatar.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 
 const MotionLi = motion.li
 
@@ -35,7 +35,7 @@ function ProfessorCard({ prof }) {
   return (
     <MotionLi
       variants={fadeUp}
-      {...liftOnHover}
+      {...hoverLift}
       className="group relative flex flex-col gap-4 rounded-2xl border border-border bg-card p-5 transition-[border-color,box-shadow] hover:border-primary hover:shadow-lift"
     >
       <div className="flex items-start gap-4">
@@ -132,18 +132,12 @@ export default function Professors() {
   const profs = result.data
 
   return (
-    <Page className="max-w-[1200px]">
-      <header className="mb-8 flex items-center justify-between gap-6">
-        <div>
-          <h1 className="text-[clamp(26px,3.6vw,34px)] leading-tight font-extrabold tracking-[-0.01em]">
-            Learn with the best professors in Tunisia
-          </h1>
-          <p className="mt-1.5 max-w-xl text-muted-foreground">
-            Private classes with hand-picked, top-rated professors. Pick a time that suits you and book in a few clicks.
-          </p>
-        </div>
-        <Mascot pose="waving" size={84} title="" aria-hidden="true" className="shrink-0 max-xs:hidden" />
-      </header>
+    <Page>
+      <PageHeader
+        title="Learn with the best professors in Tunisia"
+        subtitle="Private classes with hand-picked, top-rated professors. Pick a time that suits you and book in a few clicks."
+        mascot="waving"
+      />
 
       <section aria-labelledby="prof-filters-title" className="mb-6 flex flex-col gap-3">
         <h2 id="prof-filters-title" className="sr-only">

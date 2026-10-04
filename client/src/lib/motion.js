@@ -16,10 +16,17 @@ export const stagger = (gap = 0.08) => ({
   show: { transition: { staggerChildren: gap } },
 })
 
-// Cards: gentle lift on hover, small press on tap
+// Links and buttons that look like cards: gentle lift on hover, small press on tap.
+// (Motion makes elements with whileTap focusable, so only use this on links/buttons.)
 export const liftOnHover = {
   whileHover: { y: -4 },
   whileTap: { scale: 0.98 },
+  transition: { type: 'spring', stiffness: 400, damping: 28 },
+}
+
+// Non-interactive cards (a link inside, or none): lift on hover only, no extra Tab stop
+export const hoverLift = {
+  whileHover: { y: -4 },
   transition: { type: 'spring', stiffness: 400, damping: 28 },
 }
 

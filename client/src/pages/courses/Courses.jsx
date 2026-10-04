@@ -19,13 +19,13 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
 import { Skeleton } from '@/components/ui/skeleton'
-import Mascot from '../../components/Mascot.jsx'
 import MascotMessage, { ErrorState } from '../../components/MascotMessage.jsx'
 import Page from '../../components/Page.jsx'
 import { CardGridSkeleton } from '../../components/PageLoader.jsx'
 import ProgressRing from '../../components/ProgressRing.jsx'
 import ChipGroup from '../../components/ChipGroup.jsx'
 import CourseCard from './CourseCard.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 
 const SORTS = [
   { id: 'popular', label: 'Most popular' },
@@ -157,16 +157,12 @@ export default function Courses() {
   const sortLabel = SORTS.find((s) => s.id === sort).label
 
   return (
-    <Page className="max-w-[1200px]">
-      <header className="mb-8 flex items-center justify-between gap-6">
-        <div>
-          <h1 className="text-[2em] leading-tight font-extrabold tracking-[-0.01em]">Partner courses</h1>
-          <p className="mt-1.5 max-w-xl text-muted-foreground">
-            Hand-picked courses from our e-learning partners. Learn at your own pace, tooli keeps track of your progress.
-          </p>
-        </div>
-        <Mascot pose="explaining" size={84} title="" aria-hidden="true" className="shrink-0 max-xs:hidden" />
-      </header>
+    <Page>
+      <PageHeader
+        title="Partner courses"
+        subtitle="Hand-picked courses from our e-learning partners. Learn at your own pace, tooli keeps track of your progress."
+        mascot="explaining"
+      />
 
       <ContinueRow />
 

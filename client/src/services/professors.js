@@ -94,6 +94,23 @@ const addDays = (day, n) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86_400
 // A moment (ms) → ISO date-time written in Tunis time: '2026-10-05T17:00:00+01:00'
 const toTunisISO = (ms) => `${new Date(ms + TUNIS_OFFSET_MS).toISOString().slice(0, 19)}${TUNIS_OFFSET}`
 
+// FAKE: the class the welcome notification talks about ("Saturday at 10:30" with Prof. Amel),
+// so the dashboard's "Your week" shows a next class. Next Saturday in Tunis time, 1 h.
+{
+  const today = tunisToday()
+  const daysToSaturday = (6 - new Date(`${today}T00:00:00Z`).getUTCDay() + 7) % 7 || 7
+  const start = Date.parse(`${addDays(today, daysToSaturday)}T10:30:00${TUNIS_OFFSET}`)
+  BOOKINGS.push({
+    id: 'bk-seed',
+    profId: 'amel-exemple',
+    startsAt: toTunisISO(start),
+    endsAt: toTunisISO(start + 60 * 60_000),
+    durationMinutes: 60,
+    price: 45,
+    status: 'confirmed',
+  })
+}
+
 // Two time ranges [start, end) overlap when each one starts before the other ends
 const overlaps = (aStart, aEnd, bStart, bEnd) => aStart < bEnd && bStart < aEnd
 
@@ -242,4 +259,12 @@ export async function bookSlot(profId, { startsAt, durationMinutes }) {
     link: `/dashboard/professors/${profId}`,
   })
   return copy(booking)
+}
+
+// FAKE only (used by services/week.js): the student's next upcoming class, with the professor's name
+export function fakeNextBooking() {
+  const next = BOOKINGS.filter((b) => Date.parse(b.startsAt) > Date.now()).sort((a, b) => Date.parse(a.startsAt) - Date.parse(b.startsAt))[0]
+  if (!next) return null
+  const prof = PROFESSORS.find((p) => p.id === next.profId)
+  return copy({ ...next, professor: { id: prof.id, title: prof.title, firstName: prof.firstName, lastName: prof.lastName, subject: prof.subject } })
 }

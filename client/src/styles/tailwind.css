@@ -89,9 +89,11 @@
   button:not(:disabled), [role="button"]:not(:disabled) {
     cursor: pointer;
   }
-  /* Keyboard focus for plain links and buttons (shadcn components draw their own ring) */
+  /* Keyboard focus for plain links, buttons and anything made focusable with tabindex
+     (e.g. tab panels); shadcn components draw their own ring */
   a:focus-visible,
-  button:focus-visible {
+  button:focus-visible,
+  [tabindex]:not([tabindex="-1"]):focus-visible {
     outline: 2px solid var(--color-primary-strong);
     outline-offset: 2px;
   }

@@ -5,7 +5,7 @@ import { ArrowRight, Lightbulb, RefreshCw, SendHorizontal, Star } from 'lucide-r
 import { fullName, getInitials } from '@/lib/people'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
-import { fadeUp, liftOnHover, stagger, useEntrance } from '@/lib/motion'
+import { fadeUp, hoverLift, liftOnHover, stagger, useEntrance } from '@/lib/motion'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -20,17 +20,13 @@ import Page from '../components/Page.jsx'
 import { CardGridSkeleton } from '../components/PageLoader.jsx'
 import { useAuth } from '../auth/authContext.js'
 import { SERVICES, servicePath } from '../data/tooliServices.js'
+import Greeting from './dashboard/Greeting.jsx'
+import YourWeek from './dashboard/YourWeek.jsx'
 
 const MotionLink = motion.create(Link)
 const MotionCard = motion.create(Card)
 
 const SUGGESTIONS = ['Explain photosynthesis simply', 'How do I solve 2x + 5 = 13?', 'Tips to learn English faster']
-
-function getGreeting(hour) {
-  if (hour < 12) return 'Good morning'
-  if (hour < 18) return 'Good afternoon'
-  return 'Good evening'
-}
 
 // Random index in [0, length), different from `exclude` when possible
 function randomIndex(length, exclude) {
@@ -277,7 +273,7 @@ function ProfessorCard({ prof }) {
   const profPath = `/dashboard/professors/${prof.id}`
 
   return (
-    <MotionCard className="relative h-full items-start gap-3 p-5 transition-shadow hover:shadow-lift" {...liftOnHover}>
+    <MotionCard className="relative h-full items-start gap-3 p-5 transition-shadow hover:shadow-lift" {...hoverLift}>
       <Avatar className="size-[52px] after:hidden" aria-hidden="true">
         <AvatarFallback className="border border-highlight bg-highlight-soft text-base font-semibold text-foreground">
           {getInitials(prof)}
@@ -324,22 +320,16 @@ function TopProfessors() {
 export default function Dashboard() {
   const { user } = useAuth()
   const entrance = useEntrance()
-  const now = new Date()
-  const today = now.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   return (
-    <Page as={motion.div} className="flex max-w-[1200px] flex-col gap-9 max-[560px]:gap-7" variants={stagger()} {...entrance}>
+    <Page as={motion.div} className="flex flex-col gap-9 max-[560px]:gap-7" variants={stagger()} {...entrance}>
       <motion.header variants={fadeUp}>
-        <div className="flex items-center gap-4 max-[560px]:gap-3">
-          <Mascot pose="waving" size={64} className="shrink-0 max-[560px]:h-auto max-[560px]:w-[52px]" />
-          <div>
-            <h1 className="text-[28px] leading-tight font-semibold max-[560px]:text-[22px]">
-              {getGreeting(now.getHours())}, {user.firstName}
-            </h1>
-            <p className="mt-1 text-muted-foreground">{today}</p>
-          </div>
-        </div>
+        <Greeting firstName={user.firstName} />
       </motion.header>
+
+      <motion.div variants={fadeUp}>
+        <YourWeek />
+      </motion.div>
 
       <motion.section variants={fadeUp}>
         <AskBar />

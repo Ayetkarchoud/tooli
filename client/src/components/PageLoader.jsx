@@ -1,10 +1,11 @@
 // Shown while a page's code is downloading (React.lazy + Suspense).
 // Inside the member area: a page-shaped skeleton (title + cards), so nothing jumps.
-// Full screen (landing, login…): three dots, like the mascot's "thinking" pose.
+// Full screen (landing, login…): the thinking mascot + three dots.
 // Both fade in after a short delay, so fast loads show nothing at all.
 
 import { motion } from 'motion/react'
 import { Skeleton } from '@/components/ui/skeleton'
+import Mascot from './Mascot.jsx'
 import Page from './Page.jsx'
 
 const appear = { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { delay: 0.2, duration: 0.2 } }
@@ -41,7 +42,8 @@ export default function PageLoader({ fullScreen = false }) {
   }
 
   return (
-    <motion.div role="status" className="grid min-h-screen place-items-center" {...appear}>
+    <motion.div role="status" className="flex min-h-screen flex-col items-center justify-center gap-4" {...appear}>
+      <Mascot pose="thinking" size={84} title="" aria-hidden="true" />
       <span className="flex gap-2" aria-hidden="true">
         {[0, 1, 2].map((i) => (
           <motion.span

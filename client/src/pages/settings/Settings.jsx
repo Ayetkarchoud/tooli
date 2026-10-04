@@ -8,6 +8,7 @@ import Page from '../../components/Page.jsx'
 import AppearanceTab from './AppearanceTab.jsx'
 import NotificationsTab from './NotificationsTab.jsx'
 import ProfileTab from './ProfileTab.jsx'
+import PageHeader from '../../components/PageHeader.jsx'
 
 const TABS = [
   { id: 'profile', label: 'Profile', icon: UserRound, Component: ProfileTab },
@@ -23,9 +24,8 @@ export default function Settings() {
   if (!current) return <Navigate to="/dashboard/settings/profile" replace />
 
   return (
-    <Page className="max-w-[900px]">
-      <h1 className="mb-1 text-[2em] leading-tight font-extrabold">Settings</h1>
-      <p className="mb-6 text-muted-foreground">Your profile, how tooli looks, and what we send you.</p>
+    <Page width="narrow">
+      <PageHeader title="Settings" subtitle="Your profile, how tooli looks, and what we send you." className="mb-6" />
 
       <Tabs value={current.id} onValueChange={(id) => navigate(`/dashboard/settings/${id}`)}>
         <TabsList className="mb-6 grid h-auto w-full grid-cols-3 gap-1 rounded-2xl border border-border bg-card p-1.5 sm:inline-flex sm:w-fit">

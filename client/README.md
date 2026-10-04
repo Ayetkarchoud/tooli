@@ -15,7 +15,7 @@ Open http://localhost:5173
 ## For the backend
 
 - The full API contract (every endpoint with request and response examples) is in [docs/api.md](../docs/api.md).
-- Pages get their data from `src/services/` (courses, professors, tutor, notifications, vip, search, user).
+- Pages get their data from `src/services/` (courses, professors, tutor, notifications, vip, search, user, week).
   For now these return **fake data** after a short delay; each function has a `TODO(backend)` with the
   real call. Pages never import mock data directly.
 - The frontend calls the API through `src/api/client.js`, always on paths starting with `/api`
