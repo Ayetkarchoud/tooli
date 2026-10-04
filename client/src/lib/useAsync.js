@@ -2,6 +2,8 @@
 //   const { data, error, loading, reload } = useAsync(() => getCourse(courseId), [courseId])
 // `deps` works like useEffect's: when they change, the data is loaded again.
 // Answers that arrive after the page moved on (old deps, unmounted) are ignored.
+// While reloading (new deps or reload()), the OLD data stays in `data` on purpose: pages keep showing it
+// (e.g. dimmed) instead of flashing a skeleton. Check `!data` to know if it's the very first load.
 
 import { useCallback, useEffect, useState } from 'react'
 

@@ -70,13 +70,15 @@ export default function Tutor() {
     else setConv({ ...emptyChat, status: 'loading' })
   }
 
-  const currentChatId = useRef(chatId) // read by late answers, so they can't land in another chat
+  // Goes up whenever the conversation on screen changes (other chat, New chat). A question remembers
+  // the value it was sent under, so a late answer for an abandoned question is ignored.
+  const conversation = useRef(0)
   const focusTitleNext = useRef(false)
   const composerRef = useRef(null)
   const titleRef = useRef(null)
 
   useEffect(() => {
-    currentChatId.current = chatId
+    conversation.current += 1
   }, [chatId])
 
   // Fetch the chat whenever it is marked as loading (URL change or "Try again")
@@ -146,7 +148,7 @@ export default function Tutor() {
     async (text, { retryOf } = {}) => {
       const question = text.trim()
       if (!question || thinking) return
-      const sentFrom = chatId
+      const sentIn = conversation.current
       let pendingId = retryOf
 
       setSendError(null)
@@ -163,7 +165,7 @@ export default function Tutor() {
       try {
         const res = await sendMessage({ chatId, question })
         setHistoryVersion((v) => v + 1)
-        if (sentFrom !== currentChatId.current) return // the student opened another chat meanwhile
+        if (sentIn !== conversation.current) return // the student moved to another chat (or a new one) meanwhile
         setConv((c) => ({
           ...c,
           messages: [...c.messages.map((m) => (m.id === pendingId ? res.question : m)), { ...res.answer, fresh: true }],
@@ -174,7 +176,7 @@ export default function Tutor() {
           navigate(`/dashboard/tutor/${res.chatId}`, { replace: true })
         }
       } catch (err) {
-        if (sentFrom !== currentChatId.current) return
+        if (sentIn !== conversation.current) return
         setThinking(false)
         setSendError({ question, questionId: pendingId, message: err?.message })
       }
@@ -198,10 +200,15 @@ export default function Tutor() {
     send(q)
   }, [conv.status, params, setParams, send])
 
+  // Also works when already on /dashboard/tutor (no URL change): reset the screen ourselves
   const startNewChat = () => {
+    conversation.current += 1 // forget any answer still on its way
     setHistoryOpen(false)
-    navigate('/dashboard/tutor')
+    setConv(emptyChat)
+    setThinking(false)
+    setSendError(null)
     setDraft('')
+    navigate('/dashboard/tutor')
     composerRef.current?.focus()
   }
 

@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { formatTND } from '@/lib/money'
 import { fadeUp, stagger, useEntrance } from '@/lib/motion'
 import { fullName } from '@/lib/people'
-import { dayParts, formatDuration } from '@/lib/time'
+import { dayParts, formatDuration, formatTime, localDateKey } from '@/lib/time'
 import { Button } from '@/components/ui/button'
 import Confetti from '../../components/Confetti.jsx'
 import Mascot from '../../components/Mascot.jsx'
@@ -16,7 +16,8 @@ import Mascot from '../../components/Mascot.jsx'
 export default function BookingSuccess({ booking, prof, onBookAnother }) {
   const entrance = useEntrance()
   const titleRef = useRef(null)
-  const when = dayParts(booking.date).long
+  // startsAt is an ISO date-time: shown in the student's local time
+  const when = dayParts(localDateKey(new Date(booking.startsAt))).long
 
   // Move focus to the title so screen readers announce the success
   useEffect(() => {
@@ -56,7 +57,7 @@ export default function BookingSuccess({ booking, prof, onBookAnother }) {
           <div>
             <dt className="text-xs text-muted-foreground">When</dt>
             <dd className="font-semibold">
-              {when}, {booking.time}
+              {when}, {formatTime(booking.startsAt)}
             </dd>
           </div>
         </div>

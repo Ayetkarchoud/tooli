@@ -1,4 +1,6 @@
 // Booking: pick a day (next 7 days) → a free time → session length (live price) → confirm dialog.
+// The API sends start times as ISO date-times (Tunis time); they are shown in the student's local time.
+// The free times depend on the session length (a longer class must not overlap another booking).
 // Native radio inputs under the hood, so keyboard (arrows, Tab) and screen readers just work.
 
 import { useState } from 'react'
@@ -6,7 +8,7 @@ import { CalendarDays, Clock, Loader2, Wallet } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatTND } from '@/lib/money'
 import { fullName } from '@/lib/people'
-import { dayParts, formatDuration } from '@/lib/time'
+import { dayParts, formatDuration, formatTime, localDateKey } from '@/lib/time'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
 import { SESSION_LENGTHS, bookSlot, getAvailability } from '@/services/professors'
@@ -22,6 +24,19 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
+
+const LOCAL_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone
+const OUTSIDE_TUNISIA = LOCAL_ZONE !== 'Africa/Tunis'
+
+// ISO start times → the next 7 LOCAL days: [{ date: 'YYYY-MM-DD', times: [iso, …] }]
+function groupByLocalDay(slots) {
+  const today = new Date()
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i)
+    const date = localDateKey(d)
+    return { date, times: slots.filter((iso) => localDateKey(new Date(iso)) === date) }
+  })
+}
 
 // A radio input styled as a tile. `children` is the visible label.
 function Choice({ name, value, checked, disabled, onChange, className, children }) {
@@ -55,26 +70,29 @@ function Step({ number, title, children }) {
 
 export default function BookingCard({ prof, onBooked }) {
   const [version, setVersion] = useState(0) // bump to reload the free times
-  const availability = useAsync(() => getAvailability(prof.id), [prof.id, version])
-  const days = availability.data
+  const [duration, setDuration] = useState(60)
+  const availability = useAsync(() => getAvailability(prof.id, { durationMinutes: duration }), [prof.id, version, duration])
+  const days = availability.data && groupByLocalDay(availability.data.slots)
 
   const [pickedDate, setPickedDate] = useState(null)
-  const [time, setTime] = useState(null)
-  const [duration, setDuration] = useState(60)
+  const [time, setTime] = useState(null) // ISO start of the chosen slot
   const [confirming, setConfirming] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [bookingError, setBookingError] = useState(null)
 
-  // Default day: the first one with a free time
-  const date = pickedDate ?? days?.find((d) => d.times.length)?.date ?? null
+  // The picked day, unless it has no free time anymore (e.g. after a failed booking or a longer
+  // session): then the first day that still has one. null = fully booked.
+  const firstFree = days?.find((d) => d.times.length)?.date ?? null
+  const date = days?.find((d) => d.date === pickedDate)?.times.length ? pickedDate : firstFree
   const times = days?.find((d) => d.date === date)?.times ?? []
+  const selected = times.includes(time) ? time : null // a time that vanished is no longer selected
   const price = Math.round(prof.pricePerHour * (duration / 60) * 10) / 10
 
   const confirm = async () => {
     setSubmitting(true)
     setBookingError(null)
     try {
-      const booking = await bookSlot(prof.id, { date, time, durationMinutes: duration })
+      const booking = await bookSlot(prof.id, { startsAt: selected, durationMinutes: duration })
       setConfirming(false)
       onBooked(booking)
     } catch (err) {
@@ -110,7 +128,7 @@ export default function BookingCard({ prof, onBooked }) {
             Try again
           </Button>
         </div>
-      ) : !days.some((d) => d.times.length) ? (
+      ) : !date ? (
         <p className="rounded-xl bg-muted p-4 text-sm text-muted-foreground">
           {prof.firstName} is fully booked for the next 7 days. New times open every week, check back soon!
         </p>
@@ -147,11 +165,12 @@ export default function BookingCard({ prof, onBooked }) {
           <Step number={2} title={`Choose a time · ${dayParts(date).long}`}>
             <div className="grid grid-cols-3 gap-2">
               {times.map((t) => (
-                <Choice key={t} name="booking-time" value={t} checked={t === time} onChange={() => setTime(t)} className="py-2.5 text-sm font-semibold">
-                  {t}
+                <Choice key={t} name="booking-time" value={t} checked={t === selected} onChange={() => setTime(t)} className="py-2.5 text-sm font-semibold">
+                  {formatTime(t)}
                 </Choice>
               ))}
             </div>
+            {OUTSIDE_TUNISIA && <p className="text-xs text-muted-foreground">Times are shown in your time zone ({LOCAL_ZONE}).</p>}
           </Step>
 
           <Step number={3} title="Session length">
@@ -169,12 +188,12 @@ export default function BookingCard({ prof, onBooked }) {
             <span className="text-xl font-extrabold">{formatTND(price)}</span>
           </div>
 
-          <Button size="lg" className="w-full" disabled={!time}
+          <Button size="lg" className="w-full" disabled={!selected}
             onClick={() => {
               setBookingError(null)
               setConfirming(true)
             }}>
-            {time ? 'Book this class' : 'Pick a time to continue'}
+            {selected ? 'Book this class' : 'Pick a time to continue'}
           </Button>
         </>
       )}
@@ -186,7 +205,7 @@ export default function BookingCard({ prof, onBooked }) {
             <DialogDescription>Check the details, then confirm. You can cancel up to 24 h before the class.</DialogDescription>
           </DialogHeader>
 
-          {time && (
+          {selected && (
             <dl className="flex flex-col gap-3 rounded-xl border border-border bg-background p-4 text-sm">
               <div className="flex justify-between gap-4">
                 <dt className="text-muted-foreground">Professor</dt>
@@ -199,7 +218,7 @@ export default function BookingCard({ prof, onBooked }) {
                   <CalendarDays size={15} aria-hidden="true" /> When
                 </dt>
                 <dd className="text-right font-semibold">
-                  {dayParts(date).long}, {time}
+                  {dayParts(localDateKey(new Date(selected))).long}, {formatTime(selected)}
                 </dd>
               </div>
               <div className="flex justify-between gap-4">
@@ -230,7 +249,7 @@ export default function BookingCard({ prof, onBooked }) {
                 Cancel
               </Button>
             </DialogClose>
-            <Button onClick={confirm} disabled={submitting || !time}>
+            <Button onClick={confirm} disabled={submitting || !selected}>
               {submitting ? (
                 <>
                   <Loader2 className="animate-spin" aria-hidden="true" /> Booking…

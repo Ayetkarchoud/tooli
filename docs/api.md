@@ -13,8 +13,15 @@ If something here is awkward to build, tell me and we'll change the contract tog
 - **Base URL**: every route starts with `/api`. In development the frontend runs on
   `http://localhost:5173` and Vite forwards `/api/*` to **`http://localhost:5000`**, so run Express on port 5000.
   No CORS setup is needed in development.
-- **Format**: JSON in, JSON out (`Content-Type: application/json`). Dates are ISO 8601 strings in UTC
-  (`"2026-09-27T14:05:00.000Z"`). Prices are numbers in Tunisian dinars (TND).
+- **Format**: JSON in, JSON out (`Content-Type: application/json`). Prices are numbers in Tunisian dinars (TND).
+- **Dates and times**: always full ISO 8601 date-times **with a time zone**, never a bare date + `HH:MM`.
+  - Timestamps (`createdAt`, `updatedAt`…): UTC is fine, e.g. `"2026-09-27T14:05:00.000Z"`.
+  - **Professor availability and bookings are in Tunis time** (`Africa/Tunis`, UTC+01:00, no daylight saving),
+    e.g. `"2026-10-05T17:00:00+01:00"`. The frontend converts them and shows them in the **student's local
+    time** (the same in Tunisia; correct for students abroad too).
+  - Calendar-only dates (VIP `renewsOn`) are `YYYY-MM-DD`.
+- **Query parameters**: optional filters go in the query string (`GET /api/courses?subject=Physics&q=derivatives`).
+  The frontend leaves out empty ones (it never sends `subject=` or `q=undefined`), so treat a missing param as "no filter".
 - **IDs**: strings. MongoDB `_id` is fine, but please send it as `id` (a slug like `"algebra-basics"` also works).
 - **Auth**: a session cookie (see [Auth](#auth)). Every route except signup and login needs it.
   The frontend sends it automatically (`credentials: 'include'`).
@@ -256,13 +263,13 @@ The **professor** object:
   "rating": 4.9,
   "reviews": 128,
   "pricePerHour": 45,
-  "nextSlot": { "date": "2026-09-28", "time": "17:00" }
+  "nextSlot": "2026-09-28T17:00:00+01:00"
 }
 ```
 
 - `title`: `"Prof."` or `"Dr."`. `pricePerHour` in TND. All professors on tooli are VIP.
-- `nextSlot`: the first free time in the next 7 days, or `null` when fully booked.
-  Dates are `YYYY-MM-DD`, times `HH:MM`, both in Tunisia time.
+- `nextSlot`: the start of the first free 1-hour class in the next 7 days (ISO date-time, Tunis time),
+  or `null` when fully booked.
 - How you store the weekly schedule is up to you; the frontend only needs `nextSlot` and the
   availability endpoint below.
 
@@ -291,20 +298,30 @@ Response `200`: array of professors, best rated first.
 }
 ```
 
-### GET `/api/professors/:profId/availability?days=7`
+### GET `/api/professors/:profId/availability`
 
-Free times for the next `days` days, starting today, **one entry per day** (days without a free time
-have an empty list). Leave out times already booked and, for today, times already past.
+| Param | Example | Meaning |
+|---|---|---|
+| `days` | `7` | How many days ahead, starting today (Tunis date). Default 7 |
+| `durationMinutes` | `90` | Length of the class the student wants (`60`, `90` or `120`). Default 60 |
+
+The start times when a class of `durationMinutes` can begin, in the next `days` days, sorted:
 
 ```json
-[
-  { "date": "2026-09-27", "times": [] },
-  { "date": "2026-09-28", "times": ["17:00", "18:30"] },
-  { "date": "2026-09-29", "times": [] }
-]
+{
+  "timeZone": "Africa/Tunis",
+  "slots": ["2026-09-28T17:00:00+01:00", "2026-09-28T18:30:00+01:00", "2026-09-30T16:00:00+01:00"]
+}
 ```
 
-`404` if the professor doesn't exist.
+Leave out:
+
+- times already past;
+- **any start whose class would overlap an existing booking** of this professor, for the requested length
+  (see [the overlap rule](#the-overlap-rule)). So the list can change with `durationMinutes`.
+
+The frontend groups the slots by the student's local day and shows them in local time. `404` if the
+professor doesn't exist.
 
 ### GET `/api/professors/:profId/reviews`
 
@@ -326,8 +343,8 @@ Response `200`: one professor. `404` if unknown.
 
 ### POST `/api/professors/:profId/bookings`
 
-Request: `{ "date": "2026-10-03", "time": "10:30", "durationMinutes": 90 }`
-(`durationMinutes` is `60`, `90` or `120`.)
+Request: `{ "startsAt": "2026-10-03T10:30:00+01:00", "durationMinutes": 90 }`
+(`startsAt` is one of the availability `slots`; `durationMinutes` is `60`, `90` or `120`.)
 
 Response `201`:
 
@@ -335,8 +352,8 @@ Response `201`:
 {
   "id": "bk_61a0",
   "profId": "amel-exemple",
-  "date": "2026-10-03",
-  "time": "10:30",
+  "startsAt": "2026-10-03T10:30:00+01:00",
+  "endsAt": "2026-10-03T12:00:00+01:00",
   "durationMinutes": 90,
   "price": 67.5,
   "status": "confirmed"
@@ -346,10 +363,19 @@ Response `201`:
 `price` = `pricePerHour × durationMinutes / 60`, rounded to 0.1 TND. Compute it on the server; don't trust a
 price sent by the browser.
 
-Errors: `400` invalid date/time/length, `404` unknown professor, `409` if the time isn't free anymore
-(`"This time is no longer free. Please pick another one."`). Please also create a notification of type
-`booking` (`"Class booked"`, with a link to the professor). Payment isn't part of this yet: the student
-pays the professor after the class.
+#### The overlap rule
+
+A booking occupies `[startsAt, endsAt)`. Two classes overlap when **each one starts before the other ends**
+(`a.startsAt < b.endsAt && b.startsAt < a.endsAt`). So a 2 h booking at 09:00 blocks a class at 10:30, and a
+1 h 30 class at 08:00 is blocked by a booking at 09:00. Touching is fine (09:00–10:00 then 10:00–11:00).
+
+**Reject an overlapping booking with `409`**, even if the time looked free when the page loaded (two students
+can book at the same moment, so check inside a transaction or with a unique/locking strategy):
+`"This class would overlap another booking. Please pick another time or a shorter session."`
+
+Errors: `400` invalid `startsAt`/length or a time that isn't one of the professor's slots, `404` unknown
+professor, `409` overlap (above). Please also create a notification of type `booking` (`"Class booked"`, with a
+link to the professor). Payment isn't part of this yet: the student pays the professor after the class.
 
 ---
 
@@ -516,7 +542,7 @@ Just a starting point, organise it however you prefer:
 | `courses` | course info, platform (embedded), lessons (embedded) |
 | `progress` | `{ userId, courseId, doneLessonIds: [] }`: used to compute `done` and `progress` |
 | `professors` | profile, price, weekly availability |
-| `bookings` | `{ userId, profId, date, time, durationMinutes, price, status, createdAt }` |
+| `bookings` | `{ userId, profId, startsAt, endsAt, durationMinutes, price, status, createdAt }` (dates as real `Date`s; index `profId` + `startsAt`) |
 | `reviews` | `{ profId, userId, rating, text, createdAt }` |
 | `chats` | `{ userId, title, messages: [], updatedAt }` |
 | `tips` | `{ text }` |

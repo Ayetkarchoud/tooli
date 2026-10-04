@@ -1,6 +1,7 @@
 // AI tutor chats + learning tips (FAKE for now: see docs/api.md for the real endpoints).
 // The fake tutor picks a canned step-by-step answer by keyword.
 
+import { hasWord } from '../lib/text.js'
 import { copy, daysAgo, hoursAgo, matches, minutesAgo, wait } from './fake.js'
 
 const CHATS = [
@@ -45,7 +46,8 @@ const CHATS = [
 // Longest question the tutor accepts (the composer shows a counter near it)
 export const MAX_QUESTION_LENGTH = 1000
 
-// Canned answers: the first entry whose keywords match the question wins.
+// Canned answers: the first entry with a keyword in the question wins. Keywords match WHOLE words,
+// ignoring case and accents ("excellent" doesn't match "cell"), so list the word forms you need.
 // Answers use the tutor's light formatting: **bold**, `inline code`, ``` code blocks ```,
 // "1." numbered steps and "-" bullets (see src/lib/formatText.jsx).
 const ANSWERS = [
@@ -54,31 +56,31 @@ const ANSWERS = [
     text: 'Sure, let’s make it **super simple**.\nImagine you’re explaining it to a 10-year-old:\n1. Start with **one idea only**: the main rule.\n2. Use an everyday comparison (cooking, football, money…).\n3. Check with a tiny example before adding details.\nIf one word still feels unclear, tell me which one and I’ll explain just that word.',
   },
   {
-    keywords: ['example', 'exemple'],
+    keywords: ['example', 'examples', 'exemple', 'exemples'],
     text: 'Here’s a concrete example.\nSay you save **5 TND** every week and you already have **13 TND**. When will you reach 33 TND?\n1. Write it as an equation: `13 + 5x = 33`.\n2. Remove 13 from both sides: `5x = 20`.\n3. Divide by 5: `x = 4`.\nSo after **4 weeks** you’ll have 33 TND. Want another example with fractions?',
   },
   {
-    keywords: ['code', 'python', 'program', 'loop', 'boucle', 'function', 'javascript', 'algorithm'],
+    keywords: ['code', 'coding', 'python', 'program', 'programming', 'loop', 'loops', 'boucle', 'function', 'functions', 'javascript', 'algorithm', 'algorithms'],
     text: 'Let’s look at a **loop** in Python: it repeats code for you.\n```python\nfor day in ["Mon", "Tue", "Wed"]:\n    print("Study session on", day)\n```\n1. `for day in [...]` takes each item of the list, one at a time.\n2. The indented line runs **once per item**.\n3. So this prints 3 lines, one per day.\nTry changing the list to your own days and run it!',
   },
   {
-    keywords: ['equation', 'équation', 'solve', '='],
+    keywords: ['equation', 'equations', 'équation', 'solve', 'solving'],
     text: 'Let’s solve it **step by step**.\n1. Move the numbers without x to the other side (change their sign).\n2. Group the x terms together.\n3. Divide by the number in front of x.\n4. **Plug your answer back in** to check it.\nFor example: `2x + 5 = 13` → `2x = 8` → `x = 4`.\nSend me your exact equation and I’ll walk through it with you.',
   },
   {
-    keywords: ['photosynth', 'plant', 'leaf', 'cell', 'dna', 'gene', 'svt', 'biology'],
+    keywords: ['photosynthesis', 'plant', 'plants', 'leaf', 'leaves', 'cell', 'cells', 'dna', 'gene', 'genes', 'genetics', 'svt', 'biology'],
     text: 'Good biology question! Here’s how to think about it.\n1. Start from the **big picture**: what goes in, what comes out.\n2. Name the place where it happens (organ, cell, organelle).\n3. Write the key equation or diagram.\n4. Finish with one real-life example.\nWhich part would you like me to go deeper on?',
   },
   {
-    keywords: ['english', 'vocabulary', 'grammar', 'speak', 'french', 'essay', 'dissertation', 'language'],
+    keywords: ['english', 'vocabulary', 'grammar', 'speak', 'speaking', 'french', 'essay', 'dissertation', 'language', 'languages'],
     text: 'Languages get easier with **small daily habits**.\n1. 15 minutes a day beats 2 hours on Sunday.\n2. Learn words **in sentences**, not lists.\n3. Speak out loud, even alone: record yourself and listen back.\n4. Read one short article a day on a topic you like.\nShall I give you a 7-day practice plan?',
   },
   {
-    keywords: ['physics', 'force', 'energy', 'newton', 'speed', 'chemistry', 'gravity'],
+    keywords: ['physics', 'force', 'forces', 'energy', 'newton', 'speed', 'chemistry', 'gravity'],
     text: 'Let’s break the problem down.\n1. Draw the situation and list what you know (**with units**).\n2. Write what you are looking for.\n3. Pick the law that links them, for example `F = m × a`.\n4. Solve with letters first, numbers last, and check the units.\nSend me the exercise and we’ll do it together.',
   },
   {
-    keywords: ['bac', 'exam', 'revis', 'concours', 'prépa', 'prepa'],
+    keywords: ['bac', 'exam', 'exams', 'revise', 'revision', 'revising', 'concours', 'prépa'],
     text: 'Exams are a marathon, not a sprint. Here’s a plan that works:\n1. List every chapter and colour it **green, orange or red**.\n2. Start with the red ones, in **25-minute blocks**.\n3. Every week, do one past exam in real conditions.\n4. The last days: summary sheets only, and **sleep well**.\nTell me your exam date and subjects, and I’ll build your schedule.',
   },
 ]
@@ -133,8 +135,7 @@ export async function sendMessage({ chatId, question }) {
   }
   const now = minutesAgo(0)
   const asked = { id: `m${chat.messages.length + 1}`, role: 'user', text, createdAt: now }
-  const lower = text.toLowerCase()
-  const answerText = ANSWERS.find((a) => a.keywords.some((k) => lower.includes(k)))?.text ?? DEFAULT_ANSWER
+  const answerText = ANSWERS.find((a) => a.keywords.some((k) => hasWord(text, k)))?.text ?? DEFAULT_ANSWER
   const answer = { id: `m${chat.messages.length + 2}`, role: 'tutor', text: answerText, createdAt: now }
   chat.messages.push(asked, answer)
   chat.updatedAt = now
@@ -142,7 +143,7 @@ export async function sendMessage({ chatId, question }) {
 }
 
 // Short study tips (dashboard "Tip of the day", search)
-// TODO(backend): api.get(`/tips?q=${q}`)
+// TODO(backend): api.get('/tips', { q })
 export async function getLearningTips({ q } = {}) {
   await wait()
   return copy(LEARNING_TIPS.map((text, i) => ({ id: `tip-${i + 1}`, text })).filter((tip) => !q || matches(tip.text, q)))

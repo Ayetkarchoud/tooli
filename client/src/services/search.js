@@ -6,7 +6,7 @@ import { listProfessors } from './professors.js'
 import { getLearningTips } from './tutor.js'
 
 // → { courses: [...], professors: [...], tips: [...] } (empty lists for an empty query)
-// TODO(backend): api.get(`/search?q=${encodeURIComponent(q)}`)
+// TODO(backend): api.get('/search', { q })
 export async function search(q) {
   const query = (q ?? '').trim()
   if (!query) return { courses: [], professors: [], tips: [] }

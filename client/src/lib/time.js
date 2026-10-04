@@ -43,3 +43,14 @@ export function dayParts(isoDate) {
     long: date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }),
   }
 }
+
+// A Date → its LOCAL calendar day 'YYYY-MM-DD' (not UTC like toISOString)
+export function localDateKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+}
+
+// ISO date-time (any time zone) → "17:00" in the student's local time
+export const formatTime = (iso) => new Date(iso).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
+
+// ISO date-time → "Tomorrow at 17:00", "Sat 3 Oct at 09:30" (student's local time)
+export const formatSlotStart = (iso) => `${formatSlotDay(localDateKey(new Date(iso)))} at ${formatTime(iso)}`

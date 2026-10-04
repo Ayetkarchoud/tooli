@@ -1,7 +1,7 @@
 // VIP professors, their availability, reviews and bookings
 // (FAKE for now: see docs/api.md for the real endpoints). All names below are fictional.
 
-import { formatSlotDay } from '../lib/time.js'
+import { formatSlotStart } from '../lib/time.js'
 import { copy, daysAgo, matches, wait } from './fake.js'
 import { addNotification } from './notifications.js'
 
@@ -10,8 +10,8 @@ const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']
 // Session lengths a student can book, in minutes
 export const SESSION_LENGTHS = [60, 90, 120]
 
-// weekly: the professor's usual free times, day = 'mon' … 'sun', time = 'HH:MM' (Tunisia time).
-// The API turns this into real dates (see getAvailability) and never sends `weekly` itself.
+// weekly: the professor's usual free times, day = 'mon' … 'sun', time = 'HH:MM' in Tunis time (Africa/Tunis).
+// The API turns this into real ISO date-times (see getAvailability) and never sends `weekly` itself.
 const PROFESSORS = [
   {
     id: 'amel-exemple', title: 'Prof.', firstName: 'Amel', lastName: 'Exemple',
@@ -80,32 +80,53 @@ const REVIEW_TEXTS = [
   ['Rania M.', 4, 'Very good method. I would love a few more practice exercises to do alone.', 40],
 ]
 
-let BOOKINGS = [] // { id, profId, date, time, durationMinutes, price, status }
+// Bookings made in this session: { id, profId, startsAt, endsAt, durationMinutes, price, status }
+let BOOKINGS = []
 
-const toISODate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+// Tunisia is UTC+1 all year (no daylight saving time since 2009)
+const TUNIS_OFFSET = '+01:00'
+const TUNIS_OFFSET_MS = 60 * 60_000
 
-// The next `days` days with their free times (booked and already-past times removed)
-function availability(prof, days = 7) {
-  const now = new Date()
-  const nowTime = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`
+// Today's calendar day in Tunis, as 'YYYY-MM-DD'
+const tunisToday = () => new Date(Date.now() + TUNIS_OFFSET_MS).toISOString().slice(0, 10)
+// 'YYYY-MM-DD' + n days (pure calendar maths, no time zone involved)
+const addDays = (day, n) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86_400_000).toISOString().slice(0, 10)
+// A moment (ms) → ISO date-time written in Tunis time: '2026-10-05T17:00:00+01:00'
+const toTunisISO = (ms) => `${new Date(ms + TUNIS_OFFSET_MS).toISOString().slice(0, 19)}${TUNIS_OFFSET}`
+
+// Two time ranges [start, end) overlap when each one starts before the other ends
+const overlaps = (aStart, aEnd, bStart, bEnd) => aStart < bEnd && bStart < aEnd
+
+// Every weekly slot in the next `days` days (as ms), ignoring bookings. Past times are left out.
+function weeklySlots(prof, days = 7) {
+  const today = tunisToday()
+  const now = Date.now()
   return Array.from({ length: days }, (_, offset) => {
-    const d = new Date(now)
-    d.setDate(now.getDate() + offset)
-    const date = toISODate(d)
-    const times = (prof.weekly[DAY_KEYS[d.getDay()]] ?? []).filter(
-      (time) =>
-        !(offset === 0 && time <= nowTime) &&
-        !BOOKINGS.some((b) => b.profId === prof.id && b.date === date && b.time === time),
-    )
-    return { date, times }
+    const day = addDays(today, offset)
+    const weekday = DAY_KEYS[new Date(`${day}T00:00:00Z`).getUTCDay()]
+    return (prof.weekly[weekday] ?? []).map((time) => Date.parse(`${day}T${time}:00${TUNIS_OFFSET}`))
   })
+    .flat()
+    .filter((start) => start > now)
 }
 
-// What the API sends for a professor: no `weekly`, plus the next free slot (or null)
+// Can a session of `durationMinutes` start at `start` without touching any booking of this professor?
+// (A 2 h booking at 09:00 blocks a 10:30 start; a 1 h 30 session at 08:00 is blocked by a booking at 09:00.)
+const isFree = (prof, start, durationMinutes) =>
+  !BOOKINGS.some(
+    (b) => b.profId === prof.id && overlaps(start, start + durationMinutes * 60_000, Date.parse(b.startsAt), Date.parse(b.endsAt)),
+  )
+
+// Free start times for a session of `durationMinutes`, as ISO date-times in Tunis time
+const freeSlots = (prof, durationMinutes = 60, days = 7) =>
+  weeklySlots(prof, days)
+    .filter((start) => isFree(prof, start, durationMinutes))
+    .map(toTunisISO)
+
+// What the API sends for a professor: no `weekly`, plus the next free start (ISO) or null
 function publicProfessor(prof) {
   const { weekly, ...rest } = prof // eslint-disable-line no-unused-vars
-  const firstDay = availability(prof).find((d) => d.times.length)
-  return { ...rest, nextSlot: firstDay ? { date: firstDay.date, time: firstDay.times[0] } : null }
+  return { ...rest, nextSlot: freeSlots(prof)[0] ?? null }
 }
 
 // price range: 'under-40' | '40-50' | 'over-50'
@@ -115,7 +136,7 @@ const PRICE_RANGES = {
   'over-50': (p) => p > 50,
 }
 
-// TODO(backend): api.get(`/professors?subject=${subject}&city=${city}&language=${language}&price=${price}&available=${available ? 1 : 0}&q=${q}`)
+// TODO(backend): api.get('/professors', { subject, city, language, price, available: available ? 1 : undefined, q })
 export async function listProfessors({ subject, city, language, price, available, q } = {}) {
   await wait()
   return copy(
@@ -125,7 +146,7 @@ export async function listProfessors({ subject, city, language, price, available
         (!city || p.city === city) &&
         (!language || p.languages.includes(language)) &&
         (!price || PRICE_RANGES[price]?.(p.pricePerHour)) &&
-        (!available || availability(p).some((d) => d.times.length)) &&
+        (!available || freeSlots(p).length > 0) &&
         (!q || matches(`${p.firstName} ${p.lastName} ${p.subject} ${p.city}`, q)),
     )
       .sort((a, b) => b.rating - a.rating || b.reviews - a.reviews)
@@ -146,7 +167,7 @@ export async function getProfessorFilters() {
 }
 
 // Best rated first
-// TODO(backend): api.get(`/professors/top?limit=${limit}`)
+// TODO(backend): api.get('/professors/top', { limit })
 export async function getTopProfessors(limit = 3) {
   await wait()
   return copy(
@@ -165,13 +186,14 @@ export async function getProfessor(profId) {
   return found ? copy(publicProfessor(found)) : null
 }
 
-// Free times for the next 7 days: [{ date: 'YYYY-MM-DD', times: ['17:00', …] }] (empty times = no slot that day)
-// TODO(backend): api.get(`/professors/${profId}/availability?days=7`)
-export async function getAvailability(profId) {
+// Free start times for the next 7 days for a session of `durationMinutes` (times that would
+// overlap a booking are left out). → { timeZone: 'Africa/Tunis', slots: ['2026-10-05T17:00:00+01:00', …] }
+// TODO(backend): api.get(`/professors/${profId}/availability`, { days: 7, durationMinutes })
+export async function getAvailability(profId, { durationMinutes = 60 } = {}) {
   await wait()
   const found = PROFESSORS.find((p) => p.id === profId)
   if (!found) throw new Error('Professor not found.')
-  return copy(availability(found))
+  return { timeZone: 'Africa/Tunis', slots: freeSlots(found, durationMinutes) }
 }
 
 // TODO(backend): api.get(`/professors/${profId}/reviews`)
@@ -188,22 +210,27 @@ export async function getProfessorReviews(profId) {
   }))
 }
 
-// Book a class. Resolves with the booking; the slot disappears and a notification is created.
-// TODO(backend): api.post(`/professors/${profId}/bookings`, { date, time, durationMinutes })
-export async function bookSlot(profId, { date, time, durationMinutes }) {
+// Book a class starting at `startsAt` (ISO date-time). Resolves with the booking; overlapping
+// times disappear from the availability and a notification is created.
+// TODO(backend): api.post(`/professors/${profId}/bookings`, { startsAt, durationMinutes })
+export async function bookSlot(profId, { startsAt, durationMinutes }) {
   await wait(700, 1100)
   const prof = PROFESSORS.find((p) => p.id === profId)
   if (!prof) throw new Error('Professor not found.')
   if (!SESSION_LENGTHS.includes(durationMinutes)) throw new Error('Please choose 1 h, 1 h 30 or 2 h.')
-  const day = availability(prof).find((d) => d.date === date)
-  if (!day?.times.includes(time)) throw new Error('This time is no longer free. Please pick another one.')
+  const start = Date.parse(startsAt)
+  if (!weeklySlots(prof).includes(start)) throw new Error('This time isn’t available. Please pick one from the list.')
+  if (!isFree(prof, start, durationMinutes)) {
+    throw new Error('This class would overlap another booking. Please pick another time or a shorter session.')
+  }
 
   const booking = {
     id: `bk-${Date.now()}`,
     profId,
-    date,
-    time,
+    startsAt: toTunisISO(start),
+    endsAt: toTunisISO(start + durationMinutes * 60_000),
     durationMinutes,
+    // price per hour × hours, rounded to 0.1 TND (e.g. 45 TND × 1.5 h = 67.5 TND)
     price: Math.round(prof.pricePerHour * (durationMinutes / 60) * 10) / 10,
     status: 'confirmed',
   }
@@ -211,7 +238,7 @@ export async function bookSlot(profId, { date, time, durationMinutes }) {
   addNotification({
     type: 'booking',
     title: 'Class booked',
-    body: `Your session with ${prof.title} ${prof.firstName} ${prof.lastName} is booked for ${formatSlotDay(date)} at ${time}.`,
+    body: `Your session with ${prof.title} ${prof.firstName} ${prof.lastName} is booked: ${formatSlotStart(booking.startsAt)}.`,
     link: `/dashboard/professors/${profId}`,
   })
   return copy(booking)

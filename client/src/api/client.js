@@ -20,8 +20,22 @@ async function request(path, options = {}) {
   return res.status === 204 ? null : res.json()
 }
 
+// Add query params to a path, skipping empty ones:
+//   withQuery('/courses', { subject: 'Physics', q: '', level: undefined }) → '/courses?subject=Physics'
+function withQuery(path, query) {
+  if (!query) return path
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined || value === null || value === '') continue
+    params.append(key, String(value))
+  }
+  const qs = params.toString()
+  return qs ? `${path}?${qs}` : path
+}
+
 export const api = {
-  get: (path) => request(path),
+  // api.get('/courses', { subject, q }) → GET /api/courses?subject=…&q=… (empty values are left out)
+  get: (path, query) => request(withQuery(path, query)),
   post: (path, body) => request(path, { method: 'POST', body: JSON.stringify(body) }),
   put: (path, body) => request(path, { method: 'PUT', body: JSON.stringify(body) }),
   delete: (path) => request(path, { method: 'DELETE' }),

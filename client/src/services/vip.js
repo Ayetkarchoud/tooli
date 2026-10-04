@@ -1,7 +1,16 @@
 // VIP plans and the user's subscription (FAKE for now: see docs/api.md for the real endpoints).
 // Prices in Tunisian dinars (TND) per month.
 
+import { localDateKey } from '../lib/time.js'
 import { copy, wait } from './fake.js'
+
+// Same day next month, in LOCAL time. Short months clamp the day: 31 Jan → 28 Feb (29 in leap years).
+function oneMonthLater(from) {
+  const year = from.getFullYear()
+  const month = from.getMonth() + 1
+  const lastDay = new Date(year, month + 1, 0).getDate() // day 0 of the following month = last day of `month`
+  return new Date(year, month, Math.min(from.getDate(), lastDay))
+}
 
 const PLANS = [
   {
@@ -37,8 +46,6 @@ export async function getVipStatus() {
 export async function subscribe(planId) {
   await wait(600, 1000)
   if (!PLANS.some((p) => p.id === planId)) throw new Error('This plan does not exist.')
-  const renews = new Date()
-  renews.setMonth(renews.getMonth() + 1)
-  subscription = { active: true, planId, renewsOn: renews.toISOString().slice(0, 10) }
+  subscription = { active: true, planId, renewsOn: localDateKey(oneMonthLater(new Date())) }
   return copy(subscription)
 }

@@ -139,7 +139,7 @@ const SORTS = {
 }
 
 // sort: 'popular' (default) | 'newest' | 'shortest'. platform = platform id.
-// TODO(backend): api.get(`/courses?subject=${subject}&level=${level}&platform=${platform}&q=${q}&sort=${sort}`)
+// TODO(backend): api.get('/courses', { subject, level, platform, q, sort })
 export async function listCourses({ subject, level, platform, q, sort = 'popular' } = {}) {
   await wait()
   return copy(

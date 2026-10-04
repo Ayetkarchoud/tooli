@@ -7,7 +7,7 @@ import { CalendarCheck, CalendarX, Languages, MapPin, RefreshCw, Star, X } from 
 import { fullName } from '@/lib/people'
 import { formatTND } from '@/lib/money'
 import { fadeUp, liftOnHover, stagger, useEntrance } from '@/lib/motion'
-import { formatSlotDay } from '@/lib/time'
+import { formatSlotStart } from '@/lib/time'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
 import { getProfessorFilters, listProfessors } from '@/services/professors'
@@ -67,7 +67,7 @@ function ProfessorCard({ prof }) {
           {prof.nextSlot ? (
             <>
               <CalendarCheck size={15} className="text-primary-text" aria-hidden="true" />
-              Next: {formatSlotDay(prof.nextSlot.date)} at {prof.nextSlot.time}
+              Next: {formatSlotStart(prof.nextSlot)}
             </>
           ) : (
             <>
