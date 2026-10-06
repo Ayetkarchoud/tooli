@@ -3,6 +3,7 @@
 // and useEntrance / useInView below also skip the fade for those users.
 
 import { useReducedMotion } from 'motion/react'
+import { useTranslation } from 'react-i18next'
 
 // One item: fade in with a small upward slide
 export const fadeUp = {
@@ -40,4 +41,11 @@ export function useEntrance() {
 export function useInView(amount = 0.2) {
   const reduce = useReducedMotion()
   return { initial: reduce ? false : 'hidden', whileInView: 'show', viewport: { once: true, amount } }
+}
+
+// Horizontal slides follow the reading direction: 1 in English/French, -1 in Arabic (right-to-left).
+//   const dir = useDirectionSign();  initial={{ x: 16 * dir }}  → "comes in from the end side"
+export function useDirectionSign() {
+  const { i18n } = useTranslation()
+  return i18n.dir(i18n.resolvedLanguage) === 'rtl' ? -1 : 1
 }

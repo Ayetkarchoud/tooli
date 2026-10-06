@@ -6,9 +6,12 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Lightbulb, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { useDirectionSign } from '@/lib/motion'
 import Mascot from '../../components/Mascot.jsx'
 
-const STEPS = ['Remove the 5 from both sides: 2x = 8', 'Divide both sides by 2: x = 4', 'Check: 2 × 4 + 5 = 13 ✓']
+// The answer's steps: landing.preview.step1…3
+const STEPS = [1, 2, 3]
 // step: 0 nothing · 1 question · 2 thinking · 3 answer · 4 chips
 const TIMELINE = [400, 1300, 2700, 4300]
 const LOOP_MS = 9500
@@ -16,6 +19,8 @@ const LOOP_MS = 9500
 const pop = { initial: { opacity: 0, y: 10, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 }, exit: { opacity: 0 } }
 
 export default function TutorPreview() {
+  const { t } = useTranslation()
+  const dir = useDirectionSign()
   const reduce = useReducedMotion()
   const [step, setStep] = useState(reduce ? 4 : 0)
   const shown = reduce ? 4 : step
@@ -45,30 +50,30 @@ export default function TutorPreview() {
           <span className="grid size-9 place-items-center rounded-full bg-accent">
             <Mascot pose="explaining" size={26} title="" animated={false} />
           </span>
-          <span className="flex-1 text-left">
-            <span className="block text-sm font-bold">tooli tutor</span>
+          <span className="flex-1 text-start">
+            <span className="block text-sm font-bold">{t('landing.preview.name')}</span>
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span className="size-1.5 rounded-full bg-highlight" /> Ready to help, day and night
+              <span className="size-1.5 rounded-full bg-highlight" /> {t('landing.preview.status')}
             </span>
           </span>
         </div>
 
-        <div className="flex min-h-[262px] flex-col gap-3 text-left text-sm">
+        <div className="flex min-h-[262px] flex-col gap-3 text-start text-sm">
           <AnimatePresence>
             {shown >= 1 && (
               <motion.p
                 key="q"
                 {...(reduce ? {} : pop)}
-                className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-primary px-3.5 py-2 text-primary-foreground"
+                className="ms-auto max-w-[85%] rounded-2xl rounded-ee-md bg-primary px-3.5 py-2 text-primary-foreground"
               >
-                How do I solve 2x + 5 = 13?
+                {t('landing.preview.question')}
               </motion.p>
             )}
 
             {shown === 2 && (
               <motion.div key="thinking" {...pop} className="flex items-center gap-2">
                 <Mascot pose="thinking" size={30} title="" />
-                <span className="flex gap-1 rounded-2xl rounded-tl-md border border-border bg-background px-3 py-2.5">
+                <span className="flex gap-1 rounded-2xl rounded-ss-md border border-border bg-background px-3 py-2.5">
                   {[0, 1, 2].map((i) => (
                     <motion.span
                       key={i}
@@ -85,18 +90,18 @@ export default function TutorPreview() {
               <motion.div
                 key="a"
                 {...(reduce ? {} : pop)}
-                className="max-w-[92%] rounded-2xl rounded-tl-md border border-border bg-background px-3.5 py-2.5"
+                className="max-w-[92%] rounded-2xl rounded-ss-md border border-border bg-background px-3.5 py-2.5"
               >
-                <p className="mb-1.5 font-semibold">Let’s solve it step by step:</p>
-                <ol className="list-decimal space-y-1 pl-5 marker:font-semibold marker:text-primary-text">
+                <p className="mb-1.5 font-semibold">{t('landing.preview.intro')}</p>
+                <ol className="list-decimal space-y-1 ps-5 marker:font-semibold marker:text-primary-text">
                   {STEPS.map((s, i) => (
                     <motion.li
                       key={s}
-                      initial={reduce ? false : { opacity: 0, x: -6 }}
+                      initial={reduce ? false : { opacity: 0, x: -6 * dir }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: reduce ? 0 : 0.25 + i * 0.3 }}
                     >
-                      {s}
+                      {t(`landing.preview.step${s}`)}
                     </motion.li>
                   ))}
                 </ol>
@@ -106,10 +111,10 @@ export default function TutorPreview() {
             {shown >= 4 && (
               <motion.div key="chips" {...(reduce ? {} : pop)} className="flex flex-wrap gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold">
-                  <Sparkles size={12} /> Explain simpler
+                  <Sparkles size={12} /> {t('tutor.actions.simpler')}
                 </span>
                 <span className="inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3 py-1 text-xs font-semibold">
-                  <Lightbulb size={12} /> Give me an example
+                  <Lightbulb size={12} /> {t('tutor.actions.example')}
                 </span>
               </motion.div>
             )}
@@ -118,7 +123,7 @@ export default function TutorPreview() {
       </div>
 
       {/* the mascot peeks over the corner and waves */}
-      <Mascot pose="waving" size={104} title="" className="absolute -right-6 -bottom-10 max-md:-right-2 max-md:w-[84px] max-md:h-auto" />
+      <Mascot pose="waving" size={104} title="" className="absolute -end-6 -bottom-10 max-md:-end-2 max-md:w-[84px] max-md:h-auto" />
     </div>
   )
 }

@@ -1,15 +1,23 @@
 // The logged-in user's profile and settings (FAKE for now: see docs/api.md).
 // Name and email come from the session (useAuth); this adds the rest of the profile.
 // Theme/palette are handled by ThemeProvider (saved in the browser for now).
+// level, section and city are ids (see src/data/profileOptions.js); language = 'en' | 'fr' | 'ar'.
 
-import { copy, wait } from './fake.js'
+import { copy, currentLanguage, pick, wait } from './fake.js'
 
 let profile = {
-  level: 'Bac',
-  section: 'Mathematics',
+  level: 'bac',
+  section: 'mathematics',
   school: 'Lycée pilote de Monastir',
-  city: 'Monastir',
+  city: 'monastir',
   bio: '',
+  language: currentLanguage(),
+}
+
+const NAME_REQUIRED = {
+  en: 'Please enter your first and last name.',
+  fr: 'Indique ton prénom et ton nom.',
+  ar: 'أدخل اسمك ولقبك.',
 }
 
 let notificationSettings = {
@@ -25,7 +33,7 @@ let notificationSettings = {
 export async function updateName({ firstName, lastName }) {
   await wait()
   const clean = { firstName: firstName.trim(), lastName: lastName.trim() }
-  if (!clean.firstName || !clean.lastName) throw new Error('Please enter your first and last name.')
+  if (!clean.firstName || !clean.lastName) throw new Error(pick(NAME_REQUIRED))
   return clean
 }
 
@@ -35,8 +43,8 @@ export async function getProfile() {
   return copy(profile)
 }
 
-// Send only the fields that changed; get the full profile back
-// TODO(backend): api.put('/users/me/profile', changes)
+// Send only the fields that changed (e.g. { language: 'ar' } from the language switcher); get the full profile back
+// TODO(backend): api.patch('/users/me/profile', changes)
 export async function updateProfile(changes) {
   await wait()
   profile = { ...profile, ...changes }

@@ -3,7 +3,9 @@
 // normalize('NFD') splits accented letters into the letter + a separate accent mark
 // ("é" → "e" + "́"). The accent marks are the Unicode block U+0300–U+036F
 // ("combining diacritical marks"), so removing that range leaves the plain letters.
-export const normalise = (text) => text.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
+// For Arabic, the short-vowel marks (tashkeel), the hamza marks and the tatweel are removed too ("أ" → "ا").
+export const normalise = (text) =>
+  text.normalize('NFD').replace(/[̀-ͯـً-ٰٟ]/g, '').toLowerCase()
 
 // Does `text` contain `query` anywhere? (search boxes)
 export const matches = (text, query) => normalise(text).includes(normalise(query.trim()))

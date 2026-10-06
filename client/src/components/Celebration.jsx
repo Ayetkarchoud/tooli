@@ -4,17 +4,19 @@
 
 import { motion, useReducedMotion } from 'motion/react'
 import { X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import Confetti from './Confetti.jsx'
 import Mascot from './Mascot.jsx'
 
 export default function Celebration({ title, text, action, onClose }) {
+  const { t } = useTranslation()
   const reduce = useReducedMotion()
 
   return (
     <motion.div
       role="status"
-      className="relative flex items-center gap-4 rounded-2xl border-2 border-highlight bg-card p-4 pr-12 [background:linear-gradient(120deg,var(--color-accent-soft),transparent_60%),var(--color-surface)]"
+      className="relative flex items-center gap-4 rounded-2xl border-2 border-highlight bg-card p-4 pe-12 [background:linear-gradient(120deg,var(--color-accent-soft),transparent_60%),var(--color-surface)]"
       initial={reduce ? false : { opacity: 0, scale: 0.96, y: -6 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={reduce ? undefined : { opacity: 0, scale: 0.96 }}
@@ -30,7 +32,7 @@ export default function Celebration({ title, text, action, onClose }) {
         {action && <div className="mt-2">{action}</div>}
       </div>
       {onClose && (
-        <Button variant="ghost" size="icon-sm" className="absolute top-2 right-2" onClick={onClose} aria-label="Close">
+        <Button variant="ghost" size="icon-sm" className="absolute end-2 top-2" onClick={onClose} aria-label={t('common.close')}>
           <X aria-hidden="true" />
         </Button>
       )}

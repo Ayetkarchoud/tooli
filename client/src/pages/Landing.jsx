@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight, Menu, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { cn } from '@/lib/utils'
 import { fadeUp, hoverLift, stagger, useEntrance, useInView } from '@/lib/motion'
 import { Badge } from '@/components/ui/badge'
@@ -12,22 +14,21 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import Logo from '../components/Logo.jsx'
 import Mascot from '../components/Mascot.jsx'
+import LanguageSwitcher from '../components/LanguageSwitcher.jsx'
 import ThemeSwitcher from '../components/ThemeSwitcher.jsx'
 import { SERVICES, servicePath } from '../data/tooliServices.js'
 import TutorPreview from './landing/TutorPreview.jsx'
 
 const MotionCard = motion.create(Card)
 
-const STEPS = [
-  { title: 'Create your free account', text: 'Sign up in under a minute. All you need is an email address.' },
-  { title: 'Choose a service', text: 'Ask the AI tutor, follow a partner course or book a VIP professor.' },
-  { title: 'Start learning', text: 'Learn at your own pace and watch your progress grow week after week.' },
-]
+// "How it works": landing.steps.<key>.title / .text
+const STEPS = ['account', 'service', 'learn']
 
 // Same width + side padding for every landing block
 const WRAP = 'mx-auto w-full max-w-[1160px] px-6 max-md:px-4'
 
 function LandingHeader() {
+  const { t } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
 
   // Close the mobile menu with Escape
@@ -43,7 +44,7 @@ function LandingHeader() {
   return (
     <header className="sticky top-0 z-10 border-b border-border bg-[color-mix(in_srgb,var(--color-bg)_88%,transparent)] backdrop-blur-[10px]">
       <div className="mx-auto flex max-w-[1160px] items-center gap-4 px-6 py-3 max-md:flex-wrap max-md:px-4">
-        <Link to="/" className="inline-flex rounded-md" aria-label="tooli home">
+        <Link to="/" className="inline-flex rounded-md" aria-label={t('landing.homeLink')}>
           <Logo height={34} />
         </Link>
 
@@ -51,10 +52,10 @@ function LandingHeader() {
           type="button"
           variant="tile"
           size="icon-lg"
-          className="ml-auto bg-card md:hidden"
+          className="ms-auto bg-card md:hidden"
           aria-expanded={menuOpen}
           aria-controls="landing-menu"
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
+          aria-label={menuOpen ? t('landing.closeMenu') : t('nav.openMenu')}
           onClick={() => setMenuOpen((open) => !open)}
         >
           {menuOpen ? <X size={22} aria-hidden="true" /> : <Menu size={22} aria-hidden="true" />}
@@ -63,21 +64,24 @@ function LandingHeader() {
         <div
           id="landing-menu"
           className={cn(
-            'ml-auto flex items-center gap-5',
+            'ms-auto flex items-center gap-5',
             'max-md:basis-full max-md:flex-col max-md:items-stretch max-md:gap-4 max-md:pt-2 max-md:pb-3',
             !menuOpen && 'max-md:hidden',
           )}
         >
-          <ThemeSwitcher className="max-md:justify-center" />
+          <div className="flex items-center gap-3 max-md:justify-center">
+            <ThemeSwitcher />
+            <LanguageSwitcher />
+          </div>
           <div className="flex items-center gap-1.5 max-md:grid max-md:grid-cols-2 max-md:gap-2.5">
             <Button asChild variant="ghost" className="max-md:inset-ring-[1.5px] max-md:inset-ring-border">
               <Link to="/login" onClick={close}>
-                Log in
+                {t('auth.login.submit')}
               </Link>
             </Button>
             <Button asChild>
               <Link to="/signup" onClick={close}>
-                Sign up
+                {t('auth.signup.short')}
               </Link>
             </Button>
           </div>
@@ -88,7 +92,9 @@ function LandingHeader() {
 }
 
 function ServiceTeaser({ service }) {
-  const { slug, title, pitch, icon: Icon, soon } = service
+  const { t } = useTranslation()
+  const { key, slug, icon: Icon, soon } = service
+  const title = t(`services.${key}.title`)
 
   return (
     <MotionCard
@@ -100,18 +106,18 @@ function ServiceTeaser({ service }) {
         <span className={cn('grid size-12 place-items-center rounded-xl bg-accent text-primary-text', soon && 'opacity-70')}>
           <Icon size={24} aria-hidden="true" />
         </span>
-        {soon && <Badge variant="highlight">Soon</Badge>}
+        {soon && <Badge variant="highlight">{t('common.soon')}</Badge>}
       </div>
       <h3 className="text-[17px] font-bold">{title}</h3>
-      <p className="flex-1 text-sm leading-[1.6] text-muted-foreground">{pitch}</p>
+      <p className="flex-1 text-sm leading-[1.6] text-muted-foreground">{t(`services.${key}.pitch`)}</p>
       {!soon && (
         <Button
           asChild
           variant="ghost"
           className="mt-1.5 h-auto self-start bg-accent px-3.5 py-2 hover:bg-[color-mix(in_srgb,var(--color-primary)_28%,transparent)]"
         >
-          <Link to={`/login?next=${encodeURIComponent(servicePath(slug))}`} aria-label={`Log in to start: ${title}`}>
-            Log in to start <ArrowRight aria-hidden="true" />
+          <Link to={`/login?next=${encodeURIComponent(servicePath(slug))}`} aria-label={t('landing.startLabel', { service: title })}>
+            {t('landing.start')} <ArrowRight aria-hidden="true" className="rtl:-scale-x-100" />
           </Link>
         </Button>
       )}
@@ -131,6 +137,8 @@ function SectionHead({ id, title, sub }) {
 }
 
 export default function Landing() {
+  const { t } = useTranslation()
+  usePageTitle(t('landing.docTitle'))
   const entrance = useEntrance()
   const inView = useInView()
 
@@ -150,28 +158,27 @@ export default function Landing() {
         >
           <motion.div variants={fadeUp}>
             <Badge asChild variant="highlight" className="mb-[18px] inline-block px-3.5 py-[5px] text-[13px]">
-              <p>Your study buddy, always on</p>
+              <p>{t('landing.hero.badge')}</p>
             </Badge>
             <h1 className="text-[clamp(34px,5.6vw,58px)] leading-[1.08] font-extrabold tracking-[-0.02em]">
-              Stuck on homework?{' '}
+              {t('landing.hero.title')}{' '}
               <span className="whitespace-nowrap">
-                Ask{' '}
+                {t('landing.hero.ask')}{' '}
                 <span className="px-1 text-primary-text [background:linear-gradient(transparent_70%,var(--color-accent-soft)_70%)]">
                   tooli
                 </span>
-                .
+                {t('landing.hero.end')}
               </span>
             </h1>
             <p className="mt-[18px] max-w-[520px] text-[17px] leading-[1.65] text-muted-foreground max-md:mx-auto max-md:text-base">
-              Clear, step-by-step answers in seconds, the best partner courses and live classes with top professors in
-              Tunisia. All in one friendly place.
+              {t('landing.hero.text')}
             </p>
             <div className="mt-[30px] flex flex-wrap gap-3 max-md:justify-center">
               <Button asChild size="lg" className="max-xs:flex-[1_1_100%]">
-                <Link to="/signup">Sign up for free</Link>
+                <Link to="/signup">{t('landing.signupFree')}</Link>
               </Button>
               <Button asChild size="lg" variant="outline" className="max-xs:flex-[1_1_100%]">
-                <Link to="/login">Log in</Link>
+                <Link to="/login">{t('auth.login.submit')}</Link>
               </Button>
             </div>
           </motion.div>
@@ -182,20 +189,20 @@ export default function Landing() {
         </motion.section>
 
         <section className={cn(WRAP, 'pt-10 pb-14')} aria-labelledby="services-title">
-          <SectionHead id="services-title" title="Our services" sub="Everything you need to move forward, whatever your level." />
+          <SectionHead id="services-title" title={t('landing.services.title')} sub={t('landing.services.sub')} />
           <motion.div className="grid grid-cols-4 gap-4 max-lg:grid-cols-2 max-xs:grid-cols-1" variants={stagger(0.1)} {...inView}>
             {SERVICES.map((s) => (
-              <ServiceTeaser key={s.title} service={s} />
+              <ServiceTeaser key={s.key} service={s} />
             ))}
           </motion.div>
         </section>
 
         <section className={cn(WRAP, 'pt-10 pb-14')} aria-labelledby="how-title">
-          <SectionHead id="how-title" title="How it works" sub="Three steps and you are ready." />
+          <SectionHead id="how-title" title={t('landing.how.title')} sub={t('landing.how.sub')} />
           <motion.ol className="grid grid-cols-3 gap-4 max-md:grid-cols-1" variants={stagger(0.12)} {...inView}>
             {STEPS.map((step, i) => (
               <motion.li
-                key={step.title}
+                key={step}
                 variants={fadeUp}
                 {...hoverLift}
                 className="relative rounded-2xl border border-border bg-card px-[22px] py-6"
@@ -206,8 +213,8 @@ export default function Landing() {
                 >
                   {i + 1}
                 </span>
-                <h3 className="mb-1.5 text-[17px] font-bold">{step.title}</h3>
-                <p className="text-sm leading-[1.6] text-muted-foreground">{step.text}</p>
+                <h3 className="mb-1.5 text-[17px] font-bold">{t(`landing.steps.${step}.title`)}</h3>
+                <p className="text-sm leading-[1.6] text-muted-foreground">{t(`landing.steps.${step}.text`)}</p>
               </motion.li>
             ))}
           </motion.ol>
@@ -219,15 +226,15 @@ export default function Landing() {
             {...inView}
             className="mb-16 flex items-center gap-7 rounded-3xl border border-border px-9 py-7 [background:radial-gradient(circle_at_90%_10%,var(--color-accent-soft),transparent_45%),var(--color-primary-soft)] max-md:mb-10 max-md:flex-col max-md:gap-4 max-md:px-5 max-md:text-center"
           >
-            <Mascot pose="celebrating" size={150} title="tooli mascot celebrating" className="shrink-0" />
+            <Mascot pose="celebrating" size={150} title={t('landing.cta.mascot')} className="shrink-0" />
             <div className="flex-1">
               <h2 id="cta-title" className="text-[clamp(24px,3.2vw,30px)] font-extrabold">
-                Ready to start?
+                {t('landing.cta.title')}
               </h2>
-              <p className="mt-1.5 text-muted-foreground">Join tooli today. It is free, and your first question is only a click away.</p>
+              <p className="mt-1.5 text-muted-foreground">{t('landing.cta.text')}</p>
             </div>
             <Button asChild size="lg">
-              <Link to="/signup">Sign up for free</Link>
+              <Link to="/signup">{t('landing.signupFree')}</Link>
             </Button>
           </motion.div>
         </section>
@@ -236,14 +243,14 @@ export default function Landing() {
       <footer className="border-t border-border bg-card">
         <div className={cn(WRAP, 'flex flex-wrap items-center gap-x-7 gap-y-4 py-[22px] max-md:flex-col max-md:text-center')}>
           <Logo height={26} />
-          <nav className="flex gap-5" aria-label="Footer">
-            {['About', 'Contact', 'Privacy'].map((label) => (
-              <Link key={label} to={`/${label.toLowerCase()}`} className="text-sm text-muted-foreground no-underline hover:text-foreground">
-                {label}
+          <nav className="flex gap-5" aria-label={t('landing.footer.label')}>
+            {['about', 'contact', 'privacy'].map((page) => (
+              <Link key={page} to={`/${page}`} className="text-sm text-muted-foreground no-underline hover:text-foreground">
+                {t(`info.${page}.title`)}
               </Link>
             ))}
           </nav>
-          <p className="ml-auto text-[13px] text-muted-foreground max-md:ml-0">© {new Date().getFullYear()} tooli</p>
+          <p className="ms-auto text-[13px] text-muted-foreground max-md:ms-0">© {new Date().getFullYear()} tooli</p>
         </div>
       </footer>
     </div>

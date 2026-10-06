@@ -8,6 +8,7 @@ import { useId } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { cn } from '@/lib/utils'
 import { POSES, v } from './mascotPoses.jsx'
+import { useTranslation } from 'react-i18next'
 
 const loop = (duration, extra) => ({ duration, repeat: Infinity, ease: 'easeInOut', ...extra })
 const BOUNCE_EASE = [0.3, 0, 0.4, 1]
@@ -64,7 +65,8 @@ function Arm({ arm, handFill, on }) {
   )
 }
 
-export default function Mascot({ pose = 'waving', size = 120, title = 'tooli mascot', animated = true, className = '', ...props }) {
+export default function Mascot({ pose = 'waving', size = 120, title, animated = true, className = '', ...props }) {
+  const { t } = useTranslation()
   const p = POSES[pose] ?? POSES.waving
   // unique gradient ids per instance (useId output can contain ':' or '«»')
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '')
@@ -83,7 +85,7 @@ export default function Mascot({ pose = 'waving', size = 120, title = 'tooli mas
       width={size}
       height={(size * 226) / 200}
       role="img"
-      aria-label={title}
+      aria-label={title ?? t('common.mascot')}
       className={cn('block overflow-visible', className)}
       {...props}
     >

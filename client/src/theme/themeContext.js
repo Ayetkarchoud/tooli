@@ -1,13 +1,13 @@
 import { createContext, useContext } from 'react'
 
 // Must match the [data-palette] blocks in src/styles/tokens.css
-// and the PALETTES list in index.html's pre-load script
+// and the PALETTES list in index.html's pre-load script. Names: t(`theme.palettes.${id}`)
 export const PALETTES = [
-  { id: 'blue', label: 'Blue', swatch: 'var(--palette-blue)' },
-  { id: 'yellow', label: 'Yellow', swatch: 'var(--palette-yellow)' },
-  { id: 'green', label: 'Light green', swatch: 'var(--palette-green)' },
-  { id: 'red', label: 'Red', swatch: 'var(--palette-red)' },
-  { id: 'violet', label: 'Violet', swatch: 'var(--palette-violet)' },
+  { id: 'blue', swatch: 'var(--palette-blue)' },
+  { id: 'yellow', swatch: 'var(--palette-yellow)' },
+  { id: 'green', swatch: 'var(--palette-green)' },
+  { id: 'red', swatch: 'var(--palette-red)' },
+  { id: 'violet', swatch: 'var(--palette-violet)' },
 ]
 
 // A saved palette id we still know about (old or hand-edited values fall back to blue)

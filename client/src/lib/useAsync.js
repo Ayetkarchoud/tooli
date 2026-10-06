@@ -6,8 +6,12 @@
 // (e.g. dimmed) instead of flashing a skeleton. Check `!data` to know if it's the very first load.
 
 import { useCallback, useEffect, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function useAsync(load, deps) {
+  // The language is a dependency too: switching language reloads the data in that language
+  const { i18n } = useTranslation()
+  const lang = i18n.resolvedLanguage
   const [state, setState] = useState({ data: undefined, error: null, loading: true })
   const [attempt, setAttempt] = useState(0)
 
@@ -22,7 +26,7 @@ export function useAsync(load, deps) {
       current = false
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps -- `deps` is the caller's dependency list
-  }, [...deps, attempt])
+  }, [...deps, attempt, lang])
 
   const reload = useCallback(() => setAttempt((n) => n + 1), [])
   return { ...state, reload }

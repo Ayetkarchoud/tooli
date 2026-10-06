@@ -1,13 +1,16 @@
 // The same page header everywhere in the member area: title, one-line subtitle,
-// optional badge (next to the title), optional actions (right) and an optional mascot.
+// optional badge (next to the title), optional actions (end side) and an optional mascot.
+// A text title also becomes the browser tab title ("Partner courses · tooli").
 //   <PageHeader title="Partner courses" subtitle="…" mascot="explaining" actions={<Button…/>} />
 
 import { cn } from '@/lib/utils'
+import { usePageTitle } from '@/lib/usePageTitle'
 import Mascot from './Mascot.jsx'
 
 export const PAGE_TITLE = 'text-[clamp(26px,3.4vw,34px)] leading-tight font-extrabold tracking-[-0.01em]'
 
 export default function PageHeader({ title, subtitle, badge, actions, mascot, className }) {
+  usePageTitle(typeof title === 'string' ? title : undefined)
   return (
     <header className={cn('mb-8 flex items-center justify-between gap-6', className)}>
       <div className="min-w-0">

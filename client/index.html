@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr" dir="ltr">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -9,11 +9,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700;800&display=swap"
       rel="stylesheet"
     />
     <script>
-      // Apply the saved theme/palette before React loads, so the page never flashes the wrong colours.
+      // Apply the saved theme/palette/language before React loads, so the page never flashes the wrong colours.
       // Same rules as src/theme/ThemeProvider.jsx: no saved theme = follow the system setting;
       // an unknown palette = blue. Keep PALETTES below in sync with src/theme/themeContext.js.
       (function () {
@@ -30,6 +30,22 @@
         if (theme === 'dark') root.dataset.theme = 'dark';
         // > 0: a known palette other than blue (blue, index 0, needs no attribute)
         if (PALETTES.indexOf(palette) > 0) root.dataset.palette = palette;
+
+        // Language (same order as src/lib/i18n.js): saved choice → browser language → French.
+        // Arabic is right-to-left. The key matches LANGUAGE_KEY in src/lib/i18n.js.
+        var LANGS = ['en', 'fr', 'ar'];
+        var lang = null;
+        try {
+          lang = localStorage.getItem('tooli-lang');
+        } catch (e) {}
+        if (LANGS.indexOf(lang) < 0) {
+          var browser = (navigator.languages || [navigator.language || '']).map(function (l) {
+            return String(l).slice(0, 2).toLowerCase();
+          });
+          lang = browser.filter(function (l) { return LANGS.indexOf(l) >= 0; })[0] || 'fr';
+        }
+        root.lang = lang;
+        root.dir = lang === 'ar' ? 'rtl' : 'ltr';
       })();
     </script>
   </head>

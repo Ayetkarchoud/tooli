@@ -3,16 +3,18 @@
 
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 export default function Field({ id, label, error, hint, revealable = false, type = 'text', ref, ...inputProps }) {
+  const { t } = useTranslation()
   const [revealed, setRevealed] = useState(false)
   // The error replaces the hint, so point screen readers at whichever is shown
   const describedBy = error ? `${id}-error` : hint ? `${id}-hint` : undefined
-  const toggleLabel = revealed ? 'Hide password' : 'Show password'
+  const toggleLabel = revealed ? t('auth.hidePassword') : t('auth.showPassword')
 
   return (
     <div className="flex min-w-0 flex-col gap-1.5">
@@ -32,7 +34,7 @@ export default function Field({ id, label, error, hint, revealable = false, type
             'focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-accent',
             // error: red border always, red-tinted ring only while focused
             'aria-invalid:ring-0 aria-invalid:focus-visible:ring-3 aria-invalid:focus-visible:ring-destructive/20 dark:aria-invalid:border-destructive',
-            revealable && 'pr-12',
+            revealable && 'pe-12',
           )}
           {...inputProps}
         />
@@ -41,7 +43,7 @@ export default function Field({ id, label, error, hint, revealable = false, type
             <TooltipTrigger asChild>
               <button
                 type="button"
-                className="absolute top-1/2 right-1.5 grid size-9 -translate-y-1/2 place-items-center rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+                className="absolute end-1.5 top-1/2 grid size-9 -translate-y-1/2 place-items-center rounded-sm text-muted-foreground hover:bg-accent hover:text-foreground"
                 onClick={() => setRevealed((r) => !r)}
                 aria-label={toggleLabel}
                 aria-pressed={revealed}

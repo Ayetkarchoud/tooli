@@ -4,6 +4,7 @@
 // Both fade in after a short delay, so fast loads show nothing at all.
 
 import { motion } from 'motion/react'
+import { useTranslation } from 'react-i18next'
 import { Skeleton } from '@/components/ui/skeleton'
 import Mascot from './Mascot.jsx'
 import Page from './Page.jsx'
@@ -32,11 +33,12 @@ export function PageSkeleton() {
 }
 
 export default function PageLoader({ fullScreen = false }) {
+  const { t } = useTranslation()
   if (!fullScreen) {
     return (
       <motion.div role="status" {...appear}>
         <PageSkeleton />
-        <span className="sr-only">Loading…</span>
+        <span className="sr-only">{t('common.loading')}</span>
       </motion.div>
     )
   }
@@ -54,7 +56,7 @@ export default function PageLoader({ fullScreen = false }) {
           />
         ))}
       </span>
-      <span className="sr-only">Loading…</span>
+      <span className="sr-only">{t('common.loading')}</span>
     </motion.div>
   )
 }

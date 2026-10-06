@@ -2,11 +2,14 @@
 // In development, Vite forwards /api/* to the backend (see vite.config.js),
 // so the frontend never needs the backend's full address.
 
+import { currentLanguage } from '../lib/i18n.js'
+
 const BASE = '/api'
 
 async function request(path, options = {}) {
   const res = await fetch(`${BASE}${path}`, {
-    headers: { 'Content-Type': 'application/json' },
+    // Accept-Language: en | fr | ar, so content (courses, notifications, tips…) comes in the student's language
+    headers: { 'Content-Type': 'application/json', 'Accept-Language': currentLanguage() },
     credentials: 'include',
     ...options,
   })
@@ -38,5 +41,6 @@ export const api = {
   get: (path, query) => request(withQuery(path, query)),
   post: (path, body) => request(path, { method: 'POST', body: JSON.stringify(body) }),
   put: (path, body) => request(path, { method: 'PUT', body: JSON.stringify(body) }),
+  patch: (path, body) => request(path, { method: 'PATCH', body: JSON.stringify(body) }),
   delete: (path) => request(path, { method: 'DELETE' }),
 }

@@ -4,6 +4,8 @@
 
 import { Link } from 'react-router-dom'
 import { RefreshCw } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import Mascot from './Mascot.jsx'
@@ -20,15 +22,17 @@ export default function MascotMessage({ pose = 'thinking', title, text, action, 
 }
 
 // Unknown id / tab inside the member area
-export function NotFoundState({ title = 'We couldn’t find that', text, backTo = '/dashboard', backLabel = 'Back to dashboard' }) {
+export function NotFoundState({ title, text, backTo = '/dashboard', backLabel }) {
+  const { t } = useTranslation()
+  usePageTitle(title ?? t('errors.notFoundTitle'))
   return (
     <MascotMessage
       pose="oops"
-      title={title}
-      text={text ?? 'It may have been moved or removed, or the link has a typo.'}
+      title={title ?? t('errors.notFoundTitle')}
+      text={text ?? t('errors.notFoundText')}
       action={
         <Button asChild>
-          <Link to={backTo}>{backLabel}</Link>
+          <Link to={backTo}>{backLabel ?? t('common.backToDashboard')}</Link>
         </Button>
       }
     />
@@ -36,17 +40,18 @@ export function NotFoundState({ title = 'We couldn’t find that', text, backTo 
 }
 
 // A service call failed
-export function ErrorState({ onRetry, text = 'Something went wrong while loading this. Check your connection and try again.' }) {
+export function ErrorState({ onRetry, text }) {
+  const { t } = useTranslation()
   return (
     <MascotMessage
       pose="oops"
-      title="Oops, that didn’t load"
-      text={text}
+      title={t('errors.loadTitle')}
+      text={text ?? t('errors.loadText')}
       role="alert"
       action={
         onRetry && (
           <Button variant="outline" onClick={onRetry}>
-            <RefreshCw aria-hidden="true" /> Try again
+            <RefreshCw aria-hidden="true" /> {t('common.tryAgain')}
           </Button>
         )
       }

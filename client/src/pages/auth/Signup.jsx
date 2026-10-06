@@ -1,5 +1,6 @@
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { safeNext, useAuth } from '../../auth/authContext.js'
+import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
 import AuthShell from './AuthShell.jsx'
 import Field, { EMAIL_PATTERN } from './Field.jsx'
@@ -7,21 +8,21 @@ import { useAuthForm } from './useAuthForm.js'
 
 const MIN_PASSWORD = 8
 
-function validate({ firstName, lastName, email, password }) {
+function validate({ firstName, lastName, email, password }, t) {
   const errors = {}
-  if (!firstName.trim()) errors.firstName = 'What should we call you?'
-  if (!lastName.trim()) errors.lastName = 'Please add your last name too.'
-  if (!email.trim()) errors.email = 'We need your email to create your account.'
-  else if (!EMAIL_PATTERN.test(email.trim())) errors.email = 'That email doesn’t look quite right. Check for typos?'
-  if (!password) errors.password = 'Choose a password to protect your account.'
+  if (!firstName.trim()) errors.firstName = t('auth.errors.firstName')
+  if (!lastName.trim()) errors.lastName = t('auth.errors.lastName')
+  if (!email.trim()) errors.email = t('auth.errors.emailNeeded')
+  else if (!EMAIL_PATTERN.test(email.trim())) errors.email = t('auth.errors.emailInvalid')
+  if (!password) errors.password = t('auth.errors.passwordChoose')
   else if (password.length < MIN_PASSWORD) {
-    const missing = MIN_PASSWORD - password.length
-    errors.password = `Almost there: ${missing} more character${missing > 1 ? 's' : ''} needed (at least ${MIN_PASSWORD}).`
+    errors.password = t('auth.errors.passwordShort', { count: MIN_PASSWORD - password.length, min: MIN_PASSWORD })
   }
   return errors
 }
 
 export default function Signup() {
+  const { t } = useTranslation()
   const { signup } = useAuth()
   const navigate = useNavigate()
   const [params] = useSearchParams()
@@ -41,26 +42,26 @@ export default function Signup() {
   return (
     <AuthShell
       pose="waving"
-      mascotTitle="tooli mascot waving hello"
-      title="Create your account"
-      subtitle="It’s free and takes less than a minute."
+      mascotTitle={t('auth.signup.mascot')}
+      title={t('auth.signup.title')}
+      subtitle={t('auth.signup.subtitle')}
       footer={
         <>
-          Already have an account? <Link to={loginLink}>Log in</Link>
+          {t('auth.signup.haveAccount')} <Link to={loginLink}>{t('auth.login.submit')}</Link>
         </>
       }
     >
       <form className="mt-6 flex flex-col gap-4" onSubmit={handleSubmit} noValidate>
         <div className="grid grid-cols-2 gap-3 max-xs:grid-cols-1">
-          <Field label="First name" autoComplete="given-name" {...field('firstName')} />
-          <Field label="Last name" autoComplete="family-name" {...field('lastName')} />
+          <Field label={t('auth.firstName')} autoComplete="given-name" {...field('firstName')} />
+          <Field label={t('auth.lastName')} autoComplete="family-name" {...field('lastName')} />
         </div>
-        <Field label="Email" type="email" autoComplete="email" inputMode="email" {...field('email')} />
+        <Field label={t('auth.email')} type="email" autoComplete="email" inputMode="email" {...field('email')} />
         <Field
-          label="Password"
+          label={t('auth.password')}
           type="password"
           autoComplete="new-password"
-          hint={`At least ${MIN_PASSWORD} characters.`}
+          hint={t('auth.passwordHint', { count: MIN_PASSWORD })}
           revealable
           {...field('password')}
         />
@@ -72,7 +73,7 @@ export default function Signup() {
         )}
 
         <Button type="submit" size="lg" className="mt-1 w-full" disabled={busy}>
-          {busy ? 'Creating your account…' : 'Create my account'}
+          {busy ? t('auth.signup.busy') : t('auth.signup.submit')}
         </Button>
       </form>
     </AuthShell>

@@ -17,3 +17,11 @@ export const copy = (value) => structuredClone(value)
 
 // Text search helper, shared with the pages
 export { matches } from '../lib/text.js'
+
+// The language the fake API "answers" in. The real API reads the Accept-Language header
+// (set by src/api/client.js); the fakes read the current language directly.
+export { currentLanguage } from '../lib/i18n.js'
+
+// Pick the text for the current language from { en, fr, ar } (fallback: French, like the API)
+import { currentLanguage as lang } from '../lib/i18n.js'
+export const pick = (texts, language = lang()) => texts?.[language] ?? texts?.fr ?? texts?.en

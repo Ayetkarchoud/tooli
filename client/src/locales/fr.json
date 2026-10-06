@@ -1,0 +1,309 @@
+{
+  "common": {
+    "docTitle": "{{page}} · tooli",
+    "loading": "Chargement…",
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "tryAgain": "Réessayer",
+    "backToDashboard": "Retour au tableau de bord",
+    "backToHome": "Retour à l’accueil",
+    "friend": "toi",
+    "mascot": "La mascotte tooli",
+    "all": "Tout",
+    "seeAll": "Tout voir",
+    "new": "Nouveau",
+    "soon": "Bientôt"
+  },
+  "nav": {
+    "main": "Principal",
+    "homeLink": "Tableau de bord tooli",
+    "dashboard": "Tableau de bord",
+    "dashboardShort": "Accueil",
+    "tutor": "Tuteur IA",
+    "tutorShort": "Tuteur",
+    "courses": "Cours partenaires",
+    "coursesShort": "Cours",
+    "professors": "Profs VIP",
+    "professorsShort": "VIP",
+    "settings": "Paramètres",
+    "goVip": "Passe VIP",
+    "goVipText": "Débloque des cours particuliers avec les meilleurs profs.",
+    "upgrade": "Découvrir",
+    "menu": "Menu",
+    "openMenu": "Ouvrir le menu",
+    "accountMenu": "Menu du compte de {{name}}",
+    "logout": "Se déconnecter"
+  },
+  "errors": {
+    "loadTitle": "Oups, ça n’a pas chargé",
+    "loadText": "Un souci est survenu pendant le chargement. Vérifie ta connexion et réessaie.",
+    "notFoundTitle": "On n’a pas trouvé ça",
+    "notFoundText": "Il a peut-être été déplacé ou supprimé, ou le lien contient une faute.",
+    "pageNotFound": "Page introuvable",
+    "pageNotFoundText": "Cette page n’existe pas. On te remet sur la bonne voie.",
+    "confusedMascot": "La mascotte tooli, l’air perdue",
+    "generic": "Un souci est survenu. Réessaie."
+  },
+  "theme": {
+    "toLight": "Passer en mode clair",
+    "toDark": "Passer en mode sombre",
+    "paletteLabel": "Palette {{name}}",
+    "palettes": {
+      "blue": "Bleu",
+      "yellow": "Jaune",
+      "green": "Vert clair",
+      "red": "Rouge",
+      "violet": "Violet"
+    }
+  },
+  "language": {
+    "title": "Langue",
+    "choose": "Langue : {{language}}. Changer de langue"
+  },
+  "languageNames": {
+    "en": "Anglais",
+    "fr": "Français",
+    "ar": "Arabe"
+  },
+  "time": {
+    "justNow": "à l’instant",
+    "minutes": "{{m}} min",
+    "hours": "{{h}} h",
+    "hoursMinutes": "{{h}} h {{m}}",
+    "slotAt": "{{day}} à {{time}}"
+  },
+  "money": {
+    "tnd": "{{amount}} DT"
+  },
+  "titles": {
+    "prof": "Prof.",
+    "dr": "Dr"
+  },
+  "subjects": {
+    "mathematics": "Mathématiques",
+    "physics": "Physique",
+    "chemistry": "Chimie",
+    "biology": "SVT",
+    "computer-science": "Informatique",
+    "english": "Anglais",
+    "french": "Français"
+  },
+  "levels": {
+    "college": "Collège",
+    "bac": "Bac",
+    "prepa": "Prépa",
+    "university": "Université",
+    "all-levels": "Tous niveaux",
+    "other": "Autre"
+  },
+  "sections": {
+    "mathematics": "Mathématiques",
+    "experimental-sciences": "Sciences expérimentales",
+    "technical-sciences": "Sciences techniques",
+    "computer-science": "Sciences de l’informatique",
+    "economics": "Économie et gestion",
+    "arts": "Lettres",
+    "sport": "Sport",
+    "engineering": "Ingénierie",
+    "medicine": "Médecine et santé",
+    "other": "Autre"
+  },
+  "cities": {
+    "ariana": "Ariana",
+    "beja": "Béja",
+    "ben-arous": "Ben Arous",
+    "bizerte": "Bizerte",
+    "gabes": "Gabès",
+    "gafsa": "Gafsa",
+    "jendouba": "Jendouba",
+    "kairouan": "Kairouan",
+    "kasserine": "Kasserine",
+    "kebili": "Kébili",
+    "le-kef": "Le Kef",
+    "mahdia": "Mahdia",
+    "manouba": "La Manouba",
+    "medenine": "Médenine",
+    "monastir": "Monastir",
+    "nabeul": "Nabeul",
+    "sfax": "Sfax",
+    "sidi-bouzid": "Sidi Bouzid",
+    "siliana": "Siliana",
+    "sousse": "Sousse",
+    "tataouine": "Tataouine",
+    "tozeur": "Tozeur",
+    "tunis": "Tunis",
+    "zaghouan": "Zaghouan"
+  },
+  "services": {
+    "tutor": {
+      "title": "Tuteur IA",
+      "text": "Pose n’importe quelle question et reçois une réponse claire, étape par étape.",
+      "pitch": "Bloqué sur un devoir à minuit ? Pose ta question et reçois une explication claire, étape par étape, en quelques secondes.",
+      "cta": "Poser une question"
+    },
+    "courses": {
+      "title": "Cours partenaires",
+      "text": "Des cours choisis chez nos partenaires e-learning.",
+      "pitch": "Des cours de plateformes e-learning de confiance, réunis au même endroit pour suivre ta progression facilement.",
+      "cta": "Voir les cours"
+    },
+    "professors": {
+      "title": "Profs VIP",
+      "text": "Des cours en direct avec les meilleurs profs de Tunisie.",
+      "pitch": "Réserve des cours particuliers en direct avec les profs les mieux notés de Tunisie, à l’heure qui te convient.",
+      "cta": "Les découvrir"
+    },
+    "soon": {
+      "title": "Et bientôt plus",
+      "text": "De nouveaux services arrivent.",
+      "pitch": "On prépare de nouvelles façons de t’aider à apprendre. Reste connecté."
+    }
+  },
+  "landing": {
+    "docTitle": "Ton coach d’études",
+    "homeLink": "Accueil tooli",
+    "closeMenu": "Fermer le menu",
+    "start": "Se connecter pour commencer",
+    "startLabel": "Se connecter pour commencer : {{service}}",
+    "signupFree": "Inscris-toi gratuitement",
+    "hero": {
+      "badge": "Ton coach d’études, toujours dispo",
+      "title": "Bloqué sur un devoir ?",
+      "ask": "Demande à",
+      "end": ".",
+      "text": "Des réponses claires, étape par étape, en quelques secondes, les meilleurs cours partenaires et des cours en direct avec les meilleurs profs de Tunisie. Tout au même endroit."
+    },
+    "preview": {
+      "name": "Tuteur tooli",
+      "status": "Là pour t’aider, jour et nuit",
+      "question": "Comment je résous 2x + 5 = 13 ?",
+      "intro": "On la résout étape par étape :",
+      "step1": "Enlève 5 des deux côtés : 2x = 8",
+      "step2": "Divise les deux côtés par 2 : x = 4",
+      "step3": "Vérifie : 2 × 4 + 5 = 13 ✓"
+    },
+    "services": {
+      "title": "Nos services",
+      "sub": "Tout ce qu’il te faut pour avancer, quel que soit ton niveau."
+    },
+    "how": {
+      "title": "Comment ça marche",
+      "sub": "Trois étapes et c’est parti."
+    },
+    "steps": {
+      "account": {
+        "title": "Crée ton compte gratuit",
+        "text": "Inscription en moins d’une minute. Il te faut juste une adresse e-mail."
+      },
+      "service": {
+        "title": "Choisis un service",
+        "text": "Pose une question au tuteur IA, suis un cours partenaire ou réserve un prof VIP."
+      },
+      "learn": {
+        "title": "Commence à apprendre",
+        "text": "Avance à ton rythme et regarde ta progression grandir semaine après semaine."
+      }
+    },
+    "cta": {
+      "mascot": "La mascotte tooli fait la fête",
+      "title": "Prêt à commencer ?",
+      "text": "Rejoins tooli dès aujourd’hui. C’est gratuit, et ta première question est à un clic."
+    },
+    "footer": {
+      "label": "Pied de page"
+    }
+  },
+  "info": {
+    "about": {
+      "title": "À propos",
+      "heading": "À propos de tooli",
+      "intro": "tooli aide les élèves et étudiants en Tunisie à apprendre avec moins de stress et plus de confiance.",
+      "sections": {
+        "why": {
+          "title": "Pourquoi on l’a créé",
+          "text": "Une bonne aide ne devrait pas dépendre de l’endroit où tu vis ni de l’heure qu’il est. tooli réunit un tuteur IA, les meilleurs cours partenaires et des profs excellents au même endroit."
+        },
+        "what": {
+          "title": "Ce que tu peux faire",
+          "text": "Poser n’importe quelle question et recevoir une réponse étape par étape, suivre des cours partenaires avec ta progression enregistrée, et réserver des cours particuliers avec des profs VIP."
+        },
+        "who": {
+          "title": "Qui on est",
+          "text": "Une petite équipe d’étudiants et d’enseignants de Monastir qui aurait aimé avoir ça en préparant le bac."
+        }
+      }
+    },
+    "contact": {
+      "title": "Contact",
+      "heading": "Nous contacter",
+      "intro": "Une question, une idée ou un problème ? On lit chaque message et on répond sous deux jours ouvrés.",
+      "email": "E-mail",
+      "writeTo": "Écris à",
+      "demoAddress": "(adresse de démo).",
+      "where": "Où nous trouver",
+      "whereText": "Monastir, Tunisie. On construit tooli depuis le campus POLYTECH.",
+      "help": "Besoin d’aide pour tes études tout de suite ?",
+      "helpText": "Le tuteur IA répond jour et nuit, étape par étape.",
+      "try": "Essayer tooli gratuitement"
+    },
+    "privacy": {
+      "title": "Confidentialité",
+      "heading": "Confidentialité",
+      "intro": "Court et honnête : ce qu’on garde, et pourquoi.",
+      "sections": {
+        "demo": {
+          "title": "Ceci est une démo",
+          "text": "Pour l’instant, tooli fonctionne sans serveur : ton nom, tes réglages et ta progression sont enregistrés uniquement dans ce navigateur. Si tu effaces les données du navigateur, ils disparaissent."
+        },
+        "store": {
+          "title": "Ce qu’on enregistrera",
+          "text": "Ton compte (nom, e-mail, mot de passe chiffré de façon sécurisée), ton profil, ta langue, ta progression, tes réservations et tes discussions avec le tuteur, uniquement pour que tooli fonctionne pour toi."
+        },
+        "never": {
+          "title": "Ce qu’on ne fait jamais",
+          "text": "On ne vend jamais tes données et on ne t’affiche jamais de pubs basées dessus. Tu pourras tout télécharger ou tout supprimer depuis tes paramètres."
+        }
+      }
+    }
+  },
+  "auth": {
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe",
+    "passwordHint_one": "Au moins {{count}} caractère.",
+    "passwordHint_other": "Au moins {{count}} caractères.",
+    "login": {
+      "mascot": "La mascotte tooli réfléchit",
+      "title": "Content de te revoir",
+      "subtitle": "Connecte-toi pour continuer à apprendre avec tooli.",
+      "noAccount": "Pas encore de compte ?",
+      "submit": "Se connecter",
+      "busy": "Connexion…"
+    },
+    "signup": {
+      "mascot": "La mascotte tooli te dit bonjour",
+      "title": "Crée ton compte",
+      "subtitle": "C’est gratuit et ça prend moins d’une minute.",
+      "haveAccount": "Déjà un compte ?",
+      "short": "S’inscrire",
+      "submit": "Créer mon compte",
+      "busy": "Création de ton compte…"
+    },
+    "errors": {
+      "emailMissing": "Indique ton adresse e-mail.",
+      "emailNeeded": "Il nous faut ton e-mail pour créer ton compte.",
+      "emailInvalid": "Cet e-mail a l’air bizarre. Une petite faute de frappe ?",
+      "passwordMissing": "Indique ton mot de passe.",
+      "passwordChoose": "Choisis un mot de passe pour protéger ton compte.",
+      "passwordShort_one": "Presque ! Encore {{count}} caractère (au moins {{min}}).",
+      "passwordShort_other": "Presque ! Encore {{count}} caractères (au moins {{min}}).",
+      "firstName": "Comment on doit t’appeler ?",
+      "lastName": "Ajoute aussi ton nom de famille."
+    }
+  }
+}

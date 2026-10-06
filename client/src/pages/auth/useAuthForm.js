@@ -1,9 +1,12 @@
 // Form state for login / sign up: values, friendly errors, submit handling.
 // Errors show after a field is left (blur) or after a submit attempt, not while typing the first time.
+// validate(values, t) returns translated messages, so they follow a language change at once.
 
 import { useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export function useAuthForm({ initial, validate, onSubmit }) {
+  const { t } = useTranslation()
   const [values, setValues] = useState(initial)
   const [touched, setTouched] = useState({})
   const [submitted, setSubmitted] = useState(false)
@@ -11,7 +14,7 @@ export function useAuthForm({ initial, validate, onSubmit }) {
   const [formError, setFormError] = useState('')
   const refs = useRef({})
 
-  const allErrors = validate(values)
+  const allErrors = validate(values, t)
   const errorFor = (name) => (touched[name] || submitted ? allErrors[name] : undefined)
 
   const field = (name) => ({
@@ -22,7 +25,7 @@ export function useAuthForm({ initial, validate, onSubmit }) {
       refs.current[name] = el
     },
     onChange: (e) => setValues((v) => ({ ...v, [name]: e.target.value })),
-    onBlur: () => setTouched((t) => ({ ...t, [name]: true })),
+    onBlur: () => setTouched((current) => ({ ...current, [name]: true })),
   })
 
   const handleSubmit = async (e) => {
@@ -40,7 +43,7 @@ export function useAuthForm({ initial, validate, onSubmit }) {
     try {
       await onSubmit(values)
     } catch (err) {
-      setFormError(err?.message || 'Something went wrong. Please try again.')
+      setFormError(err?.message || t('errors.generic'))
       setBusy(false)
     }
   }

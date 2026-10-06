@@ -1,0 +1,309 @@
+{
+  "common": {
+    "docTitle": "{{page}} · tooli",
+    "loading": "Loading…",
+    "close": "Close",
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "tryAgain": "Try again",
+    "backToDashboard": "Back to dashboard",
+    "backToHome": "Back to home",
+    "friend": "friend",
+    "mascot": "tooli mascot",
+    "all": "All",
+    "seeAll": "See all",
+    "new": "New",
+    "soon": "Soon"
+  },
+  "nav": {
+    "main": "Main",
+    "homeLink": "tooli dashboard",
+    "dashboard": "Dashboard",
+    "dashboardShort": "Home",
+    "tutor": "AI tutor",
+    "tutorShort": "Tutor",
+    "courses": "Partner courses",
+    "coursesShort": "Courses",
+    "professors": "VIP professors",
+    "professorsShort": "VIP",
+    "settings": "Settings",
+    "goVip": "Go VIP",
+    "goVipText": "Unlock private sessions with top professors.",
+    "upgrade": "Upgrade",
+    "menu": "Menu",
+    "openMenu": "Open menu",
+    "accountMenu": "Account menu for {{name}}",
+    "logout": "Log out"
+  },
+  "errors": {
+    "loadTitle": "Oops, that didn’t load",
+    "loadText": "Something went wrong while loading this. Check your connection and try again.",
+    "notFoundTitle": "We couldn’t find that",
+    "notFoundText": "It may have been moved or removed, or the link has a typo.",
+    "pageNotFound": "Page not found",
+    "pageNotFoundText": "This page doesn’t exist. Let’s get you back on track.",
+    "confusedMascot": "tooli mascot looking confused",
+    "generic": "Something went wrong. Please try again."
+  },
+  "theme": {
+    "toLight": "Switch to light mode",
+    "toDark": "Switch to dark mode",
+    "paletteLabel": "{{name}} palette",
+    "palettes": {
+      "blue": "Blue",
+      "yellow": "Yellow",
+      "green": "Light green",
+      "red": "Red",
+      "violet": "Violet"
+    }
+  },
+  "language": {
+    "title": "Language",
+    "choose": "Language: {{language}}. Change language"
+  },
+  "languageNames": {
+    "en": "English",
+    "fr": "French",
+    "ar": "Arabic"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutes": "{{m}} min",
+    "hours": "{{h}} h",
+    "hoursMinutes": "{{h}} h {{m}} min",
+    "slotAt": "{{day}} at {{time}}"
+  },
+  "money": {
+    "tnd": "{{amount}} TND"
+  },
+  "titles": {
+    "prof": "Prof.",
+    "dr": "Dr."
+  },
+  "subjects": {
+    "mathematics": "Mathematics",
+    "physics": "Physics",
+    "chemistry": "Chemistry",
+    "biology": "Biology",
+    "computer-science": "Computer science",
+    "english": "English",
+    "french": "French"
+  },
+  "levels": {
+    "college": "Middle school",
+    "bac": "Bac",
+    "prepa": "Prépa",
+    "university": "University",
+    "all-levels": "All levels",
+    "other": "Other"
+  },
+  "sections": {
+    "mathematics": "Mathematics",
+    "experimental-sciences": "Experimental sciences",
+    "technical-sciences": "Technical sciences",
+    "computer-science": "Computer science",
+    "economics": "Economics and management",
+    "arts": "Arts and literature",
+    "sport": "Sport",
+    "engineering": "Engineering",
+    "medicine": "Medicine and health",
+    "other": "Other"
+  },
+  "cities": {
+    "ariana": "Ariana",
+    "beja": "Béja",
+    "ben-arous": "Ben Arous",
+    "bizerte": "Bizerte",
+    "gabes": "Gabès",
+    "gafsa": "Gafsa",
+    "jendouba": "Jendouba",
+    "kairouan": "Kairouan",
+    "kasserine": "Kasserine",
+    "kebili": "Kébili",
+    "le-kef": "Le Kef",
+    "mahdia": "Mahdia",
+    "manouba": "La Manouba",
+    "medenine": "Médenine",
+    "monastir": "Monastir",
+    "nabeul": "Nabeul",
+    "sfax": "Sfax",
+    "sidi-bouzid": "Sidi Bouzid",
+    "siliana": "Siliana",
+    "sousse": "Sousse",
+    "tataouine": "Tataouine",
+    "tozeur": "Tozeur",
+    "tunis": "Tunis",
+    "zaghouan": "Zaghouan"
+  },
+  "services": {
+    "tutor": {
+      "title": "AI tutor",
+      "text": "Ask any question and get clear, step-by-step answers.",
+      "pitch": "Stuck on homework at midnight? Ask your question and get a clear, step-by-step explanation in seconds.",
+      "cta": "Ask a question"
+    },
+    "courses": {
+      "title": "Partner courses",
+      "text": "Hand-picked courses from our e-learning partners.",
+      "pitch": "Courses from trusted e-learning platforms, gathered in one place so you can follow your progress easily.",
+      "cta": "Browse courses"
+    },
+    "professors": {
+      "title": "VIP professors",
+      "text": "Live classes with the best professors in Tunisia.",
+      "pitch": "Book private live sessions with top-rated professors in Tunisia, at a time that suits you.",
+      "cta": "Meet them"
+    },
+    "soon": {
+      "title": "More coming",
+      "text": "New services are on the way.",
+      "pitch": "We are building new ways to help you learn. Stay tuned."
+    }
+  },
+  "landing": {
+    "docTitle": "Your study buddy",
+    "homeLink": "tooli home",
+    "closeMenu": "Close menu",
+    "start": "Log in to start",
+    "startLabel": "Log in to start: {{service}}",
+    "signupFree": "Sign up for free",
+    "hero": {
+      "badge": "Your study buddy, always on",
+      "title": "Stuck on homework?",
+      "ask": "Ask",
+      "end": ".",
+      "text": "Clear, step-by-step answers in seconds, the best partner courses and live classes with top professors in Tunisia. All in one friendly place."
+    },
+    "preview": {
+      "name": "tooli tutor",
+      "status": "Ready to help, day and night",
+      "question": "How do I solve 2x + 5 = 13?",
+      "intro": "Let’s solve it step by step:",
+      "step1": "Remove the 5 from both sides: 2x = 8",
+      "step2": "Divide both sides by 2: x = 4",
+      "step3": "Check: 2 × 4 + 5 = 13 ✓"
+    },
+    "services": {
+      "title": "Our services",
+      "sub": "Everything you need to move forward, whatever your level."
+    },
+    "how": {
+      "title": "How it works",
+      "sub": "Three steps and you are ready."
+    },
+    "steps": {
+      "account": {
+        "title": "Create your free account",
+        "text": "Sign up in under a minute. All you need is an email address."
+      },
+      "service": {
+        "title": "Choose a service",
+        "text": "Ask the AI tutor, follow a partner course or book a VIP professor."
+      },
+      "learn": {
+        "title": "Start learning",
+        "text": "Learn at your own pace and watch your progress grow week after week."
+      }
+    },
+    "cta": {
+      "mascot": "tooli mascot celebrating",
+      "title": "Ready to start?",
+      "text": "Join tooli today. It is free, and your first question is only a click away."
+    },
+    "footer": {
+      "label": "Footer"
+    }
+  },
+  "info": {
+    "about": {
+      "title": "About",
+      "heading": "About tooli",
+      "intro": "tooli helps students in Tunisia learn with less stress and more confidence.",
+      "sections": {
+        "why": {
+          "title": "Why we built it",
+          "text": "Good help shouldn’t depend on where you live or how late it is. tooli puts an AI tutor, the best partner courses and top professors in one friendly place."
+        },
+        "what": {
+          "title": "What you can do",
+          "text": "Ask any question and get a step-by-step answer, follow partner courses with your progress saved, and book private classes with VIP professors."
+        },
+        "who": {
+          "title": "Who we are",
+          "text": "A small team of students and teachers from Monastir who wish this existed when we were preparing the bac."
+        }
+      }
+    },
+    "contact": {
+      "title": "Contact",
+      "heading": "Contact us",
+      "intro": "A question, an idea or a problem? We read every message and answer within two working days.",
+      "email": "Email",
+      "writeTo": "Write to",
+      "demoAddress": "(demo address).",
+      "where": "Where we are",
+      "whereText": "Monastir, Tunisia. Working on tooli from the POLYTECH campus.",
+      "help": "Need help with your studies right now?",
+      "helpText": "The AI tutor answers day and night, step by step.",
+      "try": "Try tooli for free"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "heading": "Privacy",
+      "intro": "Short and honest: what we keep, and why.",
+      "sections": {
+        "demo": {
+          "title": "This is a demo",
+          "text": "For now tooli runs without a server: your name, settings and progress are saved only in this browser. Clear your browser data and they’re gone."
+        },
+        "store": {
+          "title": "What we will store",
+          "text": "Your account (name, email, a securely hashed password), your profile, language, progress, bookings and tutor chats, only to make tooli work for you."
+        },
+        "never": {
+          "title": "What we never do",
+          "text": "We never sell your data and never show you ads based on it. You’ll be able to download or delete everything from your settings."
+        }
+      }
+    }
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "passwordHint_one": "At least {{count}} character.",
+    "passwordHint_other": "At least {{count}} characters.",
+    "login": {
+      "mascot": "tooli mascot thinking",
+      "title": "Welcome back",
+      "subtitle": "Log in to continue learning with tooli.",
+      "noAccount": "No account?",
+      "submit": "Log in",
+      "busy": "Logging in…"
+    },
+    "signup": {
+      "mascot": "tooli mascot waving hello",
+      "title": "Create your account",
+      "subtitle": "It’s free and takes less than a minute.",
+      "haveAccount": "Already have an account?",
+      "short": "Sign up",
+      "submit": "Create my account",
+      "busy": "Creating your account…"
+    },
+    "errors": {
+      "emailMissing": "Please enter your email address.",
+      "emailNeeded": "We need your email to create your account.",
+      "emailInvalid": "That email doesn’t look quite right. Check for typos?",
+      "passwordMissing": "Please enter your password.",
+      "passwordChoose": "Choose a password to protect your account.",
+      "passwordShort_one": "Almost there: {{count}} more character needed (at least {{min}}).",
+      "passwordShort_other": "Almost there: {{count}} more characters needed (at least {{min}}).",
+      "firstName": "What should we call you?",
+      "lastName": "Please add your last name too."
+    }
+  }
+}

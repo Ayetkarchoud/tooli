@@ -1,8 +1,9 @@
-// Avatar button in the top bar + its small dropdown: Settings, Log out.
+// Avatar button in the top bar + its small dropdown: Language (submenu), Settings, Log out.
 // Keyboard, outside click and Escape are handled by the shadcn DropdownMenu.
 
 import { Link, useNavigate } from 'react-router-dom'
-import { LogOut, Settings } from 'lucide-react'
+import { Languages, LogOut, Settings } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
@@ -10,15 +11,21 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useAuth } from '../auth/authContext.js'
 import { getInitials } from '@/lib/people'
+import { LANGUAGES } from '@/lib/i18n'
+import { LanguageRadioItems } from '../components/LanguageSwitcher.jsx'
 import { SETTINGS_NAV } from './navItems.js'
 
 const itemClass = 'gap-2.5 rounded-md px-3 py-2.5 text-sm font-semibold [&_svg:not([class*=size-])]:size-[18px]'
 
 export default function UserMenu() {
+  const { t, i18n } = useTranslation()
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -35,7 +42,7 @@ export default function UserMenu() {
         <button
           type="button"
           className="shrink-0 rounded-full data-[state=open]:ring-3 data-[state=open]:ring-accent"
-          aria-label={`Account menu for ${fullName}`}
+          aria-label={t('nav.accountMenu', { name: fullName })}
         >
           <Avatar className="size-[38px] after:hidden">
             <AvatarFallback className="bg-primary text-sm font-semibold text-primary-foreground">
@@ -55,13 +62,24 @@ export default function UserMenu() {
           <span className="truncate text-xs font-normal text-muted-foreground">{user.email}</span>
         </DropdownMenuLabel>
         <DropdownMenuSeparator className="mx-0 mt-0 mb-1" />
+        <DropdownMenuSub>
+          <DropdownMenuSubTrigger className={itemClass}>
+            <Languages aria-hidden="true" /> {t('language.title')}
+            <span className="ms-auto text-xs font-normal text-muted-foreground">
+              {LANGUAGES.find((l) => l.code === i18n.resolvedLanguage)?.name}
+            </span>
+          </DropdownMenuSubTrigger>
+          <DropdownMenuSubContent className="w-44 rounded-xl p-1.5">
+            <LanguageRadioItems itemClassName="rounded-md py-2 text-sm font-semibold" />
+          </DropdownMenuSubContent>
+        </DropdownMenuSub>
         <DropdownMenuItem asChild className={itemClass}>
           <Link to={SETTINGS_NAV.to}>
-            <Settings aria-hidden="true" /> Settings
+            <Settings aria-hidden="true" /> {t('nav.settings')}
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem className={itemClass} onSelect={handleLogout}>
-          <LogOut aria-hidden="true" /> Log out
+          <LogOut aria-hidden="true" /> {t('nav.logout')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

@@ -1,29 +1,37 @@
-// Shared frame for /login and /signup: back link, theme switcher, centered card with logo + mascot.
+// Shared frame for /login and /signup: back link, theme + language switchers, centered card with logo + mascot.
 
 import { Link } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { Card } from '@/components/ui/card'
 import Logo from '../../components/Logo.jsx'
 import Mascot from '../../components/Mascot.jsx'
+import LanguageSwitcher from '../../components/LanguageSwitcher.jsx'
 import ThemeSwitcher from '../../components/ThemeSwitcher.jsx'
 
 export default function AuthShell({ pose, mascotTitle, title, subtitle, children, footer }) {
+  const { t } = useTranslation()
+  usePageTitle(title)
   return (
     <div className="flex min-h-screen flex-col [background:radial-gradient(circle_at_12%_0%,var(--color-primary-soft),transparent_42%),radial-gradient(circle_at_100%_100%,var(--color-accent-soft),transparent_38%),var(--color-bg)]">
       <div className="flex flex-wrap items-center justify-between gap-3 px-6 py-4 max-xs:px-4 max-xs:py-3">
         <Link
           to="/"
-          className="-ml-2.5 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-semibold text-foreground no-underline hover:bg-accent"
+          className="-ms-2.5 inline-flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-sm font-semibold text-foreground no-underline hover:bg-accent"
         >
-          <ArrowLeft size={16} aria-hidden="true" /> Back to home
+          <ArrowLeft size={16} aria-hidden="true" className="rtl:-scale-x-100" /> {t('common.backToHome')}
         </Link>
-        <ThemeSwitcher />
+        <div className="flex items-center gap-3">
+          <ThemeSwitcher className="max-xs:[&_[aria-pressed]]:size-5 max-xs:gap-1.5" />
+          <LanguageSwitcher />
+        </div>
       </div>
 
       <main className="grid flex-1 place-items-center px-4 pt-2 pb-12">
         <Card className="w-full max-w-[440px] gap-0 p-8 text-base shadow-[0_24px_48px_-32px_color-mix(in_srgb,var(--color-text)_45%,transparent)] max-xs:px-5 max-xs:py-6">
           <div className="mb-[18px] flex items-center justify-between">
-            <Link to="/" aria-label="tooli home" className="inline-flex rounded-md">
+            <Link to="/" aria-label={t('landing.homeLink')} className="inline-flex rounded-md">
               <Logo height={34} />
             </Link>
             <Mascot pose={pose} size={76} title={mascotTitle} />

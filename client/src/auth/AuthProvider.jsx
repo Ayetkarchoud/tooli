@@ -6,12 +6,13 @@
 //
 // TODO(backend): replace the fake parts with real calls through src/api/client.js (contract: docs/api.md):
 //   login   → api.post('/auth/login',  { email, password })                       → { user }
-//   signup  → api.post('/auth/signup', { firstName, lastName, email, password })  → { user }
+//   signup  → api.post('/auth/signup', { firstName, lastName, email, password, language })  → { user }
 //   logout  → api.post('/auth/logout')
 //   on load → api.get('/auth/me') → { user } (or 401) to restore the session (httpOnly cookie), instead of localStorage
 // Once that is done, delete SESSION_KEY / PROFILES_KEY and the read/write helpers below.
 
 import { useCallback, useMemo, useState } from 'react'
+import i18n, { currentLanguage } from '../lib/i18n.js'
 import { AuthContext } from './authContext.js'
 
 const SESSION_KEY = 'tooli-demo-user'
@@ -39,7 +40,7 @@ function write(key, value) {
 const fakeDelay = () => new Promise((resolve) => setTimeout(resolve, 400))
 
 function nameFromEmail(email) {
-  const part = email.split('@')[0].split(/[._-]/)[0] || 'friend'
+  const part = email.split('@')[0].split(/[._-]/)[0] || i18n.t('common.friend')
   return part[0].toUpperCase() + part.slice(1)
 }
 
@@ -58,6 +59,8 @@ export function AuthProvider({ children }) {
       await fakeDelay()
       const key = email.trim().toLowerCase()
       const known = read(PROFILES_KEY)?.[key]
+      // The language saved in the profile wins over the browser's (the real API returns user.language)
+      if (known?.language && known.language !== currentLanguage()) i18n.changeLanguage(known.language)
       return startSession(known ?? { firstName: nameFromEmail(key), lastName: '', email: key })
     },
     [startSession],
@@ -65,10 +68,11 @@ export function AuthProvider({ children }) {
 
   const signup = useCallback(
     async ({ firstName, lastName, email }) => {
-      // TODO(backend): const { user } = await api.post('/auth/signup', { firstName, lastName, email, password })
+      // TODO(backend): const { user } = await api.post('/auth/signup', { firstName, lastName, email, password, language: currentLanguage() })
       await fakeDelay()
       const key = email.trim().toLowerCase()
-      const newUser = { firstName: firstName.trim(), lastName: lastName.trim(), email: key }
+      // The language the student is using right now is saved in their new profile
+      const newUser = { firstName: firstName.trim(), lastName: lastName.trim(), email: key, language: currentLanguage() }
       write(PROFILES_KEY, { ...read(PROFILES_KEY), [key]: newUser })
       return startSession(newUser)
     },

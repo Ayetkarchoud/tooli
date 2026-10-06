@@ -1,26 +1,27 @@
-// Choices for the Settings → Profile form (static app content, not user data)
+// Choices for the Settings → Profile form (static app content, not user data).
+// Values are ids; their names come from the translation files (levels.*, sections.*, cities.*).
 
-export const LEVELS = ['Collège', 'Bac', 'Prépa', 'University', 'Other']
+export const LEVELS = ['college', 'bac', 'prepa', 'university', 'other']
 
 // Bac sections in Tunisia, plus the usual prépa / university tracks
 export const SECTIONS = [
-  'Mathematics',
-  'Experimental sciences',
-  'Technical sciences',
-  'Computer science',
-  'Economics and management',
-  'Arts and literature',
-  'Sport',
-  'Engineering',
-  'Medicine and health',
-  'Other',
+  'mathematics',
+  'experimental-sciences',
+  'technical-sciences',
+  'computer-science',
+  'economics',
+  'arts',
+  'sport',
+  'engineering',
+  'medicine',
+  'other',
 ]
 
 // Governorate capitals
 export const CITIES = [
-  'Ariana', 'Béja', 'Ben Arous', 'Bizerte', 'Gabès', 'Gafsa', 'Jendouba', 'Kairouan', 'Kasserine', 'Kébili',
-  'Le Kef', 'Mahdia', 'La Manouba', 'Médenine', 'Monastir', 'Nabeul', 'Sfax', 'Sidi Bouzid', 'Siliana', 'Sousse',
-  'Tataouine', 'Tozeur', 'Tunis', 'Zaghouan',
+  'ariana', 'beja', 'ben-arous', 'bizerte', 'gabes', 'gafsa', 'jendouba', 'kairouan', 'kasserine', 'kebili',
+  'le-kef', 'mahdia', 'manouba', 'medenine', 'monastir', 'nabeul', 'sfax', 'sidi-bouzid', 'siliana', 'sousse',
+  'tataouine', 'tozeur', 'tunis', 'zaghouan',
 ]
 
 export const BIO_MAX = 200
