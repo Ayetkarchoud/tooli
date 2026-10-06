@@ -22,26 +22,26 @@ const CHATS = [
         text: {
           en: 'Sure! Think of a leaf as a tiny kitchen.\n1. Ingredients: water from the roots and CO₂ from the air.\n2. Energy: sunlight, caught by chlorophyll (the green pigment).\n3. Recipe: 6 CO₂ + 6 H₂O → C₆H₁₂O₆ + 6 O₂.\n4. Result: glucose feeds the plant, oxygen goes out into the air.\nQuick check: where does the oxygen come from? (Answer: the water!)',
           fr: 'Bien sûr ! Imagine une feuille comme une petite cuisine.\n1. Ingrédients : l’eau des racines et le CO₂ de l’air.\n2. Énergie : la lumière du soleil, captée par la chlorophylle (le pigment vert).\n3. Recette : 6 CO₂ + 6 H₂O → C₆H₁₂O₆ + 6 O₂.\n4. Résultat : le glucose nourrit la plante, l’oxygène part dans l’air.\nPetite vérif : d’où vient l’oxygène ? (Réponse : de l’eau !)',
-          ar: 'بكلّ سرور! تخيّل الورقة كمطبخ صغير.\n1. المكوّنات: الماء من الجذور وثاني أكسيد الكربون CO₂ من الهواء.\n2. الطاقة: ضوء الشمس، يلتقطه اليخضور (الصبغة الخضراء).\n3. الوصفة: 6 CO₂ + 6 H₂O → C₆H₁₂O₆ + 6 O₂.\n4. النتيجة: الغلوكوز يغذّي النبتة، والأكسجين يخرج إلى الهواء.\nسؤال سريع: من أين يأتي الأكسجين؟ (الجواب: من الماء!)',
+          ar: 'بكلّ سرور! تخيّل الورقة كمطبخ صغير.\n1. المكوّنات: الماء من الجذور وثاني أكسيد الكربون CO₂ من الهواء.\n2. الطاقة: ضوء الشمس، يلتقطه اليخضور (الصبغة الخضراء).\n3. الوصفة: 6 \u2066CO₂ + 6\u2069 \u2066H₂O → C₆H₁₂O₆ + 6\u2069 O₂.\n4. النتيجة: الغلوكوز يغذّي النبتة، والأكسجين يخرج إلى الهواء.\nسؤال سريع: من أين يأتي الأكسجين؟ (الجواب: من الماء!)',
         },
       },
     ],
   },
   {
     id: 'equation-2x5',
-    title: { en: 'Solving 2x + 5 = 13', fr: 'Résoudre 2x + 5 = 13', ar: 'حلّ المعادلة 2x + 5 = 13' },
+    title: { en: 'Solving 2x + 5 = 13', fr: 'Résoudre 2x + 5 = 13', ar: 'حلّ المعادلة \u20662x + 5 = 13\u2069' },
     updatedAt: daysAgo(1),
     messages: [
       {
         id: 'm1', role: 'user', createdAt: daysAgo(1),
-        text: { en: 'How do I solve 2x + 5 = 13?', fr: 'Comment je résous 2x + 5 = 13 ?', ar: 'كيف أحلّ المعادلة 2x + 5 = 13؟' },
+        text: { en: 'How do I solve 2x + 5 = 13?', fr: 'Comment je résous 2x + 5 = 13 ?', ar: 'كيف أحلّ المعادلة \u20662x + 5 = 13\u2069؟' },
       },
       {
         id: 'm2', role: 'tutor', createdAt: daysAgo(1),
         text: {
           en: 'Goal: get x alone.\n1. Remove the +5 on both sides: 2x = 13 − 5 = 8.\n2. Divide both sides by 2: x = 8 ÷ 2 = 4.\n3. Check: 2 × 4 + 5 = 13 ✓\nSo x = 4.',
           fr: 'Objectif : isoler x.\n1. Enlève le +5 des deux côtés : 2x = 13 − 5 = 8.\n2. Divise les deux côtés par 2 : x = 8 ÷ 2 = 4.\n3. Vérifie : 2 × 4 + 5 = 13 ✓\nDonc x = 4.',
-          ar: 'الهدف: عزل x.\n1. اطرح 5 من الطرفين: 2x = 13 − 5 = 8.\n2. اقسم الطرفين على 2: x = 8 ÷ 2 = 4.\n3. تحقّق: 2 × 4 + 5 = 13 ✓\nإذن x = 4.',
+          ar: 'الهدف: عزل x.\n1. اطرح 5 من الطرفين: \u20662x = 13 − 5 = 8\u2069.\n2. اقسم الطرفين على 2: \u2066x = 8 ÷ 2 = 4\u2069.\n3. تحقّق: \u20662 × 4 + 5 = 13 ✓\u2069\nإذن \u2066x = 4\u2069.',
         },
       },
     ],

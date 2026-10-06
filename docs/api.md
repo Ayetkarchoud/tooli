@@ -23,6 +23,10 @@ If something here is awkward to build, tell me and we'll change the contract tog
 - **Query parameters**: optional filters go in the query string (`GET /api/courses?subject=Physics&q=derivatives`).
   The frontend leaves out empty ones (it never sends `subject=` or `q=undefined`), so treat a missing param as "no filter".
 - **IDs**: strings. MongoDB `_id` is fine, but please send it as `id` (a slug like `"algebra-basics"` also works).
+- **Fixed lists are ids, not words**: subjects, levels, sections, cities, teaching languages and professor titles
+  are sent as lowercase ids (`"mathematics"`, `"bac"`, `"monastir"`, `"ar"`, `"prof"`). The frontend translates them
+  (the full lists are in [Languages](#languages)). Free text (titles, descriptions…) comes already translated.
+- **Language**: every request carries `Accept-Language: en | fr | ar`; see [Languages](#languages).
 - **Auth**: a session cookie (see [Auth](#auth)). Every route except signup and login needs it.
   The frontend sends it automatically (`credentials: 'include'`).
 - **Errors**: always this shape, with a sensible status code. `message` is shown to the user, so keep it friendly.
@@ -41,6 +45,46 @@ If something here is awkward to build, tell me and we'll change the contract tog
   | 500 | Something broke on the server |
 
 - **Empty success**: `204 No Content` with no body.
+
+## Languages
+
+tooli speaks **English (`en`), French (`fr`) and Arabic (`ar`, written right to left)**. French is the default:
+most Tunisian students study in French.
+
+- **`Accept-Language` on every request.** The frontend sends exactly one code: `Accept-Language: fr` (`en`, `fr` or `ar`;
+  set in `client/src/api/client.js`). It is the language the student is using right now.
+- **Content comes back in that language, with French as the fallback.** This applies to every text you store:
+  course titles, descriptions, outcomes and lesson titles, professor bios, notifications (title + body),
+  study tips and VIP plans (name + features). If a text is missing in the requested language, send the French one.
+  Store them per language, for example `"title": { "en": "…", "fr": "…", "ar": "…" }`, and send only the right one:
+  the responses keep the shapes below (`"title": "…"`, a plain string).
+- **Error messages** (`error.message`) are shown to the student, so write them in the requested language too
+  (fallback French). Keep `error.code` in English: the frontend may test it.
+- **Not translated**: what people wrote (tutor questions, reviews, the profile bio and school, names). Send it as it was written.
+- **The user's language is saved in the profile**: `language` (`"en" | "fr" | "ar"`) on the user and in
+  `GET /api/users/me/profile`. Signup sends the language the visitor was using; when the student changes language,
+  the frontend saves it with `PUT /api/users/me/profile` `{ "language": "ar" }`. After login the app switches to
+  `user.language`. Use it for anything sent outside a request (emails, notifications created by the server):
+  write those in the user's saved language, or store them so they can be rendered in the requested one.
+- **The AI tutor answers in the student's language**: `POST /api/tutor/messages` includes `language`;
+  tell the model to answer in it (see [the tutor](#post-apitutormessages)).
+- **Search** (`q` filters and `/api/search`) should match the texts in the requested language (and the ids),
+  ignoring case and accents. For Arabic, also ignore the short-vowel marks (tashkeel).
+- **Numbers, dates and prices** stay as numbers and ISO strings: the frontend formats them per language.
+
+The ids the frontend knows (translations in `client/src/locales/{en,fr,ar}.json`):
+
+| Field | Ids |
+|---|---|
+| subject | `mathematics`, `physics`, `chemistry`, `biology`, `computer-science`, `english`, `french` |
+| course / professor level | `bac`, `prepa`, `university`, `all-levels` |
+| profile level | `college`, `bac`, `prepa`, `university`, `other` |
+| profile section | `mathematics`, `experimental-sciences`, `technical-sciences`, `computer-science`, `economics`, `arts`, `sport`, `engineering`, `medicine`, `other` |
+| city (24 governorate capitals) | `ariana`, `beja`, `ben-arous`, `bizerte`, `gabes`, `gafsa`, `jendouba`, `kairouan`, `kasserine`, `kebili`, `le-kef`, `mahdia`, `manouba`, `medenine`, `monastir`, `nabeul`, `sfax`, `sidi-bouzid`, `siliana`, `sousse`, `tataouine`, `tozeur`, `tunis`, `zaghouan` |
+| professor teaching languages, user language | `ar`, `fr`, `en` |
+| professor title | `prof`, `dr` |
+
+Need a new subject or city? Tell me: it needs a translation in the 3 files before the API sends it.
 
 ## Endpoints at a glance
 
@@ -93,7 +137,7 @@ Use an **httpOnly cookie** holding a session id or a JWT (for example `tooli_ses
 The **user** object used everywhere:
 
 ```json
-{ "id": "u_8f2c", "firstName": "Ayet", "lastName": "Karchoud", "email": "ayet@example.com" }
+{ "id": "u_8f2c", "firstName": "Ayet", "lastName": "Karchoud", "email": "ayet@example.com", "language": "fr" }
 ```
 
 ### POST `/api/auth/signup`
@@ -103,8 +147,10 @@ Creates the account and logs the user in (sets the cookie).
 Request:
 
 ```json
-{ "firstName": "Ayet", "lastName": "Karchoud", "email": "ayet@example.com", "password": "at-least-8-chars" }
+{ "firstName": "Ayet", "lastName": "Karchoud", "email": "ayet@example.com", "password": "at-least-8-chars", "language": "fr" }
 ```
+
+`language` is the language the visitor was using while signing up (`en`, `fr` or `ar`; default `fr`). Save it on the user.
 
 Response `201`: `{ "user": { …user } }`
 
@@ -156,7 +202,7 @@ The dashboard's "Your week" strip. The week is Monday → Sunday in the student'
     "durationMinutes": 60,
     "price": 45,
     "status": "confirmed",
-    "professor": { "id": "amel-exemple", "title": "Prof.", "firstName": "Amel", "lastName": "Exemple", "subject": "Mathematics" }
+    "professor": { "id": "amel-exemple", "title": "prof", "firstName": "Amel", "lastName": "Exemple", "subject": "mathematics" }
   }
 }
 ```
@@ -178,26 +224,26 @@ Extra profile details (name and email come from `/auth/me`).
 
 ```json
 {
-  "level": "Bac",
-  "section": "Mathematics",
+  "level": "bac",
+  "section": "mathematics",
   "school": "Lycée pilote de Monastir",
-  "city": "Monastir",
-  "bio": ""
+  "city": "monastir",
+  "bio": "",
+  "language": "fr"
 }
 ```
 
 The frontend offers these choices (`client/src/data/profileOptions.js`); accept them, plus empty strings:
 
-- `level`: `"Collège"`, `"Bac"`, `"Prépa"`, `"University"`, `"Other"`
-- `section`: `"Mathematics"`, `"Experimental sciences"`, `"Technical sciences"`, `"Computer science"`,
-  `"Economics and management"`, `"Arts and literature"`, `"Sport"`, `"Engineering"`, `"Medicine and health"`, `"Other"`
-- `city`: one of the 24 governorate capitals (`"Tunis"`, `"Sousse"`, `"Monastir"`…)
+- `level`, `section`, `city`: ids from the [Languages](#languages) table (profile level, profile section, city)
+- `language`: `"en"`, `"fr"` or `"ar"` (the interface language, see [Languages](#languages))
 - `school`: free text; `bio`: free text, **200 characters max**
 
 ### PUT `/api/users/me/profile`
 
-Request: only the fields that changed, e.g. `{ "city": "Sousse", "bio": "Bac maths student" }`.
-Response `200`: the full profile (same shape as GET). Errors: `400` unknown level/section/city or bio too long.
+Request: only the fields that changed, e.g. `{ "city": "sousse", "bio": "Bac maths student" }`, or
+`{ "language": "ar" }` when the student switches language (avatar menu or Settings → Appearance & language).
+Response `200`: the full profile (same shape as GET). Errors: `400` unknown level/section/city/language or bio too long.
 
 ### GET `/api/users/me/settings/notifications`
 
@@ -217,15 +263,15 @@ Request: the changed flags, e.g. `{ "dailyTip": false }`. Response `200`: all fl
 
 ## Courses
 
-Courses come from 4 partner platforms. The **course** object:
+Courses come from 4 partner platforms. The **course** object (texts in the requested language, see [Languages](#languages)):
 
 ```json
 {
   "id": "algebra-basics",
   "platform": { "id": "learnsphere", "name": "LearnSphere", "cover": "blue", "url": "https://learnsphere.example" },
   "title": "Algebra basics: equations and inequalities",
-  "subject": "Mathematics",
-  "level": "Bac",
+  "subject": "mathematics",
+  "level": "bac",
   "rating": 4.8,
   "reviews": 412,
   "publishedAt": "2026-05-30T09:00:00.000Z",
@@ -246,6 +292,7 @@ Courses come from 4 partner platforms. The **course** object:
 - `lessons[].done` and `progress` are **for the logged-in user**. `progress` is 0–100
   (percentage of lessons done, rounded), or `null` if the user hasn't started the course.
 - `durationMinutes` = sum of the lesson minutes.
+- `subject` and `level` are ids. `title`, `description`, `outcomes` and `lessons[].title` are in the requested language.
 
 ### GET `/api/courses`
 
@@ -253,22 +300,22 @@ Query parameters (all optional, combine freely):
 
 | Param | Example | Meaning |
 |---|---|---|
-| `subject` | `Mathematics` | Exact subject |
-| `level` | `Bac` | Exact level |
+| `subject` | `mathematics` | Subject id |
+| `level` | `bac` | Level id |
 | `platform` | `codenest` | Platform id |
-| `q` | `prepa` | Text search in title, subject and platform name (ignore case and accents: `prepa` finds `Prépa`) |
+| `q` | `prepa` | Text search in title, subject name and platform name, in the requested language (ignore case and accents: `prepa` finds `Prépa`) |
 | `sort` | `newest` | `popular` (most reviews first, the default), `newest` (`publishedAt`), `shortest` (`durationMinutes`) |
 
 Response `200`: an array of courses (`[]` if nothing matches).
 
 ### GET `/api/courses/filters`
 
-The values for the filter chips, in display order:
+The values for the filter chips (ids; the frontend translates and sorts them):
 
 ```json
 {
-  "subjects": ["Biology", "Chemistry", "Computer science", "English", "French", "Mathematics", "Physics"],
-  "levels": ["Bac", "Prépa", "University", "All levels"],
+  "subjects": ["biology", "chemistry", "computer-science", "english", "french", "mathematics", "physics"],
+  "levels": ["bac", "prepa", "university", "all-levels"],
   "platforms": [{ "id": "learnsphere", "name": "LearnSphere" }, { "id": "codenest", "name": "CodeNest" }]
 }
 ```
@@ -295,18 +342,18 @@ Response `200`: the updated course (with the new `progress`). `404` if the cours
 
 ## Professors
 
-The **professor** object:
+The **professor** object (`bio` in the requested language):
 
 ```json
 {
   "id": "amel-exemple",
-  "title": "Prof.",
+  "title": "prof",
   "firstName": "Amel",
   "lastName": "Exemple",
-  "subject": "Mathematics",
-  "levels": ["Bac", "Prépa"],
-  "city": "Tunis",
-  "languages": ["Arabic", "French"],
+  "subject": "mathematics",
+  "levels": ["bac", "prepa"],
+  "city": "tunis",
+  "languages": ["ar", "fr"],
   "bio": "Maths teacher for 15 years in a pilot high school…",
   "rating": 4.9,
   "reviews": 128,
@@ -315,7 +362,8 @@ The **professor** object:
 }
 ```
 
-- `title`: `"Prof."` or `"Dr."`. `pricePerHour` in TND. All professors on tooli are VIP.
+- `title`: `"prof"` or `"dr"` (shown as "Prof." / "Dr." / "أ." / "د."). `subject`, `levels`, `city`, `languages`: ids.
+  `pricePerHour` in TND. All professors on tooli are VIP.
 - `nextSlot`: the start of the first free 1-hour class in the next 7 days (ISO date-time, Tunis time),
   or `null` when fully booked.
 - How you store the weekly schedule is up to you; the frontend only needs `nextSlot` and the
@@ -327,12 +375,12 @@ Query parameters (all optional, combine freely):
 
 | Param | Example | Meaning |
 |---|---|---|
-| `subject` | `Physics` | Exact subject |
-| `city` | `Monastir` | Exact city |
-| `language` | `English` | Teaches in this language |
+| `subject` | `physics` | Subject id |
+| `city` | `monastir` | City id |
+| `language` | `en` | Teaches in this language (`ar`, `fr`, `en`) |
 | `price` | `under-40` | `under-40` (< 40 TND), `40-50` (40 to 50), `over-50` (> 50) |
 | `available` | `1` | Only professors with at least one free time in the next 7 days |
-| `q` | `sousse` | Text search in name, subject and city (ignore case and accents) |
+| `q` | `sousse` | Text search in name, subject name and city name, in the requested language (ignore case and accents) |
 
 Response `200`: array of professors, best rated first.
 
@@ -340,9 +388,9 @@ Response `200`: array of professors, best rated first.
 
 ```json
 {
-  "subjects": ["Biology", "Chemistry", "Computer science", "English", "French", "Mathematics", "Physics"],
-  "cities": ["Bizerte", "Monastir", "Nabeul", "Sfax", "Sousse", "Tunis"],
-  "languages": ["Arabic", "English", "French"]
+  "subjects": ["biology", "chemistry", "computer-science", "english", "french", "mathematics", "physics"],
+  "cities": ["bizerte", "monastir", "nabeul", "sfax", "sousse", "tunis"],
+  "languages": ["ar", "fr", "en"]
 }
 ```
 
@@ -379,7 +427,7 @@ Newest first:
 [{ "id": "r_1", "author": "Yasmine B.", "rating": 5, "text": "Super clear and patient…", "createdAt": "2026-09-24T10:00:00.000Z" }]
 ```
 
-Show only the first name + initial of the author (privacy).
+Show only the first name + initial of the author (privacy). Reviews are sent as written (not translated).
 
 ### GET `/api/professors/top?limit=3`
 
@@ -422,8 +470,8 @@ can book at the same moment, so check inside a transaction or with a unique/lock
 `"This class would overlap another booking. Please pick another time or a shorter session."`
 
 Errors: `400` invalid `startsAt`/length or a time that isn't one of the professor's slots, `404` unknown
-professor, `409` overlap (above). Please also create a notification of type `booking` (`"Class booked"`, with a
-link to the professor). Payment isn't part of this yet: the student pays the professor after the class.
+professor, `409` overlap (above). Please also create a notification of type `booking` ("Class booked" / "Cours réservé" /
+"تمّ حجز الحصّة", with a link to the professor; see [Languages](#languages) for the text). Payment isn't part of this yet: the student pays the professor after the class.
 
 ---
 
@@ -479,7 +527,12 @@ The user's chats, newest first, **without** their messages:
 
 Ask a question. Without `chatId`, create a new chat titled after the question (max ~48 characters).
 
-Request: `{ "chatId": "photosynthesis", "question": "And what about at night?" }` (`chatId` optional)
+Request: `{ "chatId": "photosynthesis", "question": "And what about at night?", "language": "fr" }` (`chatId` optional)
+
+`language` (`"en"`, `"fr"` or `"ar"`) is the interface language when the question was asked. **The tutor must answer
+in that language**, whatever language the question is written in (put it in the system prompt, e.g. "Always answer
+in French"). For Arabic, keep formulas, code and units in Latin script (`2x + 5 = 13`, `CO₂`, `F = m × a`); the
+frontend shows them left to right inside the Arabic text. Missing or unknown `language`: use `Accept-Language`, then French.
 
 Response `200`:
 
@@ -496,7 +549,7 @@ the frontend shows a "thinking" state meanwhile.
 
 ### GET `/api/tips?q=`
 
-Short study tips (dashboard "Tip of the day", search). `q` optional (text search).
+Short study tips (dashboard "Tip of the day", search), in the requested language. `q` optional (text search).
 
 ```json
 [{ "id": "tip-1", "text": "Study in 25-minute blocks with 5-minute breaks. Your focus stays sharp much longer." }]
@@ -506,7 +559,7 @@ Short study tips (dashboard "Tip of the day", search). `q` optional (text search
 
 ## Notifications
 
-The **notification** object:
+The **notification** object (`title` and `body` in the requested language):
 
 ```json
 {
@@ -549,7 +602,7 @@ The unread count is fetched on every page change, so keep it cheap (an index on 
 ]
 ```
 
-`highlighted`: the plan we recommend (shown bigger). Prices in TND per month.
+`highlighted`: the plan we recommend (shown bigger). Prices in TND per month. `name` and `features` in the requested language.
 
 ### GET `/api/vip/status`
 
@@ -592,14 +645,14 @@ Just a starting point, organise it however you prefer:
 
 | Collection | Holds |
 |---|---|
-| `users` | name, email, password hash, profile fields, notification settings |
-| `courses` | course info, platform (embedded), lessons (embedded) |
+| `users` | name, email, password hash, `language`, profile fields, notification settings |
+| `courses` | course info, platform (embedded), lessons (embedded); texts as `{ en, fr, ar }` |
 | `progress` | `{ userId, courseId, doneLessonIds: [] }`: used to compute `done` and `progress` |
 | `professors` | profile, price, weekly availability |
 | `bookings` | `{ userId, profId, startsAt, endsAt, durationMinutes, price, status, createdAt }` (dates as real `Date`s; index `profId` + `startsAt`) |
 | `reviews` | `{ profId, userId, rating, text, createdAt }` |
 | `chats` | `{ userId, title, messages: [], updatedAt }` |
-| `tips` | `{ text }` |
+| `tips` | `{ text: { en, fr, ar } }` |
 | `notifications` | `{ userId, type, title, body, link, read, createdAt }` |
 | `subscriptions` | `{ userId, planId, renewsOn }` |
 

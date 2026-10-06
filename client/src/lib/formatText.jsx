@@ -61,7 +61,7 @@ function Inline({ text }) {
     }
     if (part.startsWith('`') && part.endsWith('`') && part.length > 2) {
       return (
-        <code key={i} className="rounded-sm bg-muted px-1.5 py-0.5 font-mono text-[0.88em]">
+        <code key={i} dir="ltr" className="rounded-sm bg-muted px-1.5 py-0.5 font-mono text-[0.88em]">
           {part.slice(1, -1)}
         </code>
       )
@@ -73,8 +73,9 @@ function Inline({ text }) {
 function Block({ block }) {
   switch (block.type) {
     case 'code':
+      // code always reads left to right, also inside an Arabic answer
       return (
-        <pre className="overflow-x-auto rounded-lg border border-border bg-background p-3.5 text-[13px] leading-relaxed">
+        <pre dir="ltr" className="overflow-x-auto rounded-lg border border-border bg-background p-3.5 text-start text-[13px] leading-relaxed">
           <code className="font-mono" data-lang={block.lang || undefined}>
             {block.code}
           </code>
@@ -82,9 +83,9 @@ function Block({ block }) {
       )
     case 'ol':
       return (
-        <ol start={block.start} className="list-decimal space-y-1.5 pl-6 marker:font-semibold marker:text-primary-text">
+        <ol start={block.start} className="list-decimal space-y-1.5 ps-6 marker:font-semibold marker:text-primary-text">
           {block.items.map((item, i) => (
-            <li key={i} className="pl-1">
+            <li key={i} className="ps-1">
               <Inline text={item} />
             </li>
           ))}
@@ -92,9 +93,9 @@ function Block({ block }) {
       )
     case 'ul':
       return (
-        <ul className="list-disc space-y-1.5 pl-6 marker:text-primary-text">
+        <ul className="list-disc space-y-1.5 ps-6 marker:text-primary-text">
           {block.items.map((item, i) => (
-            <li key={i} className="pl-1">
+            <li key={i} className="ps-1">
               <Inline text={item} />
             </li>
           ))}

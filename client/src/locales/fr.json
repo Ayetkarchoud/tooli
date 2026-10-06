@@ -14,7 +14,10 @@
     "all": "Tout",
     "seeAll": "Tout voir",
     "new": "Nouveau",
-    "soon": "Bientôt"
+    "soon": "Bientôt",
+    "breadcrumb": "Fil d’Ariane",
+    "listSeparator": ", ",
+    "saveError": "Ça n’a pas été enregistré"
   },
   "nav": {
     "main": "Principal",
@@ -304,6 +307,494 @@
       "passwordShort_other": "Presque ! Encore {{count}} caractères (au moins {{min}}).",
       "firstName": "Comment on doit t’appeler ?",
       "lastName": "Ajoute aussi ton nom de famille."
+    }
+  },
+  "dashboard": {
+    "sectionError": "Cette partie n’a pas chargé. Vérifie ta connexion et réessaie.",
+    "topProfessors": "Les profs VIP les mieux notés",
+    "ask": {
+      "title": "Demande n’importe quoi à tooli",
+      "text": "Devoirs, examens, une notion difficile : une réponse claire en quelques secondes.",
+      "placeholder": "Écris ta question…",
+      "label": "Ta question pour tooli",
+      "send": "Envoyer la question",
+      "submit": "Demander",
+      "suggestions": {
+        "photosynthesis": "Explique-moi simplement la photosynthèse",
+        "equation": "Comment je résous 2x + 5 = 13 ?",
+        "english": "Des astuces pour progresser vite en anglais"
+      }
+    },
+    "continue": {
+      "title": "Continuer à apprendre",
+      "loading": "Chargement de tes cours…",
+      "empty": "Aucun cours en cours pour l’instant"
+    },
+    "tip": {
+      "title": "L’astuce du jour",
+      "next": "Autre astuce"
+    },
+    "greeting": {
+      "morning": {
+        "hello": "Bonjour {{name}}",
+        "lines": [
+          "Prêt à apprendre quelque chose de nouveau ?",
+          "Nouvelle journée : on commence par quoi ?",
+          "Une petite victoire avant midi ?"
+        ]
+      },
+      "afternoon": {
+        "hello": "Bon après-midi {{name}}",
+        "lines": [
+          "Prêt à apprendre quelque chose de nouveau ?",
+          "Le moment parfait pour une petite révision.",
+          "Une leçon maintenant, un pas de plus vers le bac."
+        ]
+      },
+      "evening": {
+        "hello": "Bonsoir {{name}}",
+        "lines": [
+          "Une petite séance avant le dîner ?",
+          "Réviser aujourd’hui, retenir demain.",
+          "Prêt à apprendre quelque chose de nouveau ?"
+        ]
+      },
+      "night": {
+        "hello": "Bonsoir {{name}}",
+        "lines": [
+          "Tu révises tard ? N’oublie pas de dormir !",
+          "Ton cerveau range ce que tu as appris pendant ton sommeil."
+        ]
+      }
+    },
+    "week": {
+      "title": "Ta semaine",
+      "loading": "Chargement de ta semaine",
+      "error": "Ta semaine n’a pas chargé.",
+      "daysStudied": "Jours de révision",
+      "soFar_one": "sur {{count}} pour l’instant",
+      "soFar_many": "sur {{count}} pour l’instant",
+      "soFar_other": "sur {{count}} pour l’instant",
+      "daysLabel": "Cette semaine, du lundi au dimanche",
+      "day": "{{day}} : {{state}}",
+      "todayDay": "{{day}} (aujourd’hui) : {{state}}",
+      "state": {
+        "toCome": "à venir",
+        "studied": "révisé",
+        "none": "pas de révision"
+      },
+      "questions": "Questions posées",
+      "askAnother": "En poser une autre",
+      "lessons": "Leçons terminées",
+      "keepGoing": "Continuer",
+      "nextClass": "Prochain cours",
+      "noClass": "Aucun cours réservé pour l’instant",
+      "with": "avec"
+    }
+  },
+  "tutor": {
+    "newChat": "Nouvelle discussion",
+    "placeholder": "Demande n’importe quoi à tooli…",
+    "thinking": "tooli réfléchit…",
+    "sendTooltip": "Envoyer (Entrée)",
+    "enterToSend": "pour envoyer",
+    "shiftEnter": "pour aller à la ligne",
+    "you": "Toi :",
+    "tooli": "tooli :",
+    "conversation": "Discussion avec tooli",
+    "loadingChat": "Chargement de la discussion",
+    "newMessage": "Nouveau message",
+    "sendError": "Oups, je n’ai pas pu répondre.",
+    "sendErrorText": "Vérifie ta connexion et réessaie.",
+    "notFound": {
+      "title": "Discussion introuvable",
+      "text": "Cette discussion n’existe plus. Commences-en une nouvelle : tooli est prêt !",
+      "back": "Nouvelle discussion"
+    },
+    "followUps": {
+      "simpler": "Tu peux m’expliquer ça plus simplement ?",
+      "example": "Tu peux me donner un exemple ?"
+    },
+    "actions": {
+      "copy": "Copier la réponse",
+      "copied": "Copié !",
+      "copiedStatus": "Réponse copiée",
+      "good": "Bonne réponse",
+      "bad": "Pas utile",
+      "simpler": "Plus simple",
+      "example": "Un exemple"
+    },
+    "history": {
+      "label": "Historique des discussions",
+      "title": "Tes discussions",
+      "search": "Rechercher",
+      "searchLabel": "Rechercher dans tes discussions",
+      "loading": "Chargement de tes discussions",
+      "error": "Tes discussions n’ont pas chargé.",
+      "empty": "Pas encore de discussion. Tes questions apparaîtront ici.",
+      "noMatch": "Aucune discussion ne correspond à « {{query}} »."
+    },
+    "welcome": {
+      "hi": "Salut {{name}} ! Je suis ton tuteur.",
+      "title": "Qu’est-ce que tu veux apprendre aujourd’hui ?",
+      "text": "Pose-moi n’importe quelle question. J’explique étape par étape, et tu peux demander une version plus simple ou un exemple à tout moment.",
+      "suggested": "Questions suggérées",
+      "suggestions": {
+        "maths": {
+          "subject": "Maths",
+          "question": "Comment je résous 2x + 5 = 13, étape par étape ?"
+        },
+        "physics": {
+          "subject": "Physique",
+          "question": "Que veut vraiment dire la deuxième loi de Newton ?"
+        },
+        "biology": {
+          "subject": "SVT",
+          "question": "Explique-moi la photosynthèse comme si j’avais 12 ans."
+        },
+        "languages": {
+          "subject": "Langues",
+          "question": "Comment parler anglais avec plus d’assurance ?"
+        },
+        "coding": {
+          "subject": "Programmation",
+          "question": "Comment marche une boucle en Python ?"
+        },
+        "exams": {
+          "subject": "Examens",
+          "question": "Fais-moi un planning de révision pour le bac."
+        }
+      }
+    }
+  },
+  "filters": {
+    "title": "Filtres",
+    "subject": "Matière",
+    "level": "Niveau",
+    "platform": "Plateforme",
+    "city": "Ville",
+    "language": "Langue",
+    "price": "Prix",
+    "reset": "Effacer les filtres"
+  },
+  "search": {
+    "title": "Recherche",
+    "subtitle": "Cours, profs et astuces de révision, tout en une fois.",
+    "placeholder": "Rechercher un cours, un prof…",
+    "bigPlaceholder": "Un cours, un prof, une ville, une astuce…",
+    "label": "Rechercher des cours, des profs et des astuces",
+    "intro": "Cherche dans tout tooli en une fois : cours partenaires, profs VIP et astuces de révision.",
+    "popular": "Matières populaires",
+    "trySubject": "Ou essaie une matière",
+    "searching": "Recherche en cours",
+    "noMatch": "Aucun résultat pour « {{query}} »",
+    "noMatchText": "Essaie une matière ci-dessous, ou demande au tuteur IA : il peut expliquer presque tout, étape par étape.",
+    "professors": "Profs",
+    "tips": "Astuces de révision",
+    "resultCount_one": "{{count}} résultat pour « {{query}} »",
+    "resultCount_many": "{{count}} résultats pour « {{query}} »",
+    "resultCount_other": "{{count}} résultats pour « {{query}} »"
+  },
+  "courses": {
+    "subtitle": "Des cours choisis chez nos partenaires e-learning. Avance à ton rythme, tooli suit ta progression.",
+    "all": "Tous les cours",
+    "continueError": "Tes cours en cours n’ont pas chargé.",
+    "searchPlaceholder": "Un cours, une matière, une plateforme…",
+    "searchLabel": "Rechercher des cours",
+    "sortBy": "Trier par",
+    "sortLabel": "Trier les cours : {{sort}}",
+    "sorts": {
+      "popular": "Les plus populaires",
+      "newest": "Les plus récents",
+      "shortest": "Les plus courts"
+    },
+    "count_one": "{{count}} cours",
+    "count_many": "{{count}} cours",
+    "count_other": "{{count}} cours",
+    "empty": {
+      "title": "Aucun cours ne correspond",
+      "text": "Essaie un autre filtre ou un autre mot. De nouveaux cours arrivent chaque mois !"
+    },
+    "resume": "Reprendre",
+    "resumeLabel": "Reprendre {{title}}",
+    "progressLabel": "Progression : {{title}}",
+    "doneLabel": "{{title}} : {{percent}} terminé",
+    "outOf5": "sur 5,",
+    "start": "Commencer le cours",
+    "review": "Revoir le cours",
+    "tutorQuestion": "Je suis le cours « {{title}} » sur {{platform}}. Tu peux m’aider à comprendre « {{lesson}} » ?",
+    "tutorQuiz": "J’ai terminé « {{title}} » sur {{platform}}. Tu peux m’interroger sur les idées principales ?",
+    "opening": "Ouverture de {{platform}}…",
+    "openingText": "« {{title}} » va s’ouvrir dans un nouvel onglet.",
+    "details": "Détails du cours",
+    "lessonCount_one": "{{count}} leçon",
+    "lessonCount_many": "{{count}} leçons",
+    "lessonCount_other": "{{count}} leçons",
+    "yourProgress": "Ta progression : {{percent}}",
+    "notStarted": "Pas encore commencé",
+    "completed": "Cours terminé, bravo !",
+    "lessonsDone_one": "{{done}} leçon sur {{count}} terminée",
+    "lessonsDone_many": "{{done}} leçons sur {{count}} terminées",
+    "lessonsDone_other": "{{done}} leçons sur {{count}} terminées",
+    "firstLesson": "Première leçon : {{title}}",
+    "upNextLesson": "À suivre : {{title}}",
+    "askTutor": "Demander au tuteur IA",
+    "aboutCourse": "sur ce cours",
+    "lessons": "Leçons",
+    "lessonNumber": "Leçon {{n}}",
+    "status": {
+      "done": "Terminé",
+      "next": "À suivre",
+      "locked": "Verrouillé"
+    },
+    "markDone": "Marquer « {{title}} » comme terminé",
+    "outcomes": "Ce que tu vas apprendre",
+    "findNext": "Trouver ton prochain cours",
+    "celebrate": {
+      "completeTitle": "Cours terminé ! 🎓",
+      "completeText_one": "Tu as terminé la leçon de « {{title}} ». Super travail.",
+      "completeText_many": "Tu as terminé les {{count}} leçons de « {{title}} ». Super travail.",
+      "completeText_other": "Tu as terminé les {{count}} leçons de « {{title}} ». Super travail.",
+      "lessonTitle": "Leçon terminée, bien joué !",
+      "lessonText": "« {{title}} » ✓ · {{done}} leçons sur {{count}}, {{percent}} du cours."
+    },
+    "notFound": {
+      "title": "Cours introuvable",
+      "text": "Ce cours a peut-être été retiré, ou le lien contient une faute.",
+      "back": "Voir tous les cours"
+    }
+  },
+  "professors": {
+    "title": "Apprends avec les meilleurs profs de Tunisie",
+    "subtitle": "Des cours particuliers avec des profs choisis et très bien notés. Choisis l’heure qui te convient et réserve en quelques clics.",
+    "reviewCount_one": "{{count}} avis",
+    "reviewCount_many": "{{count}} avis",
+    "reviewCount_other": "{{count}} avis",
+    "stars_one": "{{count}} étoile sur 5",
+    "stars_many": "{{count}} étoiles sur 5",
+    "stars_other": "{{count}} étoiles sur 5",
+    "book": "Réserver un cours",
+    "bookWith": "Réserver un cours avec {{name}}",
+    "perHour": "/ heure",
+    "perHourShort": "/ h",
+    "next": "Prochain créneau : {{when}}",
+    "fullyBooked": "Complet cette semaine",
+    "viewProfile": "Voir le profil",
+    "viewProfileOf": "Voir le profil de {{name}}",
+    "availableWeek": "Disponible cette semaine",
+    "prices": {
+      "under-40": "Moins de {{low}}",
+      "40-50": "De {{low}} à {{high}}",
+      "over-50": "Plus de {{high}}"
+    },
+    "count_one": "{{count}} prof",
+    "count_many": "{{count}} profs",
+    "count_other": "{{count}} profs",
+    "empty": {
+      "title": "Aucun prof ne correspond à ces filtres",
+      "text": "Essaie une autre ville ou une autre langue, ou désactive « Disponible cette semaine »."
+    },
+    "details": "Détails",
+    "about": "À propos",
+    "tutorQuestion": "J’ai bientôt un cours de {{subject}} avec {{name}}. Tu peux m’aider à le préparer ?",
+    "askTutor": "Demander à tooli : {{subject}}",
+    "reviewsTitle": "Ce qu’en disent les élèves",
+    "loadingReviews": "Chargement des avis",
+    "reviewsError": "Les avis n’ont pas chargé.",
+    "notFound": {
+      "title": "Prof introuvable",
+      "text": "Ce profil a peut-être changé d’adresse, ou le lien contient une faute.",
+      "back": "Voir tous les profs"
+    }
+  },
+  "booking": {
+    "failed": "La réservation n’est pas passée",
+    "loading": "Chargement des créneaux libres",
+    "error": "Les créneaux libres n’ont pas chargé.",
+    "fullyBooked": "{{name}} est complet·e pour les 7 prochains jours. De nouveaux créneaux ouvrent chaque semaine, repasse bientôt !",
+    "pickDay": "Choisis un jour",
+    "freeTimes_zero": "aucun créneau libre",
+    "freeTimes_one": "{{count}} créneau libre",
+    "freeTimes_many": "{{count}} créneaux libres",
+    "freeTimes_other": "{{count}} créneaux libres",
+    "chooseTime": "Choisis une heure · {{day}}",
+    "timeZone": "Les heures sont affichées dans ton fuseau horaire ({{zone}}).",
+    "length": "Durée de la séance",
+    "lengthShort": "Durée",
+    "totalFor": "Total pour {{duration}}",
+    "bookThis": "Réserver ce cours",
+    "pickTime": "Choisis une heure pour continuer",
+    "confirmTitle": "Confirme ton cours",
+    "confirmText": "Vérifie les détails, puis confirme. Tu peux annuler jusqu’à 24 h avant le cours.",
+    "professor": "Prof",
+    "when": "Quand",
+    "price": "Prix",
+    "payLater": "Tu paies le prof après le cours. Le paiement en ligne arrive bientôt.",
+    "booking": "Réservation…",
+    "confirm": "Confirmer la réservation",
+    "success": {
+      "title": "Ton cours est réservé !",
+      "text": "{{name}} a hâte de te voir. On a ajouté un rappel dans tes notifications.",
+      "calendarSoon": "Les invitations agenda arrivent bientôt",
+      "calendarText": "On te le rappellera dans tes notifications la veille.",
+      "addCalendar": "Ajouter à l’agenda",
+      "another": "Réserver un autre cours avec {{name}}"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Réservations, nouvelles leçons et astuces de révision, tout au même endroit.",
+    "bellUnread_one": "Notifications, {{count}} non lue",
+    "bellUnread_many": "Notifications, {{count}} non lues",
+    "bellUnread_other": "Notifications, {{count}} non lues",
+    "unreadBadge_one": "{{count}} non lue",
+    "unreadBadge_many": "{{count}} non lues",
+    "unreadBadge_other": "{{count}} non lues",
+    "markAll": "Tout marquer comme lu",
+    "show": "Afficher",
+    "unread": "Non lues",
+    "unreadItem": "Non lue.",
+    "typeLabel": "Notification : {{type}}.",
+    "types": {
+      "course": "Cours",
+      "booking": "Réservation",
+      "tip": "Astuce",
+      "system": "tooli"
+    },
+    "groups": {
+      "today": "Aujourd’hui",
+      "week": "Cette semaine",
+      "earlier": "Plus tôt"
+    },
+    "loading": "Chargement des notifications",
+    "caughtUp": "Tu es à jour !",
+    "markError": "Impossible de les marquer comme lues",
+    "emptyUnread": "Aucune notification non lue. Et si tu faisais une petite séance de révision ?",
+    "empty": "Les nouvelles leçons, réservations et astuces apparaîtront ici.",
+    "showAll": "Voir toutes les notifications"
+  },
+  "vip": {
+    "docTitle": "tooli VIP",
+    "title": "Apprends plus vite avec tooli VIP",
+    "subtitle": "Des cours particuliers avec les meilleurs profs de Tunisie, un planning de révision fait pour toi et un tuteur qui ne dort jamais.",
+    "onPlan": "Tu as la formule {{plan}}.",
+    "onPlanUntil": "Tu as la formule {{plan}} jusqu’au {{date}}.",
+    "pick": "Choisis ta formule",
+    "pricesNote": "Prix en dinars tunisiens, par mois. Sans engagement.",
+    "yourPlan": "Ta formule",
+    "popular": "La plus choisie",
+    "perMonth": "/ mois",
+    "currentPlan": "Ta formule actuelle",
+    "choose": "Choisir {{plan}}",
+    "notified": "On te préviendra",
+    "notifiedText": "Tu seras le premier informé quand {{plan}} ouvrira.",
+    "faqTitle": "Tes questions, nos réponses",
+    "faq": {
+      "cancel": {
+        "q": "Je peux arrêter quand je veux ?",
+        "a": "Oui. Les formules sont mensuelles et sans engagement : tu arrêtes depuis tes paramètres et tu gardes le VIP jusqu’à la fin du mois payé."
+      },
+      "pay": {
+        "q": "Comment je vais payer ?",
+        "a": "Le paiement en ligne arrive bientôt, par carte bancaire (tunisienne et internationale) et e-dinar. En attendant, tu paies les profs VIP directement après chaque cours."
+      },
+      "professor": {
+        "q": "C’est quoi, un prof VIP ?",
+        "a": "Un enseignant expérimenté choisi par tooli pour ses résultats et ses avis. Tu réserves des cours particuliers avec lui aux heures qui te conviennent."
+      },
+      "refund": {
+        "q": "Je peux être remboursé ?",
+        "a": "Si quelque chose ne va pas pendant tes 7 premiers jours, contacte-nous et on te rembourse le mois, sans discuter. Les heures particulières non utilisées peuvent passer au mois suivant."
+      },
+      "parents": {
+        "q": "Il y a des formules pour les parents ?",
+        "a": "Oui : la formule Intensif envoie un bilan de progression chaque semaine à un parent. Des formules famille pour plusieurs enfants arrivent bientôt."
+      }
+    },
+    "dialog": {
+      "title": "Le paiement en ligne arrive bientôt",
+      "text": "On prépare un paiement sécurisé par carte et e-dinar pour la formule {{plan}} ({{price}} / mois). Laisse-nous un signe et on te prévient le jour de l’ouverture. En attendant, tu peux déjà réserver des profs VIP et les payer après le cours.",
+      "notify": "Me prévenir"
+    }
+  },
+  "settings": {
+    "subtitle": "Ton profil, l’apparence de tooli, ta langue et ce qu’on t’envoie.",
+    "tabs": {
+      "profile": "Profil",
+      "appearance": "Apparence et langue",
+      "notifications": "Notifications"
+    },
+    "language": {
+      "text": "tooli, ses cours et les réponses du tuteur IA passent dans cette langue. L’arabe se lit de droite à gauche.",
+      "saveError": "Ta langue a changé, mais elle n’a pas été enregistrée dans ton profil. Ce sera fait la prochaine fois."
+    },
+    "appearance": {
+      "palette": "Palette de couleurs",
+      "paletteText": "Choisis la couleur qui te plaît : les boutons, les liens et la mascotte la suivent.",
+      "previewButton": "Go",
+      "mode": "Clair ou sombre",
+      "modeText": "« Système » change tout seul quand ton téléphone ou ton ordinateur change.",
+      "modes": {
+        "light": {
+          "label": "Clair",
+          "text": "Lumineux et net"
+        },
+        "dark": {
+          "label": "Sombre",
+          "text": "Plus doux pour les yeux le soir"
+        },
+        "system": {
+          "label": "Système",
+          "text": "Suit ton appareil"
+        }
+      }
+    },
+    "notifications": {
+      "title": "Ce qu’on t’envoie",
+      "text": "Les changements sont enregistrés tout de suite.",
+      "loading": "Chargement de tes réglages de notifications",
+      "on": "{{label}} : activé",
+      "off": "{{label}} : désactivé",
+      "saveError": "Ce changement n’a pas été enregistré",
+      "items": {
+        "courseReminders": {
+          "label": "Rappels de cours",
+          "text": "Un petit rappel quand tu n’as pas ouvert depuis quelques jours un cours commencé."
+        },
+        "bookingUpdates": {
+          "label": "Réservations",
+          "text": "Confirmations, rappels et changements pour tes cours avec les profs."
+        },
+        "dailyTip": {
+          "label": "L’astuce du jour",
+          "text": "Une courte astuce de révision chaque matin."
+        },
+        "productNews": {
+          "label": "Les nouveautés tooli",
+          "text": "Nouvelles fonctionnalités, nouveaux cours partenaires et offres spéciales (environ une fois par mois)."
+        }
+      }
+    },
+    "profile": {
+      "loading": "Chargement de ton profil",
+      "firstSave": "Ton profil est prêt ! 🎉",
+      "firstSaveText": "tooli peut maintenant te proposer des cours et des profs faits pour toi.",
+      "saved": "Profil enregistré",
+      "saveError": "Tes changements n’ont pas été enregistrés",
+      "bioTooLong_one": "Pas plus de {{count}} caractère.",
+      "bioTooLong_many": "Pas plus de {{count}} caractères.",
+      "bioTooLong_other": "Pas plus de {{count}} caractères.",
+      "choose": "Choisir…",
+      "yourName": "Ton nom",
+      "avatar": "Ton avatar affiche tes initiales.",
+      "emailHint": "Ton e-mail de connexion ne peut pas encore être modifié ici.",
+      "section": "Section",
+      "school": "Établissement",
+      "bio": "Petite bio",
+      "optional": "(facultatif)",
+      "bioPlaceholder": "Tu prépares quoi ? Qu’est-ce que tu adores apprendre ?",
+      "discard": "Annuler",
+      "save": "Enregistrer"
     }
   }
 }

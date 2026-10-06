@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight, ArrowUpDown, RefreshCw, Search, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { formatPercent } from '@/lib/numbers'
 import { stagger, useEntrance } from '@/lib/motion'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
@@ -27,15 +29,13 @@ import ChipGroup from '../../components/ChipGroup.jsx'
 import CourseCard from './CourseCard.jsx'
 import PageHeader from '../../components/PageHeader.jsx'
 
-const SORTS = [
-  { id: 'popular', label: 'Most popular' },
-  { id: 'newest', label: 'Newest' },
-  { id: 'shortest', label: 'Shortest' },
-]
+// Labels: courses.sorts.<id>
+const SORTS = ['popular', 'newest', 'shortest']
 const FILTER_KEYS = ['q', 'subject', 'level', 'platform']
 
 // ---------- Continue learning (horizontal scroll) ----------
 function ContinueRow() {
+  const { t } = useTranslation()
   const { data: courses, error, loading, reload } = useAsync(getContinueLearning, [])
 
   if (!loading && !error && courses.length === 0) return null
@@ -43,13 +43,13 @@ function ContinueRow() {
   return (
     <section aria-labelledby="continue-title" className="mb-8">
       <h2 id="continue-title" className="mb-3 text-lg font-semibold">
-        Continue learning
+        {t('dashboard.continue.title')}
       </h2>
       {error ? (
         <p className="flex items-center gap-3 text-sm text-muted-foreground" role="alert">
-          Your courses in progress didn’t load.
+          {t('courses.continueError')}
           <Button variant="pill" size="sm" onClick={reload}>
-            <RefreshCw aria-hidden="true" /> Try again
+            <RefreshCw aria-hidden="true" /> {t('common.tryAgain')}
           </Button>
         </p>
       ) : (
@@ -66,12 +66,17 @@ function ContinueRow() {
                     to={`/dashboard/courses/${c.id}`}
                     className="group flex h-full items-center gap-3.5 rounded-2xl border border-border bg-card p-3.5 text-foreground no-underline transition-[border-color,box-shadow] hover:border-primary hover:shadow-lift"
                   >
-                    <ProgressRing value={c.progress} size={58} label={`${c.title}: ${c.progress}% done`} />
+                    <ProgressRing value={c.progress} size={58} label={t('courses.doneLabel', { title: c.title, percent: formatPercent(c.progress) })} />
                     <span className="min-w-0">
                       <span className="block text-xs font-semibold text-muted-foreground">{c.platform.name}</span>
                       <span className="line-clamp-2 text-sm leading-snug font-semibold">{c.title}</span>
                       <span className="mt-0.5 inline-flex items-center gap-1 text-xs font-semibold text-primary-text">
-                        Resume <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                        {t('courses.resume')}{' '}
+                        <ArrowRight
+                          size={12}
+                          className="transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5"
+                          aria-hidden="true"
+                        />
                       </span>
                     </span>
                   </Link>
@@ -85,6 +90,7 @@ function ContinueRow() {
 
 // ---------- Search box (writes ?q= after a short pause) ----------
 function SearchBox({ value, onSearch }) {
+  const { t } = useTranslation()
   const [text, setText] = useState(value)
   // The URL changed from elsewhere (reset, back button): show it
   const [shown, setShown] = useState(value)
@@ -101,27 +107,28 @@ function SearchBox({ value, onSearch }) {
 
   return (
     <div className="relative min-w-0 flex-1">
-      <Search size={18} className="pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+      <Search size={18} className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
       <Input
         type="search"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="Search a course, a subject, a platform…"
-        aria-label="Search courses"
-        className="h-11 rounded-xl bg-card pl-10 text-sm md:text-sm dark:bg-card"
+        placeholder={t('courses.searchPlaceholder')}
+        aria-label={t('courses.searchLabel')}
+        className="h-11 rounded-xl bg-card ps-10 text-sm md:text-sm dark:bg-card"
       />
     </div>
   )
 }
 
 export default function Courses() {
+  const { t } = useTranslation()
   const [params, setParams] = useSearchParams()
   const filters = {
     q: params.get('q') ?? '',
     subject: params.get('subject') ?? '',
     level: params.get('level') ?? '',
     platform: params.get('platform') ?? '',
-    sort: SORTS.some((s) => s.id === params.get('sort')) ? params.get('sort') : 'popular',
+    sort: SORTS.includes(params.get('sort')) ? params.get('sort') : 'popular',
   }
   const { q, subject, level, platform, sort } = filters
 
@@ -154,13 +161,13 @@ export default function Courses() {
     )
 
   const courses = result.data
-  const sortLabel = SORTS.find((s) => s.id === sort).label
+  const sortLabel = t(`courses.sorts.${sort}`)
 
   return (
     <Page>
       <PageHeader
-        title="Partner courses"
-        subtitle="Hand-picked courses from our e-learning partners. Learn at your own pace, tooli keeps track of your progress."
+        title={t('nav.courses')}
+        subtitle={t('courses.subtitle')}
         mascot="explaining"
       />
 
@@ -168,24 +175,24 @@ export default function Courses() {
 
       <section aria-labelledby="catalogue-title">
         <h2 id="catalogue-title" className="sr-only">
-          All courses
+          {t('courses.all')}
         </h2>
 
         <div className="mb-4 flex gap-3">
           <SearchBox value={q} onSearch={onSearch} />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="h-11 shrink-0 rounded-xl bg-card" aria-label={`Sort courses: ${sortLabel}`}>
+              <Button variant="outline" className="h-11 shrink-0 rounded-xl bg-card" aria-label={t('courses.sortLabel', { sort: sortLabel })}>
                 <ArrowUpDown aria-hidden="true" />
                 <span className="max-xs:hidden">{sortLabel}</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 rounded-xl p-1.5 ring-0 border border-border">
-              <DropdownMenuLabel>Sort by</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('courses.sortBy')}</DropdownMenuLabel>
               <DropdownMenuRadioGroup value={sort} onValueChange={(v) => setParam('sort', v)}>
                 {SORTS.map((s) => (
-                  <DropdownMenuRadioItem key={s.id} value={s.id} className="py-2 text-sm font-semibold">
-                    {s.label}
+                  <DropdownMenuRadioItem key={s} value={s} className="py-2 text-sm font-semibold">
+                    {t(`courses.sorts.${s}`)}
                   </DropdownMenuRadioItem>
                 ))}
               </DropdownMenuRadioGroup>
@@ -197,19 +204,19 @@ export default function Courses() {
           {options.data ? (
             <>
               <ChipGroup
-                label="Subject"
+                label={t('filters.subject')}
                 value={subject}
                 onChange={(v) => setParam('subject', v)}
-                options={options.data.subjects.map((s) => ({ value: s, label: s }))}
+                options={options.data.subjects.map((s) => ({ value: s, label: t(`subjects.${s}`) }))}
               />
               <ChipGroup
-                label="Level"
+                label={t('filters.level')}
                 value={level}
                 onChange={(v) => setParam('level', v)}
-                options={options.data.levels.map((l) => ({ value: l, label: l }))}
+                options={options.data.levels.map((l) => ({ value: l, label: t(`levels.${l}`) }))}
               />
               <ChipGroup
-                label="Platform"
+                label={t('filters.platform')}
                 value={platform}
                 onChange={(v) => setParam('platform', v)}
                 options={options.data.platforms.map((p) => ({ value: p.id, label: p.name }))}
@@ -222,11 +229,11 @@ export default function Courses() {
 
         <div className="mb-4 flex min-h-8 items-center justify-between gap-3">
           <p className="text-sm text-muted-foreground" aria-live="polite">
-            {courses && !result.loading && `${courses.length} ${courses.length === 1 ? 'course' : 'courses'}`}
+            {courses && !result.loading && t('courses.count', { count: courses.length })}
           </p>
           {hasFilters && (
             <Button variant="ghost" size="sm" onClick={resetFilters}>
-              <X aria-hidden="true" /> Reset filters
+              <X aria-hidden="true" /> {t('filters.reset')}
             </Button>
           )}
         </div>
@@ -238,11 +245,11 @@ export default function Courses() {
         ) : courses.length === 0 ? (
           <MascotMessage
             pose="sleepy"
-            title="No course matches your search"
-            text="Try another filter or a different word. New courses arrive every month!"
+            title={t('courses.empty.title')}
+            text={t('courses.empty.text')}
             action={
               <Button onClick={resetFilters}>
-                <RefreshCw aria-hidden="true" /> Reset filters
+                <RefreshCw aria-hidden="true" /> {t('filters.reset')}
               </Button>
             }
           />

@@ -19,6 +19,9 @@ services:
     volumes:
       - ./client:/app # your code, live
       - /app/node_modules # ...but keep the container's own node_modules
+    # npm install at every start: the node_modules volume above outlives image rebuilds, so without this
+    # a new package (e.g. after git pull) would be missing in the container. Takes a second when nothing changed.
+    command: sh -c "npm install --no-audit --no-fund && npm run dev -- --host 0.0.0.0"
     # depends_on:
     #   - server # uncomment together with the server service below
 

@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { CalendarPlus, CalendarDays, Clock, Wallet } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { formatTND } from '@/lib/money'
 import { fadeUp, stagger, useEntrance } from '@/lib/motion'
 import { fullName } from '@/lib/people'
@@ -14,6 +15,7 @@ import Confetti from '../../components/Confetti.jsx'
 import Mascot from '../../components/Mascot.jsx'
 
 export default function BookingSuccess({ booking, prof, onBookAnother }) {
+  const { t } = useTranslation()
   const entrance = useEntrance()
   const titleRef = useRef(null)
   // startsAt is an ISO date-time: shown in the student's local time
@@ -45,17 +47,17 @@ export default function BookingSuccess({ booking, prof, onBookAnother }) {
         variants={fadeUp}
         className="mt-6 text-[clamp(24px,4vw,30px)] leading-tight font-extrabold outline-none"
       >
-        Your class is booked!
+        {t('booking.success.title')}
       </motion.h1>
       <motion.p variants={fadeUp} className="mt-2 text-muted-foreground">
-        {fullName(prof)} is looking forward to seeing you. We added a reminder to your notifications.
+        {t('booking.success.text', { name: fullName(prof) })}
       </motion.p>
 
-      <motion.dl variants={fadeUp} className="mt-6 grid w-full gap-3 rounded-2xl bg-muted/70 p-4 text-left text-sm sm:grid-cols-[1.7fr_1fr_1fr]">
+      <motion.dl variants={fadeUp} className="mt-6 grid w-full gap-3 rounded-2xl bg-muted/70 p-4 text-start text-sm sm:grid-cols-[1.7fr_1fr_1fr]">
         <div className="flex items-center gap-2.5">
           <CalendarDays size={18} className="shrink-0 text-primary-text" aria-hidden="true" />
           <div>
-            <dt className="text-xs text-muted-foreground">When</dt>
+            <dt className="text-xs text-muted-foreground">{t('booking.when')}</dt>
             <dd className="font-semibold">
               {when}, {formatTime(booking.startsAt)}
             </dd>
@@ -64,14 +66,14 @@ export default function BookingSuccess({ booking, prof, onBookAnother }) {
         <div className="flex items-center gap-2.5">
           <Clock size={18} className="shrink-0 text-primary-text" aria-hidden="true" />
           <div>
-            <dt className="text-xs text-muted-foreground">Length</dt>
+            <dt className="text-xs text-muted-foreground">{t('booking.lengthShort')}</dt>
             <dd className="font-semibold">{formatDuration(booking.durationMinutes)}</dd>
           </div>
         </div>
         <div className="flex items-center gap-2.5">
           <Wallet size={18} className="shrink-0 text-primary-text" aria-hidden="true" />
           <div>
-            <dt className="text-xs text-muted-foreground">Price</dt>
+            <dt className="text-xs text-muted-foreground">{t('booking.price')}</dt>
             <dd className="font-semibold">{formatTND(booking.price)}</dd>
           </div>
         </div>
@@ -80,17 +82,17 @@ export default function BookingSuccess({ booking, prof, onBookAnother }) {
       <motion.div variants={fadeUp} className="mt-7 flex w-full flex-wrap justify-center gap-3">
         <Button
           variant="outline"
-          onClick={() => toast('Calendar invites are coming soon', { description: 'We’ll remind you in your notifications the day before.' })}
+          onClick={() => toast(t('booking.success.calendarSoon'), { description: t('booking.success.calendarText') })}
         >
-          <CalendarPlus aria-hidden="true" /> Add to calendar
+          <CalendarPlus aria-hidden="true" /> {t('booking.success.addCalendar')}
         </Button>
         <Button asChild>
-          <Link to="/dashboard">Back to dashboard</Link>
+          <Link to="/dashboard">{t('common.backToDashboard')}</Link>
         </Button>
       </motion.div>
       <motion.div variants={fadeUp}>
         <Button variant="link" className="mt-2" onClick={onBookAnother}>
-          Book another class with {prof.firstName}
+          {t('booking.success.another', { name: prof.firstName })}
         </Button>
       </motion.div>
     </motion.div>

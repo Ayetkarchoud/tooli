@@ -6,7 +6,8 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { BookOpen, CalendarCheck, CheckCheck, Lightbulb, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
-import { fadeUp, stagger, useEntrance } from '@/lib/motion'
+import { useTranslation } from 'react-i18next'
+import { fadeUp, stagger, useDirectionSign, useEntrance } from '@/lib/motion'
 import { localDateKey, timeAgo } from '@/lib/time'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
@@ -20,20 +21,21 @@ import Page from '../components/Page.jsx'
 import { useNotifications } from '../layout/notificationsContext.js'
 import PageHeader from '../components/PageHeader.jsx'
 
-// One icon + palette colour per type, drawn as a soft tinted circle
+// One icon + palette colour per type, drawn as a soft tinted circle (type names: notifications.types.<type>)
 const TYPES = {
-  course: { icon: BookOpen, colour: 'blue', label: 'Course' },
-  booking: { icon: CalendarCheck, colour: 'amber', label: 'Booking' },
-  tip: { icon: Lightbulb, colour: 'green', label: 'Tip' },
-  system: { icon: Sparkles, colour: 'violet', label: 'tooli' },
+  course: { icon: BookOpen, colour: 'blue' },
+  booking: { icon: CalendarCheck, colour: 'amber' },
+  tip: { icon: Lightbulb, colour: 'green' },
+  system: { icon: Sparkles, colour: 'violet' },
 }
 
-const GROUPS = ['Today', 'This week', 'Earlier']
+// Headings: notifications.groups.<key>
+const GROUPS = ['today', 'week', 'earlier']
 
 function groupOf(iso, now = new Date()) {
   const date = new Date(iso)
-  if (localDateKey(date) === localDateKey(now)) return 'Today'
-  return now - date < 7 * 86_400_000 ? 'This week' : 'Earlier'
+  if (localDateKey(date) === localDateKey(now)) return 'today'
+  return now - date < 7 * 86_400_000 ? 'week' : 'earlier'
 }
 
 function TypeIcon({ type }) {
@@ -51,6 +53,7 @@ function TypeIcon({ type }) {
 }
 
 function NotificationItem({ n, onOpen }) {
+  const { t } = useTranslation()
   const reduce = useReducedMotion()
   const content = (
     <>
@@ -78,13 +81,13 @@ function NotificationItem({ n, onOpen }) {
         </AnimatePresence>
       </span>
       <span className="sr-only">
-        {n.read ? '' : 'Unread. '}
-        {TYPES[n.type]?.label ?? 'tooli'} notification.
+        {n.read ? '' : `${t('notifications.unreadItem')} `}
+        {t('notifications.typeLabel', { type: t(`notifications.types.${TYPES[n.type] ? n.type : 'system'}`) })}
       </span>
     </>
   )
   const className = cn(
-    'flex w-full items-start gap-3.5 rounded-2xl border px-4 py-3.5 text-left text-foreground no-underline transition-colors duration-300',
+    'flex w-full items-start gap-3.5 rounded-2xl border px-4 py-3.5 text-start text-foreground no-underline transition-colors duration-300',
     n.read ? 'border-transparent hover:bg-card' : 'border-border bg-card hover:border-primary',
   )
 
@@ -100,6 +103,8 @@ function NotificationItem({ n, onOpen }) {
 }
 
 export default function Notifications() {
+  const { t } = useTranslation()
+  const dir = useDirectionSign()
   const [params, setParams] = useSearchParams()
   const onlyUnread = params.get('show') === 'unread'
   const { data, error, loading, reload } = useAsync(listNotifications, [])
@@ -134,9 +139,9 @@ export default function Notifications() {
     try {
       await markAllAsRead()
       setAllRead(true)
-      toast.success('You’re all caught up!')
+      toast.success(t('notifications.caughtUp'))
     } catch {
-      toast.error('Couldn’t mark them as read', { description: 'Check your connection and try again.' })
+      toast.error(t('notifications.markError'), { description: t('tutor.sendErrorText') })
     } finally {
       setMarkingAll(false)
     }
@@ -155,22 +160,27 @@ export default function Notifications() {
   return (
     <Page width="narrow">
       <PageHeader
-        title="Notifications"
-        subtitle="Class bookings, new lessons and study tips, all in one place."
-        badge={unreadCount > 0 && <Badge className="h-auto px-2.5 py-0.5 text-xs">{unreadCount} unread</Badge>}
+        title={t('notifications.title')}
+        subtitle={t('notifications.subtitle')}
+        badge={unreadCount > 0 && <Badge className="h-auto px-2.5 py-0.5 text-xs">{t('notifications.unreadBadge', { count: unreadCount })}</Badge>}
         actions={
           <Button variant="outline" onClick={markAll} disabled={!unreadCount || markingAll}>
-            <CheckCheck aria-hidden="true" /> <span className="max-xs:sr-only">Mark all as read</span>
+            <CheckCheck aria-hidden="true" /> <span className="max-xs:sr-only">{t('notifications.markAll')}</span>
           </Button>
         }
       />
 
       <div className="mb-6">
-        <ChipGroup label="Show" value={onlyUnread ? 'unread' : ''} onChange={setShow} options={[{ value: 'unread', label: 'Unread' }]} />
+        <ChipGroup
+          label={t('notifications.show')}
+          value={onlyUnread ? 'unread' : ''}
+          onChange={setShow}
+          options={[{ value: 'unread', label: t('notifications.unread') }]}
+        />
       </div>
 
       {loading && !data ? (
-        <div className="flex flex-col gap-3" role="status" aria-label="Loading notifications">
+        <div className="flex flex-col gap-3" role="status" aria-label={t('notifications.loading')}>
           {[0, 1, 2, 3, 4].map((i) => (
             <Skeleton key={i} className="h-[84px] rounded-2xl" />
           ))}
@@ -180,16 +190,16 @@ export default function Notifications() {
       ) : shown.length === 0 ? (
         <MascotMessage
           pose="sleepy"
-          title="You’re all caught up!"
-          text={onlyUnread ? 'No unread notifications. Time for a little study session?' : 'New lessons, bookings and tips will show up here.'}
+          title={t('notifications.caughtUp')}
+          text={onlyUnread ? t('notifications.emptyUnread') : t('notifications.empty')}
           action={
             onlyUnread && items.length > 0 ? (
               <Button variant="outline" onClick={() => setShow('')}>
-                Show all notifications
+                {t('notifications.showAll')}
               </Button>
             ) : (
               <Button asChild>
-                <Link to="/dashboard">Back to dashboard</Link>
+                <Link to="/dashboard">{t('common.backToDashboard')}</Link>
               </Button>
             )
           }
@@ -206,7 +216,7 @@ export default function Notifications() {
                   id={`group-${group}`}
                   className="mb-2 px-1 text-xs font-semibold tracking-[0.04em] text-muted-foreground uppercase"
                 >
-                  {group}
+                  {t(`notifications.groups.${group}`)}
                 </motion.h2>
                 <ul className="flex flex-col gap-2">
                   <AnimatePresence initial={false}>
@@ -215,7 +225,7 @@ export default function Notifications() {
                         key={n.id}
                         variants={fadeUp}
                         layout={!reduce}
-                        exit={reduce ? undefined : { opacity: 0, x: 24, transition: { duration: 0.2 } }}
+                        exit={reduce ? undefined : { opacity: 0, x: 24 * dir, transition: { duration: 0.2 } }}
                       >
                         <NotificationItem n={n} onOpen={open} />
                       </motion.li>

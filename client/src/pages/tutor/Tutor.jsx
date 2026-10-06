@@ -1,11 +1,13 @@
 // AI tutor: /dashboard/tutor (new chat) and /dashboard/tutor/:chatId (one conversation).
 // One route with an optional :chatId, so the page stays mounted when a new chat gets its id.
-// Chat history on the left (a Sheet on mobile), conversation + composer on the right.
+// Chat history on the start side (a Sheet on mobile), conversation + composer next to it.
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { ArrowDown, History, MessageSquarePlus } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { useAuth } from '@/auth/authContext'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
@@ -26,19 +28,21 @@ const shortTitle = (text) => (text.length > 48 ? `${text.slice(0, 45)}…` : tex
 const finePointer = () => window.matchMedia('(pointer: fine)').matches
 
 function ConversationSkeleton() {
+  const { t } = useTranslation()
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6" role="status" aria-label="Loading the conversation">
-      <Skeleton className="ml-auto h-11 w-2/3 rounded-2xl" />
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-6" role="status" aria-label={t('tutor.loadingChat')}>
+      <Skeleton className="ms-auto h-11 w-2/3 rounded-2xl" />
       <div className="flex gap-3">
         <Skeleton className="size-10 shrink-0 rounded-full" />
         <Skeleton className="h-36 flex-1 rounded-2xl" />
       </div>
-      <Skeleton className="ml-auto h-11 w-1/2 rounded-2xl" />
+      <Skeleton className="ms-auto h-11 w-1/2 rounded-2xl" />
     </div>
   )
 }
 
 export default function Tutor() {
+  const { t, i18n } = useTranslation()
   const { chatId } = useParams()
   const navigate = useNavigate()
   const [params, setParams] = useSearchParams()
@@ -68,6 +72,13 @@ export default function Tutor() {
     if (!chatId) setConv(emptyChat)
     else if (chatId === createdChatId) setCreatedChatId(null) // already on screen, just forget the flag
     else setConv({ ...emptyChat, status: 'loading' })
+  }
+
+  // The language changed: load the chat again so its texts come in the new language (not mid-answer)
+  const [shownLang, setShownLang] = useState(i18n.resolvedLanguage)
+  if (i18n.resolvedLanguage !== shownLang) {
+    setShownLang(i18n.resolvedLanguage)
+    if (chatId && !thinking) setConv({ ...emptyChat, status: 'loading' })
   }
 
   // Goes up whenever the conversation on screen changes (other chat, New chat). A question remembers
@@ -163,7 +174,8 @@ export default function Tutor() {
       if (finePointer() && document.activeElement !== composerRef.current) composerRef.current?.focus({ preventScroll: true })
 
       try {
-        const res = await sendMessage({ chatId, question })
+        // the tutor answers in the language the student is using right now
+        const res = await sendMessage({ chatId, question, language: i18n.resolvedLanguage })
         setHistoryVersion((v) => v + 1)
         if (sentIn !== conversation.current) return // the student moved to another chat (or a new one) meanwhile
         setConv((c) => ({
@@ -181,7 +193,7 @@ export default function Tutor() {
         setSendError({ question, questionId: pendingId, message: err?.message })
       }
     },
-    [chatId, thinking, navigate],
+    [chatId, thinking, navigate, i18n],
   )
 
   // ?q=… (from the dashboard): ask it once the chat is ready, then clean the URL
@@ -235,10 +247,10 @@ export default function Tutor() {
   else if (conv.status === 'notfound') {
     body = (
       <NotFoundState
-        title="Chat not found"
-        text="This conversation doesn’t exist anymore. Start a new one: tooli is ready!"
+        title={t('tutor.notFound.title')}
+        text={t('tutor.notFound.text')}
         backTo="/dashboard/tutor"
-        backLabel="Start a new chat"
+        backLabel={t('tutor.notFound.back')}
       />
     )
   } else if (isEmptyNewChat) {
@@ -251,7 +263,7 @@ export default function Tutor() {
         role="log"
         aria-live="polite"
         aria-relevant="additions"
-        aria-label="Conversation with tooli"
+        aria-label={t('tutor.conversation')}
       >
         {conv.messages.map((m, i) =>
           m.role === 'user' ? (
@@ -275,10 +287,13 @@ export default function Tutor() {
     )
   }
 
+  const heading = conv.status === 'ready' ? (conv.title ?? t('tutor.newChat')) : t('nav.tutor')
+  usePageTitle(conv.title ?? t('nav.tutor'))
+
   return (
     <div className="flex h-[calc(100dvh-var(--app-header-h,67px))] max-nav:h-[calc(100dvh-var(--app-header-h,111px)-72px-env(safe-area-inset-bottom))]">
       {/* History: side panel from 1024px, a Sheet below */}
-      <aside className="hidden w-[300px] shrink-0 border-r border-border bg-card p-4 lg:flex lg:flex-col" aria-label="Chat history">
+      <aside className="hidden w-[300px] shrink-0 border-e border-border bg-card p-4 lg:flex lg:flex-col" aria-label={t('tutor.history.label')}>
         {historyPanel}
       </aside>
 
@@ -288,15 +303,18 @@ export default function Tutor() {
             <Tooltip>
               <TooltipTrigger asChild>
                 <SheetTrigger asChild>
-                  <Button variant="tile" size="icon" className="lg:hidden" aria-label="Your chats">
+                  <Button variant="tile" size="icon" className="lg:hidden" aria-label={t('tutor.history.title')}>
                     <History size={18} aria-hidden="true" />
                   </Button>
                 </SheetTrigger>
               </TooltipTrigger>
-              <TooltipContent>Your chats</TooltipContent>
+              <TooltipContent>{t('tutor.history.title')}</TooltipContent>
             </Tooltip>
-            <SheetContent side="left" className="w-[300px] bg-card px-4 pt-12 pb-4">
-              <SheetTitle className="sr-only">Your chats</SheetTitle>
+            <SheetContent
+              side={i18n.dir(i18n.resolvedLanguage) === 'rtl' ? 'right' : 'left'}
+              className="w-[300px] bg-card px-4 pt-12 pb-4"
+            >
+              <SheetTitle className="sr-only">{t('tutor.history.title')}</SheetTitle>
               {historyPanel}
             </SheetContent>
           </Sheet>
@@ -307,16 +325,16 @@ export default function Tutor() {
             tabIndex={-1}
             className="min-w-0 flex-1 truncate text-base font-semibold outline-none"
           >
-            {conv.status === 'ready' ? (conv.title ?? 'New chat') : 'AI tutor'}
+            <bdi>{heading}</bdi>
           </h1>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="tile" size="icon" className="lg:hidden" aria-label="New chat" onClick={startNewChat}>
+              <Button variant="tile" size="icon" className="lg:hidden" aria-label={t('tutor.newChat')} onClick={startNewChat}>
                 <MessageSquarePlus size={18} aria-hidden="true" />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>New chat</TooltipContent>
+            <TooltipContent>{t('tutor.newChat')}</TooltipContent>
           </Tooltip>
         </header>
 
@@ -338,7 +356,7 @@ export default function Tutor() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={reduce ? undefined : { opacity: 0, y: 8 }}
               >
-                <ArrowDown size={16} aria-hidden="true" /> New message
+                <ArrowDown size={16} aria-hidden="true" /> {t('tutor.newMessage')}
               </motion.button>
             )}
           </AnimatePresence>

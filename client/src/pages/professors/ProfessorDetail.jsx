@@ -6,6 +6,9 @@ import { Link, useParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ChevronRight, Crown, GraduationCap, Languages, MapPin, MessagesSquare, RefreshCw, Star } from 'lucide-react'
 import { formatTND } from '@/lib/money'
+import { useTranslation } from 'react-i18next'
+import { formatRating } from '@/lib/numbers'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { fadeUp, stagger, useEntrance } from '@/lib/motion'
 import { fullName } from '@/lib/people'
 import { timeAgo } from '@/lib/time'
@@ -22,8 +25,9 @@ import BookingCard from './BookingCard.jsx'
 import BookingSuccess from './BookingSuccess.jsx'
 
 function Stars({ value, size = 14 }) {
+  const { t } = useTranslation()
   return (
-    <span className="inline-flex gap-0.5" aria-label={`${value} out of 5 stars`} role="img">
+    <span className="inline-flex gap-0.5" aria-label={t('professors.stars', { count: value })} role="img">
       {[1, 2, 3, 4, 5].map((n) => (
         <Star key={n} size={size} className={n <= value ? 'text-highlight' : 'text-border'} fill="currentColor" aria-hidden="true" />
       ))}
@@ -32,6 +36,8 @@ function Stars({ value, size = 14 }) {
 }
 
 function ProfileHeader({ prof }) {
+  const { t } = useTranslation()
+  const subject = t(`subjects.${prof.subject}`)
   return (
     <motion.section variants={fadeUp}>
       <Card className="gap-5 p-6 md:p-7">
@@ -44,44 +50,44 @@ function ProfileHeader({ prof }) {
                 <Crown aria-hidden="true" /> VIP
               </Badge>
             </div>
-            <p className="mt-0.5 font-semibold text-primary-text">{prof.subject}</p>
+            <p className="mt-0.5 font-semibold text-primary-text">{subject}</p>
             <p className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
               <Star size={16} className="text-highlight" fill="currentColor" aria-hidden="true" />
-              <strong>{prof.rating.toFixed(1)}</strong>
-              <span className="text-muted-foreground">({prof.reviews} reviews)</span>
+              <strong>{formatRating(prof.rating)}</strong>
+              <span className="text-muted-foreground">({t('professors.reviewCount', { count: prof.reviews })})</span>
               <span className="text-border" aria-hidden="true">
                 •
               </span>
               <strong>{formatTND(prof.pricePerHour)}</strong>
-              <span className="text-muted-foreground">/ hour</span>
+              <span className="text-muted-foreground">{t('professors.perHour')}</span>
             </p>
           </div>
         </div>
 
-        <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground" aria-label="Details">
+        <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-muted-foreground" aria-label={t('professors.details')}>
           <li className="flex items-center gap-2">
-            <MapPin size={16} aria-hidden="true" /> {prof.city}
+            <MapPin size={16} aria-hidden="true" /> {t(`cities.${prof.city}`)}
           </li>
           <li className="flex items-center gap-2">
-            <Languages size={16} aria-hidden="true" /> {prof.languages.join(', ')}
+            <Languages size={16} aria-hidden="true" /> {prof.languages.map((l) => t(`languageNames.${l}`)).join(t('common.listSeparator'))}
           </li>
           <li className="flex items-center gap-2">
-            <GraduationCap size={16} aria-hidden="true" /> {prof.levels.join(', ')}
+            <GraduationCap size={16} aria-hidden="true" /> {prof.levels.map((l) => t(`levels.${l}`)).join(t('common.listSeparator'))}
           </li>
         </ul>
 
         <div>
-          <h2 className="mb-1.5 font-semibold">About</h2>
+          <h2 className="mb-1.5 font-semibold">{t('professors.about')}</h2>
           <p className="leading-relaxed text-muted-foreground">{prof.bio}</p>
         </div>
 
         <Button asChild variant="outline" className="self-start max-xs:w-full">
           <Link
             to={`/dashboard/tutor?q=${encodeURIComponent(
-              `I have a ${prof.subject} class with ${fullName(prof)} soon. Can you help me prepare?`,
+              t('professors.tutorQuestion', { subject, name: fullName(prof) }),
             )}`}
           >
-            <MessagesSquare aria-hidden="true" /> Ask tooli about {prof.subject}
+            <MessagesSquare aria-hidden="true" /> {t('professors.askTutor', { subject })}
           </Link>
         </Button>
       </Card>
@@ -90,6 +96,7 @@ function ProfileHeader({ prof }) {
 }
 
 function Reviews({ prof }) {
+  const { t } = useTranslation()
   const { data: reviews, error, loading, reload } = useAsync(() => getProfessorReviews(prof.id), [prof.id])
 
   return (
@@ -97,26 +104,26 @@ function Reviews({ prof }) {
       <Card className="gap-4 p-6">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 id="reviews-title" className="text-lg font-bold">
-            What students say
+            {t('professors.reviewsTitle')}
           </h2>
           <p className="flex items-center gap-2 text-sm">
             <Stars value={Math.round(prof.rating)} />
-            <span className="font-semibold">{prof.rating.toFixed(1)}</span>
-            <span className="text-muted-foreground">· {prof.reviews} reviews</span>
+            <span className="font-semibold">{formatRating(prof.rating)}</span>
+            <span className="text-muted-foreground">· {t('professors.reviewCount', { count: prof.reviews })}</span>
           </p>
         </div>
 
         {loading && !reviews ? (
-          <div className="flex flex-col gap-3" role="status" aria-label="Loading reviews">
+          <div className="flex flex-col gap-3" role="status" aria-label={t('professors.loadingReviews')}>
             {[0, 1, 2].map((i) => (
               <Skeleton key={i} className="h-20 rounded-xl" />
             ))}
           </div>
         ) : error ? (
           <div role="alert" className="flex items-center gap-3 text-sm text-muted-foreground">
-            Reviews didn’t load.
+            {t('professors.reviewsError')}
             <Button variant="pill" size="sm" onClick={reload}>
-              <RefreshCw aria-hidden="true" /> Try again
+              <RefreshCw aria-hidden="true" /> {t('common.tryAgain')}
             </Button>
           </div>
         ) : (
@@ -128,7 +135,7 @@ function Reviews({ prof }) {
                 </span>
                 <div className="min-w-0">
                   <p className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-                    <span className="font-semibold">{r.author}</span>
+                    <bdi className="font-semibold">{r.author}</bdi>
                     <Stars value={r.rating} size={13} />
                     <time dateTime={r.createdAt} className="text-xs text-muted-foreground">
                       {timeAgo(r.createdAt)}
@@ -146,7 +153,9 @@ function Reviews({ prof }) {
 }
 
 function ProfessorView({ prof }) {
+  const { t } = useTranslation()
   const entrance = useEntrance()
+  usePageTitle(fullName(prof))
   const [booking, setBooking] = useState(null)
 
   if (booking) {
@@ -159,15 +168,15 @@ function ProfessorView({ prof }) {
 
   return (
     <Page>
-      <nav aria-label="Breadcrumb" className="mb-5 text-sm">
+      <nav aria-label={t('common.breadcrumb')} className="mb-5 text-sm">
         <ol className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
           <li>
             <Link to="/dashboard/professors" className="font-semibold text-primary-text no-underline hover:underline">
-              Professors
+              {t('nav.professors')}
             </Link>
           </li>
           <li aria-hidden="true">
-            <ChevronRight size={14} />
+            <ChevronRight size={14} className="rtl:-scale-x-100" />
           </li>
           <li className="min-w-0 truncate" aria-current="page">
             {fullName(prof)}
@@ -175,7 +184,7 @@ function ProfessorView({ prof }) {
         </ol>
       </nav>
 
-      {/* Phones: header → booking → reviews. Desktop: booking is a sticky right column spanning both rows */}
+      {/* Phones: header → booking → reviews. Desktop: booking is a sticky end-side column spanning both rows */}
       <motion.div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_380px]" variants={stagger(0.08)} {...entrance}>
         <div className="min-w-0 lg:col-start-1">
           <ProfileHeader prof={prof} />
@@ -198,6 +207,7 @@ function ProfessorView({ prof }) {
 }
 
 export default function ProfessorDetail() {
+  const { t } = useTranslation()
   const { profId } = useParams()
   const result = useAsync(() => getProfessor(profId), [profId])
 
@@ -205,10 +215,10 @@ export default function ProfessorDetail() {
     <LoadState
       result={result}
       notFound={{
-        title: 'Professor not found',
-        text: 'This profile may have moved, or the link has a typo.',
+        title: t('professors.notFound.title'),
+        text: t('professors.notFound.text'),
         backTo: '/dashboard/professors',
-        backLabel: 'See all professors',
+        backLabel: t('professors.notFound.back'),
       }}
     >
       {(prof) => <ProfessorView prof={prof} />}

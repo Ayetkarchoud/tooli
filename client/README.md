@@ -90,11 +90,50 @@ Check the new file for built-in colour classes (`bg-black/50`, `text-white`) and
 - `src/components/Logo.jsx` (logo) and `src/components/Mascot.jsx` (mascot, poses in `mascotPoses.jsx`)
   are inline SVGs; their colours come from the `--logo-*` and `--mascot-*` tokens.
 
+## Languages: English, Français, العربية
+
+tooli runs in 3 languages with [react-i18next](https://react.i18next.com/). Arabic is right-to-left.
+
+- **Texts**: `src/locales/{en,fr,ar}.json`, one section per page or feature (`common`, `nav`, `landing`, `auth`,
+  `dashboard`, `tutor`, `courses`, `professors`, `booking`, `vip`, `notifications`, `search`, `settings`, `errors`…),
+  plus the names of ids (`subjects`, `levels`, `sections`, `cities`, `languageNames`, `titles`). Each file is
+  downloaded only when that language is used. Add every new key to the 3 files.
+- **In a component**: `const { t } = useTranslation()` → `t('courses.lessons')`, `t('auth.welcome', { name })`.
+  Plurals: `t('courses.count', { count })` picks `count_one` / `count_other` (English, French) or
+  `_zero` / `_one` / `_two` / `_few` / `_many` / `_other` (Arabic). Outside React: `i18n.t(…)` from `src/lib/i18n.js`.
+- **Which language**: the saved choice (`localStorage 'tooli-lang'`, and `user.language` after login) → the
+  browser's language (fr / ar / en) → French. `index.html` sets `<html lang dir>` before React starts (no flash).
+- **Switching**: `<LanguageSwitcher />` (🌐 menu: landing header, login/signup), the avatar menu → Language,
+  and Settings → Appearance & language. All use `useChangeLanguage()` (`src/lib/useChangeLanguage.js`):
+  it applies at once and, when logged in, saves `language` in the profile.
+- **Data from services** comes in the current language (the real API reads the `Accept-Language` header that
+  `src/api/client.js` sends). `useAsync` reloads the data when the language changes. Fixed lists come as ids
+  (`subject: 'mathematics'`) and are translated in the page: `t(`subjects.${course.subject}`)`.
+- **Dates, numbers, prices**: always through `src/lib/time.js` (`formatSlotStart`, `formatDuration`, `timeAgo`…),
+  `src/lib/numbers.js` (`formatRating`, `formatPercent`) and `src/lib/money.js` (`formatTND`). Locales:
+  en-GB, fr-TN, ar-TN with Latin digits.
+- **Browser tab title**: `PageHeader` sets it from its title; other pages call `usePageTitle(t('…'))`.
+
+### Right-to-left (Arabic)
+
+- Use **logical classes**, never left/right: `ms-*` / `me-*`, `ps-*` / `pe-*`, `start-*` / `end-*`, `text-start` /
+  `text-end`, `border-s` / `border-e`, `rounded-s-*` / `rounded-e-*` (corners: `rounded-ss-md`, `rounded-ee-md`).
+- **Mirror directional icons** with `rtl:-scale-x-100` (arrows, chevrons, send). A hover nudge needs its mirror too:
+  `group-hover:translate-x-1 rtl:group-hover:-translate-x-1`. Never mirror the logo, the mascot, clocks or media icons.
+- **Motion slides**: multiply x by `useDirectionSign()` (`src/lib/motion.js`): `x: 12 * dir`.
+- **Sheets** open from the start side: `side={i18n.dir() === 'rtl' ? 'right' : 'left'}`.
+- **Mixed text**: put `dir="auto"` (or `<bdi>`) on text people typed (questions, chat titles, names); code is
+  always `dir="ltr"`. In Arabic translations, wrap formulas like `2x + 5 = 13` in U+2066 … U+2069 so they stay
+  left-to-right.
+- **Font**: Poppins has no Arabic letters, so Arabic text uses **Tajawal** (400/500/700/800, same rounded feel),
+  with a taller line height under `:lang(ar)` (`tailwind.css`). Latin text and numbers stay in Poppins.
+
 ## Shared helpers worth knowing
 
 - `useNotifications()` (member area only): `{ unread, refresh, setUnread }`. The 🔔 dot reads it; call
   `refresh()` after an action that creates a notification, `setUnread(...)` after marking some as read.
 - `useAuth().updateUser({ firstName, lastName })`: update the logged-in user after the API saved it.
+- `useChangeLanguage()`: switch the language (and save it in the profile when logged in).
 - `<Highlight text={…} query={q} />` (`src/lib/highlight.jsx`): marks the matching words, ignoring case and
   accents, as React elements (never HTML strings). `hasWord` / `matches` / `normalise` in `src/lib/text.js`.
 - `api.get(path, { …query })` (`src/api/client.js`) builds the query string and skips empty values.
@@ -107,9 +146,11 @@ src/
   auth/         who is logged in (fake for now) + route guards
   components/   reusable UI (Logo, Mascot, MascotMessage, LoadState, PageLoader, ThemeSwitcher, …)
     ui/         shadcn/ui components
-  data/         static app content (the list of tooli services)
+  data/         static app content (the list of tooli services, profile choices as ids)
   layout/       member area frame (sidebar, top bar, mobile menu, tab bar)
-  lib/          motion.js (animations), useAsync.js (load data), people.js, utils.js (cn)
+  lib/          i18n.js (languages), motion.js (animations), useAsync.js (load data), time.js / numbers.js /
+                money.js (formatting per language), people.js, utils.js (cn)
+  locales/      en.json, fr.json, ar.json: every text the user sees
   pages/        one file per page; folders per area (auth/, tutor/, courses/, professors/, settings/)
   services/     data functions the pages call (fake for now, see docs/api.md)
   styles/       tokens.css, shadcn-theme.css, tailwind.css

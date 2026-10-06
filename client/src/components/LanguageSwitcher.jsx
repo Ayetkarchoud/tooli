@@ -1,15 +1,12 @@
 // Language choice: English, Français, العربية (each written in its own language).
 //   <LanguageSwitcher />        🌐 FR button + small menu (landing header, login/signup)
 //   <LanguageRadioItems />      the same 3 choices inside another dropdown (avatar menu → Language)
-//   useChangeLanguage()         what both use: switches at once (Arabic → right-to-left),
-//                               remembers it in the browser and, when logged in, in the profile.
+// Both switch through useChangeLanguage() (src/lib/useChangeLanguage.js).
 
-import { useCallback } from 'react'
 import { useTranslation } from 'react-i18next'
-import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
 import { LANGUAGES } from '@/lib/i18n'
-import { updateProfile } from '@/services/user'
+import { useChangeLanguage } from '@/lib/useChangeLanguage'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,28 +16,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
-import { useAuth } from '../auth/authContext.js'
-
-export function useChangeLanguage() {
-  const { i18n, t } = useTranslation()
-  const { isLoggedIn, updateUser } = useAuth()
-
-  return useCallback(
-    async (code) => {
-      if (code === i18n.resolvedLanguage) return
-      await i18n.changeLanguage(code) // also saved in localStorage ('tooli-lang') by the detector
-      if (!isLoggedIn) return
-      updateUser({ language: code })
-      try {
-        await updateProfile({ language: code })
-      } catch {
-        // The page is already in the new language; only the profile copy failed
-        toast.error(t('settings.language.saveError'))
-      }
-    },
-    [i18n, isLoggedIn, updateUser, t],
-  )
-}
 
 // lang/dir on each name, so screen readers and the browser read "العربية" as Arabic
 export function LanguageRadioItems({ itemClassName }) {

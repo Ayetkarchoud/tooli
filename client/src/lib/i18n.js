@@ -50,11 +50,15 @@ export const i18nReady = i18n
       order: ['localStorage', 'navigator'],
       lookupLocalStorage: LANGUAGE_KEY,
       caches: ['localStorage'],
+      // "en-GB", "ar-TN" → "en", "ar": that short code is what gets saved (index.html reads it too)
+      convertDetectedLanguage: (lng) => lng.slice(0, 2).toLowerCase(),
     },
     interpolation: { escapeValue: false }, // React already escapes
     returnNull: false,
   })
 
-i18n.on('languageChanged', (lang) => applyToDocument(supported.includes(lang) ? lang : DEFAULT_LANGUAGE))
+// <html lang dir> follow the language actually shown (currentLanguage() maps anything unknown to French)
+i18n.on('languageChanged', () => applyToDocument(currentLanguage()))
+i18nReady.then(() => applyToDocument(currentLanguage()))
 
 export default i18n

@@ -44,7 +44,7 @@ export async function getProfile() {
 }
 
 // Send only the fields that changed (e.g. { language: 'ar' } from the language switcher); get the full profile back
-// TODO(backend): api.patch('/users/me/profile', changes)
+// TODO(backend): api.put('/users/me/profile', changes)
 export async function updateProfile(changes) {
   await wait()
   profile = { ...profile, ...changes }

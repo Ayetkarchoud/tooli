@@ -6,6 +6,9 @@ import { Link, useParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { BookOpen, Check, CheckCheck, CheckCircle2, ChevronRight, Clock, Lock, MessagesSquare, Play, PlayCircle, Star } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
+import { formatPercent, formatRating } from '@/lib/numbers'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { fadeUp, stagger, useEntrance } from '@/lib/motion'
 import { formatDuration } from '@/lib/time'
 import { useAsync } from '@/lib/useAsync'
@@ -27,16 +30,17 @@ function lessonStatuses(lessons) {
 }
 
 function Breadcrumb({ title }) {
+  const { t } = useTranslation()
   return (
-    <nav aria-label="Breadcrumb" className="mb-5 text-sm">
+    <nav aria-label={t('common.breadcrumb')} className="mb-5 text-sm">
       <ol className="flex min-w-0 items-center gap-1.5 text-muted-foreground">
         <li>
           <Link to="/dashboard/courses" className="font-semibold text-primary-text no-underline hover:underline">
-            Courses
+            {t('nav.coursesShort')}
           </Link>
         </li>
         <li aria-hidden="true">
-          <ChevronRight size={14} />
+          <ChevronRight size={14} className="rtl:-scale-x-100" />
         </li>
         <li className="min-w-0 truncate" aria-current="page">
           {title}
@@ -47,17 +51,18 @@ function Breadcrumb({ title }) {
 }
 
 function Hero({ course, statuses }) {
+  const { t } = useTranslation()
   const { title, platform, subject, level, durationMinutes, lessons, rating, reviews, description, progress } = course
   const doneCount = statuses.filter((s) => s === 'done').length
   const nextLesson = lessons[statuses.indexOf('next')]
-  const action = progress === null ? 'Start course' : progress === 100 ? 'Review course' : 'Resume'
+  const action = progress === null ? t('courses.start') : progress === 100 ? t('courses.review') : t('courses.resume')
   const tutorQuestion = nextLesson
-    ? `I'm following "${title}" on ${platform.name}. Can you help me understand "${nextLesson.title}"?`
-    : `I finished "${title}" on ${platform.name}. Can you quiz me on the main ideas?`
+    ? t('courses.tutorQuestion', { title, platform: platform.name, lesson: nextLesson.title })
+    : t('courses.tutorQuiz', { title, platform: platform.name })
 
   const open = () => {
     // TODO: open the partner platform once we have real links: window.open(platform.url, '_blank', 'noopener')
-    toast(`Opening ${platform.name}…`, { description: `“${title}” will open in a new tab.` })
+    toast(t('courses.opening', { platform: platform.name }), { description: t('courses.openingText', { title }) })
   }
 
   return (
@@ -70,7 +75,7 @@ function Hero({ course, statuses }) {
             {platform.name}
           </Badge>
           <Badge variant="highlight" className="text-xs">
-            {level}
+            {t(`levels.${level}`)}
           </Badge>
         </div>
 
@@ -79,29 +84,33 @@ function Hero({ course, statuses }) {
           <p className="mt-2 max-w-2xl text-muted-foreground">{description}</p>
         </div>
 
-        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm" aria-label="Course details">
+        <ul className="flex flex-wrap gap-x-5 gap-y-2 text-sm" aria-label={t('courses.details')}>
           <li className="inline-flex items-center gap-1.5">
             <Clock size={16} className="text-primary-text" aria-hidden="true" /> {formatDuration(durationMinutes)}
           </li>
           <li className="inline-flex items-center gap-1.5">
-            <BookOpen size={16} className="text-primary-text" aria-hidden="true" /> {lessons.length} lessons
+            <BookOpen size={16} className="text-primary-text" aria-hidden="true" /> {t('courses.lessonCount', { count: lessons.length })}
           </li>
           <li className="inline-flex items-center gap-1.5">
             <Star size={16} className="text-highlight" fill="currentColor" aria-hidden="true" />
-            <strong>{rating.toFixed(1)}</strong>
-            <span className="text-muted-foreground">({reviews} reviews)</span>
+            <strong>{formatRating(rating)}</strong>
+            <span className="text-muted-foreground">({t('professors.reviewCount', { count: reviews })})</span>
           </li>
         </ul>
 
         <div className="flex items-center gap-4 rounded-2xl bg-muted/60 p-3.5">
-          <ProgressRing value={progress ?? 0} size={64} label={`Your progress: ${progress ?? 0}%`} />
+          <ProgressRing value={progress ?? 0} size={64} label={t('courses.yourProgress', { percent: formatPercent(progress ?? 0) })} />
           <div className="min-w-0 text-sm">
             <p className="font-semibold">
-              {progress === null ? 'Not started yet' : progress === 100 ? 'Course completed, well done!' : `${doneCount} of ${lessons.length} lessons done`}
+              {progress === null
+                ? t('courses.notStarted')
+                : progress === 100
+                  ? t('courses.completed')
+                  : t('courses.lessonsDone', { done: doneCount, count: lessons.length })}
             </p>
             {nextLesson && (
               <p className="truncate text-muted-foreground">
-                {progress === null ? 'First lesson' : 'Up next'}: {nextLesson.title}
+                {t(progress === null ? 'courses.firstLesson' : 'courses.upNextLesson', { title: nextLesson.title })}
               </p>
             )}
           </div>
@@ -115,7 +124,8 @@ function Hero({ course, statuses }) {
             <Link to={`/dashboard/tutor?q=${encodeURIComponent(tutorQuestion)}`}>
               <MessagesSquare aria-hidden="true" />
               <span>
-                Ask the AI tutor<span className="max-xs:sr-only"> about this course</span>
+                {t('courses.askTutor')}
+                <span className="max-xs:sr-only"> {t('courses.aboutCourse')}</span>
               </span>
             </Link>
           </Button>
@@ -125,18 +135,20 @@ function Hero({ course, statuses }) {
   )
 }
 
+// Labels: courses.status.<key>
 const STATUS = {
-  done: { icon: CheckCircle2, label: 'Done', className: 'text-primary-text' },
-  next: { icon: PlayCircle, label: 'Up next', className: 'text-primary-text' },
-  locked: { icon: Lock, label: 'Locked', className: 'text-muted-foreground' },
+  done: { icon: CheckCircle2, className: 'text-primary-text' },
+  next: { icon: PlayCircle, className: 'text-primary-text' },
+  locked: { icon: Lock, className: 'text-muted-foreground' },
 }
 
 function Lessons({ lessons, statuses, onMarkDone, marking }) {
+  const { t } = useTranslation()
   return (
     <motion.section variants={fadeUp} aria-labelledby="lessons-title">
       <Card className="gap-0 p-0">
         <h2 id="lessons-title" className="border-b border-border px-5 py-4 text-lg font-semibold">
-          Lessons
+          {t('courses.lessons')}
         </h2>
         <ol>
           {lessons.map((lesson, i) => {
@@ -152,13 +164,13 @@ function Lessons({ lessons, statuses, onMarkDone, marking }) {
               >
                 <Icon size={22} className={cn('shrink-0', status.className)} aria-hidden="true" />
                 <span className="min-w-0 flex-1">
-                  <span className="block text-xs text-muted-foreground">Lesson {i + 1}</span>
+                  <span className="block text-xs text-muted-foreground">{t('courses.lessonNumber', { n: i + 1 })}</span>
                   <span className={cn('block font-semibold', statuses[i] === 'locked' && 'text-muted-foreground')}>{lesson.title}</span>
                 </span>
                 {statuses[i] === 'next' && (
-                  <Badge className="shrink-0 text-xs max-sm:hidden">Up next</Badge>
+                  <Badge className="shrink-0 text-xs max-sm:hidden">{t('courses.status.next')}</Badge>
                 )}
-                <span className="shrink-0 text-sm text-muted-foreground">{lesson.minutes} min</span>
+                <span className="shrink-0 text-sm text-muted-foreground">{formatDuration(lesson.minutes)}</span>
                 {statuses[i] === 'next' && (
                   <Button
                     size="sm"
@@ -166,12 +178,12 @@ function Lessons({ lessons, statuses, onMarkDone, marking }) {
                     className="shrink-0 bg-card"
                     onClick={() => onMarkDone(lesson)}
                     disabled={marking}
-                    aria-label={`Mark “${lesson.title}” as done`}
+                    aria-label={t('courses.markDone', { title: lesson.title })}
                   >
-                    <CheckCheck aria-hidden="true" /> <span className="max-xs:sr-only">Done</span>
+                    <CheckCheck aria-hidden="true" /> <span className="max-xs:sr-only">{t('courses.status.done')}</span>
                   </Button>
                 )}
-                <span className="sr-only">({status.label})</span>
+                <span className="sr-only">({t(`courses.status.${statuses[i]}`)})</span>
               </li>
             )
           })}
@@ -182,11 +194,12 @@ function Lessons({ lessons, statuses, onMarkDone, marking }) {
 }
 
 function Outcomes({ outcomes }) {
+  const { t } = useTranslation()
   return (
     <motion.section variants={fadeUp} aria-labelledby="outcomes-title">
       <Card className="gap-4 p-5">
         <h2 id="outcomes-title" className="text-lg font-semibold">
-          What you’ll learn
+          {t('courses.outcomes')}
         </h2>
         <ul className="flex flex-col gap-3">
           {outcomes.map((o) => (
@@ -204,6 +217,7 @@ function Outcomes({ outcomes }) {
 }
 
 function CourseView({ course: initial }) {
+  const { t } = useTranslation()
   const entrance = useEntrance()
   const [course, setCourse] = useState(initial)
   const [marking, setMarking] = useState(false)
@@ -218,16 +232,25 @@ function CourseView({ course: initial }) {
       const done = updated.lessons.filter((l) => l.done).length
       setCelebration(
         updated.progress === 100
-          ? { complete: true, title: 'Course completed! 🎓', text: `You finished all ${done} lessons of “${updated.title}”. Amazing work.` }
-          : { title: 'Lesson done, well played!', text: `“${lesson.title}” ✓ · ${done} of ${updated.lessons.length} lessons, ${updated.progress}% of the course.` },
+          ? { complete: true, title: t('courses.celebrate.completeTitle'), text: t('courses.celebrate.completeText', { count: done, title: updated.title }) }
+          : {
+              title: t('courses.celebrate.lessonTitle'),
+              text: t('courses.celebrate.lessonText', {
+                title: lesson.title,
+                done,
+                count: updated.lessons.length,
+                percent: formatPercent(updated.progress),
+              }),
+            },
       )
     } catch (err) {
-      toast.error('That didn’t save', { description: err.message })
+      toast.error(t('common.saveError'), { description: err.message })
     } finally {
       setMarking(false)
     }
   }
 
+  usePageTitle(course.title)
   return (
     <Page>
       <Breadcrumb title={course.title} />
@@ -243,7 +266,7 @@ function CourseView({ course: initial }) {
               action={
                 celebration.complete && (
                   <Button asChild size="sm">
-                    <Link to="/dashboard/courses">Find your next course</Link>
+                    <Link to="/dashboard/courses">{t('courses.findNext')}</Link>
                   </Button>
                 )
               }
@@ -260,6 +283,7 @@ function CourseView({ course: initial }) {
 }
 
 export default function CourseDetail() {
+  const { t } = useTranslation()
   const { courseId } = useParams()
   const result = useAsync(() => getCourse(courseId), [courseId])
 
@@ -267,10 +291,10 @@ export default function CourseDetail() {
     <LoadState
       result={result}
       notFound={{
-        title: 'Course not found',
-        text: 'This course may have been removed, or the link has a typo.',
+        title: t('courses.notFound.title'),
+        text: t('courses.notFound.text'),
         backTo: '/dashboard/courses',
-        backLabel: 'See all courses',
+        backLabel: t('courses.notFound.back'),
       }}
     >
       {(course) => <CourseView course={course} />}

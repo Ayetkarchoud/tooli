@@ -3,6 +3,8 @@
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { Clock, GraduationCap, Star } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { formatPercent, formatRating } from '@/lib/numbers'
 import Highlight from '@/lib/highlight'
 import { fadeUp, liftOnHover } from '@/lib/motion'
 import { formatDuration } from '@/lib/time'
@@ -13,6 +15,7 @@ const MotionLink = motion.create(Link)
 
 // `query`: optional, highlights the matching words in the subject and title (search results)
 export default function CourseCard({ course, query }) {
+  const { t } = useTranslation()
   const { id, title, platform, subject, level, durationMinutes, rating, reviews, progress } = course
 
   return (
@@ -24,14 +27,14 @@ export default function CourseCard({ course, query }) {
       >
         <div className="relative">
           <CourseCover cover={platform.cover} subject={subject} className="h-32" />
-          <Badge className="absolute top-3 left-3 border-0 bg-card/90 px-2.5 py-0.5 text-xs font-semibold text-foreground backdrop-blur-sm">
+          <Badge className="absolute start-3 top-3 border-0 bg-card/90 px-2.5 py-0.5 text-xs font-semibold text-foreground backdrop-blur-sm">
             {platform.name}
           </Badge>
         </div>
 
         <div className="flex flex-1 flex-col gap-2 p-4">
           <p className="text-xs font-semibold tracking-[0.04em] text-muted-foreground uppercase">
-            <Highlight text={subject} query={query} />
+            <Highlight text={t(`subjects.${subject}`)} query={query} />
           </p>
           <h3 className="line-clamp-2 text-base leading-snug font-semibold">
             <Highlight text={title} query={query} />
@@ -39,15 +42,15 @@ export default function CourseCard({ course, query }) {
 
           <p className="mt-auto flex flex-wrap items-center gap-x-3 gap-y-1 pt-1 text-[13px] text-muted-foreground">
             <span className="inline-flex items-center gap-1">
-              <GraduationCap size={14} aria-hidden="true" /> {level}
+              <GraduationCap size={14} aria-hidden="true" /> {t(`levels.${level}`)}
             </span>
             <span className="inline-flex items-center gap-1">
               <Clock size={14} aria-hidden="true" /> {formatDuration(durationMinutes)}
             </span>
             <span className="inline-flex items-center gap-1">
               <Star size={14} className="text-highlight" fill="currentColor" aria-hidden="true" />
-              <span className="font-semibold text-foreground">{rating.toFixed(1)}</span>
-              <span className="sr-only">out of 5,</span> ({reviews})
+              <span className="font-semibold text-foreground">{formatRating(rating)}</span>
+              <span className="sr-only">{t('courses.outOf5')}</span> ({reviews})
             </span>
           </p>
 
@@ -59,11 +62,11 @@ export default function CourseCard({ course, query }) {
                 aria-valuenow={progress}
                 aria-valuemin={0}
                 aria-valuemax={100}
-                aria-label={`${title}: ${progress}% done`}
+                aria-label={t('courses.doneLabel', { title, percent: formatPercent(progress) })}
               >
                 <span className="block h-full rounded-full bg-primary" style={{ width: `${progress}%` }} />
               </div>
-              <span className="text-xs font-semibold">{progress}%</span>
+              <span className="text-xs font-semibold">{formatPercent(progress)}</span>
             </div>
           )}
         </div>

@@ -4,7 +4,9 @@ import { useCallback, useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight, Lightbulb, MessagesSquare, Search as SearchIcon, Star } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import Highlight from '@/lib/highlight'
+import { formatRating } from '@/lib/numbers'
 import { formatTND } from '@/lib/money'
 import { fadeUp, stagger, useEntrance } from '@/lib/motion'
 import { fullName } from '@/lib/people'
@@ -23,6 +25,7 @@ import PageHeader from '../components/PageHeader.jsx'
 
 // Big search box: types freely, writes ?q= after a short pause; follows the URL when it changes elsewhere
 function SearchBox({ value, onSearch }) {
+  const { t } = useTranslation()
   const [text, setText] = useState(value)
   const [shown, setShown] = useState(value)
   if (value !== shown) {
@@ -45,30 +48,32 @@ function SearchBox({ value, onSearch }) {
         onSearch(text.trim())
       }}
     >
-      <SearchIcon size={22} className="pointer-events-none absolute top-1/2 left-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+      <SearchIcon size={22} className="pointer-events-none absolute start-4 top-1/2 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
       <Input
         type="search"
         value={text}
         onChange={(e) => setText(e.target.value)}
-        placeholder="A course, a professor, a city, a study tip…"
-        aria-label="Search courses, professors and tips"
+        placeholder={t('search.bigPlaceholder')}
+        aria-label={t('search.label')}
         autoFocus={!value}
-        className="h-14 rounded-2xl bg-card pl-12 text-lg shadow-[0_8px_24px_-18px_color-mix(in_srgb,var(--color-text)_40%,transparent)] focus-visible:border-primary focus-visible:ring-accent md:text-lg dark:bg-card"
+        className="h-14 rounded-2xl bg-card ps-12 text-lg shadow-[0_8px_24px_-18px_color-mix(in_srgb,var(--color-text)_40%,transparent)] focus-visible:border-primary focus-visible:ring-accent md:text-lg dark:bg-card"
       />
     </form>
   )
 }
 
-function SubjectChips({ subjects, onPick, label = 'Popular subjects' }) {
+// subjects = ids; picking one searches its name in the current language
+function SubjectChips({ subjects, onPick, label }) {
+  const { t } = useTranslation()
   if (!subjects?.length) return null
   return (
     <div className="flex flex-col items-center gap-2.5">
-      <p className="text-sm font-semibold text-muted-foreground">{label}</p>
+      <p className="text-sm font-semibold text-muted-foreground">{label ?? t('search.popular')}</p>
       <ul className="flex flex-wrap justify-center gap-2">
         {subjects.map((s) => (
           <li key={s}>
-            <Button type="button" variant="pill" size="sm" className="bg-card" onClick={() => onPick(s)}>
-              {s}
+            <Button type="button" variant="pill" size="sm" className="bg-card" onClick={() => onPick(t(`subjects.${s}`))}>
+              {t(`subjects.${s}`)}
             </Button>
           </li>
         ))}
@@ -87,6 +92,7 @@ function SectionTitle({ id, children, count }) {
 }
 
 function ProfessorResult({ prof, query }) {
+  const { t } = useTranslation()
   return (
     <motion.li variants={fadeUp}>
       <Link
@@ -99,22 +105,25 @@ function ProfessorResult({ prof, query }) {
             <Highlight text={fullName(prof)} query={query} />
           </span>
           <span className="block truncate text-sm text-muted-foreground">
-            <Highlight text={`${prof.subject} · ${prof.city}`} query={query} />
+            <Highlight text={`${t(`subjects.${prof.subject}`)} · ${t(`cities.${prof.city}`)}`} query={query} />
           </span>
         </span>
-        <span className="hidden shrink-0 text-right text-sm sm:block">
+        <span className="hidden shrink-0 text-end text-sm sm:block">
           <span className="flex items-center justify-end gap-1 font-semibold">
-            <Star size={14} className="text-highlight" fill="currentColor" aria-hidden="true" /> {prof.rating.toFixed(1)}
+            <Star size={14} className="text-highlight" fill="currentColor" aria-hidden="true" /> {formatRating(prof.rating)}
           </span>
-          <span className="text-muted-foreground">{formatTND(prof.pricePerHour)} / h</span>
+          <span className="text-muted-foreground">
+            {formatTND(prof.pricePerHour)} {t('professors.perHourShort')}
+          </span>
         </span>
-        <ArrowRight size={18} className="shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+        <ArrowRight size={18} className="shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5" aria-hidden="true" />
       </Link>
     </motion.li>
   )
 }
 
 export default function Search() {
+  const { t } = useTranslation()
   const [params, setParams] = useSearchParams()
   const q = (params.get('q') ?? '').trim()
   const result = useAsync(() => (q ? search(q) : Promise.resolve(null)), [q])
@@ -142,13 +151,13 @@ export default function Search() {
   if (!q) {
     body = (
       <div className="flex flex-col items-center gap-6 py-6 text-center">
-        <p className="max-w-md text-muted-foreground">Search everything on tooli at once: partner courses, VIP professors and study tips.</p>
+        <p className="max-w-md text-muted-foreground">{t('search.intro')}</p>
         <SubjectChips subjects={subjects} onPick={setQuery} />
       </div>
     )
   } else if (result.loading && !data) {
     body = (
-      <div className="flex flex-col gap-8" role="status" aria-label="Searching">
+      <div className="flex flex-col gap-8" role="status" aria-label={t('search.searching')}>
         <Skeleton className="h-6 w-40" />
         <CardGridSkeleton count={3} className="h-[280px]" />
         <Skeleton className="h-6 w-40" />
@@ -161,16 +170,16 @@ export default function Search() {
     body = (
       <MascotMessage
         pose="thinking"
-        title={`No match for “${q}”`}
-        text="Try a subject below, or ask the AI tutor: it can explain almost anything, step by step."
+        title={t('search.noMatch', { query: q })}
+        text={t('search.noMatchText')}
         action={
           <div className="flex flex-col items-center gap-6">
             <Button asChild size="lg">
               <Link to={`/dashboard/tutor?q=${encodeURIComponent(q)}`}>
-                <MessagesSquare aria-hidden="true" /> Ask the AI tutor
+                <MessagesSquare aria-hidden="true" /> {t('courses.askTutor')}
               </Link>
             </Button>
-            <SubjectChips subjects={subjects} onPick={setQuery} label="Or try a subject" />
+            <SubjectChips subjects={subjects} onPick={setQuery} label={t('search.trySubject')} />
           </div>
         }
       />
@@ -187,7 +196,7 @@ export default function Search() {
         {data.courses.length > 0 && (
           <section aria-labelledby="results-courses">
             <SectionTitle id="results-courses" count={data.courses.length}>
-              Courses
+              {t('nav.coursesShort')}
             </SectionTitle>
             <motion.ul className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] gap-4" variants={stagger(0.05)}>
               {data.courses.map((c) => (
@@ -200,7 +209,7 @@ export default function Search() {
         {data.professors.length > 0 && (
           <section aria-labelledby="results-professors">
             <SectionTitle id="results-professors" count={data.professors.length}>
-              Professors
+              {t('search.professors')}
             </SectionTitle>
             <motion.ul className="grid gap-3 md:grid-cols-2" variants={stagger(0.05)}>
               {data.professors.map((p) => (
@@ -213,7 +222,7 @@ export default function Search() {
         {data.tips.length > 0 && (
           <section aria-labelledby="results-tips">
             <SectionTitle id="results-tips" count={data.tips.length}>
-              Study tips
+              {t('search.tips')}
             </SectionTitle>
             <motion.ul className="flex flex-col gap-3" variants={stagger(0.05)}>
               {data.tips.map((tip) => (
@@ -235,10 +244,10 @@ export default function Search() {
 
   return (
     <Page>
-      <PageHeader title="Search" subtitle="Courses, professors and study tips, all at once." className="mb-5" />
+      <PageHeader title={t('search.title')} subtitle={t('search.subtitle')} className="mb-5" />
       <SearchBox value={q} onSearch={setQuery} />
       <p className="mt-3 mb-8 min-h-5 text-sm text-muted-foreground" aria-live="polite">
-        {q && data && !result.loading && `${total} ${total === 1 ? 'result' : 'results'} for “${q}”`}
+        {q && data && !result.loading && t('search.resultCount', { count: total, query: q })}
       </p>
       {body}
     </Page>

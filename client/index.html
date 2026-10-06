@@ -36,7 +36,7 @@
         var LANGS = ['en', 'fr', 'ar'];
         var lang = null;
         try {
-          lang = localStorage.getItem('tooli-lang');
+          lang = String(localStorage.getItem('tooli-lang') || '').slice(0, 2).toLowerCase();
         } catch (e) {}
         if (LANGS.indexOf(lang) < 0) {
           var browser = (navigator.languages || [navigator.language || '']).map(function (l) {

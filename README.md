@@ -49,7 +49,8 @@ No Node.js or MongoDB needed on your computer.
 - **Stop**: `Ctrl + C`, then `docker compose down` (or `docker compose down` from another terminal).
 - **Run in the background**: `docker compose up --build -d`, logs with `docker compose logs -f client`.
 - **Reset the database** (deletes all its data): `docker compose down -v` (the `-v` removes the `mongo-data` volume).
-- **After changing `package.json`**: `docker compose up --build` again, so the container installs the new packages.
+- **After changing `package.json`** (or a `git pull` that did): just restart; the client container runs `npm install` every time it starts.
+  If you ever see "Failed to resolve import" for a package, run `docker compose up --build -V` (fresh `node_modules` volume).
 - **The API**: the `server` service is commented out in `docker-compose.yml` until the Express app exists.
   Uncomment it (and `depends_on` in `client`) once `server/` has a Dockerfile that starts Express on port 5000.
 

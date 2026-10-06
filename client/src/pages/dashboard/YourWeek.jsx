@@ -3,6 +3,7 @@
 
 import { Link } from 'react-router-dom'
 import { motion } from 'motion/react'
+import { useTranslation } from 'react-i18next'
 import { ArrowRight, BookOpenCheck, CalendarCheck, CalendarPlus, MessagesSquare, RefreshCw } from 'lucide-react'
 import { fullName } from '@/lib/people'
 import { liftOnHover } from '@/lib/motion'
@@ -17,6 +18,8 @@ const MotionLink = motion.create(Link)
 const TILE = 'flex h-full flex-col gap-2 rounded-2xl border border-border bg-card p-4 text-foreground no-underline'
 const LINK_TILE = cn(TILE, 'group transition-[border-color,box-shadow] hover:border-primary hover:shadow-lift')
 
+const ARROW = 'transition-transform group-hover:translate-x-0.5 rtl:-scale-x-100 rtl:group-hover:-translate-x-0.5'
+
 function StatLink({ to, icon: Icon, value, label, cta }) {
   return (
     <MotionLink to={to} className={LINK_TILE} {...liftOnHover}>
@@ -25,29 +28,30 @@ function StatLink({ to, icon: Icon, value, label, cta }) {
       </span>
       <span className="text-3xl leading-none font-extrabold">{value}</span>
       <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary-text">
-        {cta} <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+        {cta} <ArrowRight size={14} className={ARROW} aria-hidden="true" />
       </span>
     </MotionLink>
   )
 }
 
 function DaysStudied({ days }) {
+  const { t } = useTranslation()
   const today = localDateKey(new Date())
   const past = days.filter((d) => d.studied !== null)
   const studied = past.filter((d) => d.studied).length
 
   return (
     <div className={TILE}>
-      <span className="text-sm font-semibold text-muted-foreground">Days studied</span>
+      <span className="text-sm font-semibold text-muted-foreground">{t('dashboard.week.daysStudied')}</span>
       <span className="text-3xl leading-none font-extrabold">
         {studied}
-        <span className="text-base font-semibold text-muted-foreground"> / {past.length} so far</span>
+        <span className="text-base font-semibold text-muted-foreground"> {t('dashboard.week.soFar', { count: past.length })}</span>
       </span>
-      <ol className="mt-auto flex justify-between gap-1 pt-1" aria-label="This week, Monday to Sunday">
+      <ol className="mt-auto flex justify-between gap-1 pt-1" aria-label={t('dashboard.week.daysLabel')}>
         {days.map((d) => {
-          const { weekday, long } = dayParts(d.date)
+          const { narrow, long } = dayParts(d.date)
           const isToday = d.date === today
-          const state = d.studied === null ? 'still to come' : d.studied ? 'studied' : 'no study'
+          const state = t(`dashboard.week.state.${d.studied === null ? 'toCome' : d.studied ? 'studied' : 'none'}`)
           return (
             <li key={d.date} className="flex flex-col items-center gap-1">
               <span
@@ -61,11 +65,10 @@ function DaysStudied({ days }) {
                 aria-hidden="true"
               />
               <span className={cn('text-[11px] font-semibold text-muted-foreground', isToday && 'text-foreground')} aria-hidden="true">
-                {weekday[0]}
+                {narrow}
               </span>
               <span className="sr-only">
-                {long}
-                {isToday ? ' (today)' : ''}: {state}
+                {isToday ? t('dashboard.week.todayDay', { day: long, state }) : t('dashboard.week.day', { day: long, state })}
               </span>
             </li>
           )
@@ -76,15 +79,16 @@ function DaysStudied({ days }) {
 }
 
 function NextClass({ booking }) {
+  const { t } = useTranslation()
   if (!booking) {
     return (
       <MotionLink to="/dashboard/professors" className={LINK_TILE} {...liftOnHover}>
         <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-          <CalendarPlus size={16} className="text-primary-text" aria-hidden="true" /> Next class
+          <CalendarPlus size={16} className="text-primary-text" aria-hidden="true" /> {t('dashboard.week.nextClass')}
         </span>
-        <span className="text-lg leading-snug font-bold">No class booked yet</span>
+        <span className="text-lg leading-snug font-bold">{t('dashboard.week.noClass')}</span>
         <span className="mt-auto inline-flex items-center gap-1 text-sm font-semibold text-primary-text">
-          Book a class <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+          {t('professors.book')} <ArrowRight size={14} className={ARROW} aria-hidden="true" />
         </span>
       </MotionLink>
     )
@@ -93,35 +97,37 @@ function NextClass({ booking }) {
   return (
     <MotionLink to={`/dashboard/professors/${prof.id}`} className={LINK_TILE} {...liftOnHover}>
       <span className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-        <CalendarCheck size={16} className="text-primary-text" aria-hidden="true" /> Next class
+        <CalendarCheck size={16} className="text-primary-text" aria-hidden="true" /> {t('dashboard.week.nextClass')}
       </span>
       <span className="text-lg leading-snug font-bold">{formatSlotStart(booking.startsAt)}</span>
       <span className="mt-auto text-sm text-muted-foreground">
-        with <span className="font-semibold text-foreground">{fullName(prof)}</span> · {prof.subject}
+        {t('dashboard.week.with')} <span className="font-semibold text-foreground">{fullName(prof)}</span> ·{' '}
+        {t(`subjects.${prof.subject}`)}
       </span>
     </MotionLink>
   )
 }
 
 export default function YourWeek() {
+  const { t } = useTranslation()
   const { data, error, loading, reload } = useAsync(getWeekSummary, [])
 
   return (
     <section aria-labelledby="week-title">
       <h2 id="week-title" className="mb-3.5 text-lg font-semibold">
-        Your week
+        {t('dashboard.week.title')}
       </h2>
       {loading && !data ? (
-        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4" role="status" aria-label="Loading your week">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-4" role="status" aria-label={t('dashboard.week.loading')}>
           {[0, 1, 2, 3].map((i) => (
             <Skeleton key={i} className="h-[132px] rounded-2xl" />
           ))}
         </div>
       ) : error ? (
         <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-4 text-sm text-muted-foreground" role="alert">
-          Your week didn’t load.
+          {t('dashboard.week.error')}
           <Button variant="pill" size="sm" onClick={reload}>
-            <RefreshCw aria-hidden="true" /> Try again
+            <RefreshCw aria-hidden="true" /> {t('common.tryAgain')}
           </Button>
         </div>
       ) : (
@@ -129,8 +135,12 @@ export default function YourWeek() {
           <div className="max-[420px]:col-span-2">
             <DaysStudied days={data.days} />
           </div>
-          <StatLink to="/dashboard/tutor" icon={MessagesSquare} value={data.questionsAsked} label="Questions asked" cta="Ask another" />
-          <StatLink to="/dashboard/courses" icon={BookOpenCheck} value={data.lessonsDone} label="Lessons done" cta="Keep going" />
+          <StatLink to="/dashboard/tutor" icon={MessagesSquare} value={data.questionsAsked}
+            label={t('dashboard.week.questions')}
+            cta={t('dashboard.week.askAnother')} />
+          <StatLink to="/dashboard/courses" icon={BookOpenCheck} value={data.lessonsDone}
+            label={t('dashboard.week.lessons')}
+            cta={t('dashboard.week.keepGoing')} />
           <div className="max-[420px]:col-span-2">
             <NextClass booking={data.nextClass} />
           </div>

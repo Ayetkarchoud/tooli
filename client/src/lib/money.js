@@ -3,7 +3,10 @@
 
 import i18n, { currentLanguage, localeOf } from './i18n.js'
 
+const NBSP = String.fromCharCode(0xa0) // non-breaking space
+
 export function formatTND(amount, lang = currentLanguage()) {
   const number = new Intl.NumberFormat(localeOf(lang), { maximumFractionDigits: 1 }).format(amount)
-  return i18n.t('money.tnd', { lng: lang, amount: number })
+  // non-breaking spaces: a price never splits over two lines ("59" / "د.ت")
+  return i18n.t('money.tnd', { lng: lang, amount: number }).replace(/ /g, NBSP)
 }

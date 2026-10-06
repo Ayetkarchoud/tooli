@@ -2,6 +2,9 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'motion/react'
 import { ArrowRight, Lightbulb, RefreshCw, SendHorizontal, Star } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { formatPercent, formatRating } from '@/lib/numbers'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { fullName, getInitials } from '@/lib/people'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
@@ -26,7 +29,8 @@ import YourWeek from './dashboard/YourWeek.jsx'
 const MotionLink = motion.create(Link)
 const MotionCard = motion.create(Card)
 
-const SUGGESTIONS = ['Explain photosynthesis simply', 'How do I solve 2x + 5 = 13?', 'Tips to learn English faster']
+// Example questions: dashboard.ask.suggestions.<key>
+const SUGGESTIONS = ['photosynthesis', 'equation', 'english']
 
 // Random index in [0, length), different from `exclude` when possible
 function randomIndex(length, exclude) {
@@ -40,6 +44,7 @@ function SectionTitle({ className, ...props }) {
 }
 
 function AskBar() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const [question, setQuestion] = useState('')
 
@@ -51,8 +56,8 @@ function AskBar() {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border border-primary p-7 [background:linear-gradient(135deg,var(--color-primary-soft),var(--color-accent-soft)),var(--color-surface)] max-[560px]:p-5">
       <div>
-        <h2 className="text-[22px] leading-tight font-semibold max-[560px]:text-[19px]">Ask tooli anything</h2>
-        <p className="mt-1 text-muted-foreground">Homework, exams, a tricky concept: get a clear answer in seconds.</p>
+        <h2 className="text-[22px] leading-tight font-semibold max-[560px]:text-[19px]">{t('dashboard.ask.title')}</h2>
+        <p className="mt-1 text-muted-foreground">{t('dashboard.ask.text')}</p>
       </div>
 
       <form
@@ -66,25 +71,32 @@ function AskBar() {
           type="text"
           value={question}
           onChange={(e) => setQuestion(e.target.value)}
-          placeholder="Type your question…"
-          aria-label="Your question for tooli"
+          placeholder={t('dashboard.ask.placeholder')}
+          aria-label={t('dashboard.ask.label')}
           className="h-[58px] flex-1 rounded-xl bg-card px-5 text-base focus-visible:border-primary focus-visible:ring-4 focus-visible:ring-accent md:text-base dark:bg-card max-[560px]:h-[52px]"
         />
         <Button
           type="submit"
           disabled={!question.trim()}
-          aria-label="Send question"
+          aria-label={t('dashboard.ask.send')}
           className="h-[58px] rounded-xl px-6 text-[15px] transition-[translate,box-shadow,opacity] hover:-translate-y-0.5 hover:bg-primary hover:shadow-lift disabled:opacity-55 motion-reduce:hover:translate-y-0 max-[560px]:size-[52px] max-[560px]:px-0 [&_svg:not([class*='size-'])]:size-5"
         >
-          <SendHorizontal aria-hidden="true" />
-          <span className="max-[560px]:hidden">Ask</span>
+          <SendHorizontal aria-hidden="true" className="rtl:-scale-x-100" />
+          <span className="max-[560px]:hidden">{t('dashboard.ask.submit')}</span>
         </Button>
       </form>
 
       <div className="flex flex-wrap gap-2">
-        {SUGGESTIONS.map((s) => (
-          <Button key={s} type="button" variant="pill" size="sm" className="bg-card font-normal" onClick={() => ask(s)}>
-            {s}
+        {SUGGESTIONS.map((key) => (
+          <Button
+            key={key}
+            type="button"
+            variant="pill"
+            size="sm"
+            className="bg-card font-normal"
+            onClick={() => ask(t(`dashboard.ask.suggestions.${key}`))}
+          >
+            {t(`dashboard.ask.suggestions.${key}`)}
           </Button>
         ))}
       </div>
@@ -93,7 +105,8 @@ function AskBar() {
 }
 
 function ServiceCardBody({ service, number }) {
-  const { title, text, icon: Icon, cta, soon } = service
+  const { t } = useTranslation()
+  const { key, icon: Icon, soon } = service
 
   return (
     <>
@@ -102,7 +115,7 @@ function ServiceCardBody({ service, number }) {
           <Icon size={22} aria-hidden="true" />
         </span>
         {soon ? (
-          <Badge variant="highlight">Soon</Badge>
+          <Badge variant="highlight">{t('common.soon')}</Badge>
         ) : (
           <span className="grid size-[26px] place-items-center rounded-full border border-primary-text text-xs font-semibold text-primary-text">
             {number}
@@ -110,13 +123,17 @@ function ServiceCardBody({ service, number }) {
         )}
       </div>
       <div className="flex-1">
-        <h3 className="text-base font-semibold">{title}</h3>
-        <p className="mt-1 text-sm leading-normal text-muted-foreground">{text}</p>
+        <h3 className="text-base font-semibold">{t(`services.${key}.title`)}</h3>
+        <p className="mt-1 text-sm leading-normal text-muted-foreground">{t(`services.${key}.text`)}</p>
       </div>
       {!soon && (
         <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-text">
-          {cta}
-          <ArrowRight size={16} className="transition-transform group-hover:translate-x-1 motion-reduce:transform-none" aria-hidden="true" />
+          {t(`services.${key}.cta`)}
+          <ArrowRight
+            size={16}
+            className="transition-transform group-hover:translate-x-1 motion-reduce:transform-none rtl:-scale-x-100 rtl:group-hover:-translate-x-1"
+            aria-hidden="true"
+          />
         </span>
       )}
     </>
@@ -145,17 +162,19 @@ function ServiceCard({ service, number }) {
 
 // A small error line with a retry button, for one dashboard section
 function SectionError({ onRetry }) {
+  const { t } = useTranslation()
   return (
     <Card className="flex-1 items-start gap-3 p-5" role="alert">
-      <p className="text-muted-foreground">This part didn’t load. Check your connection and try again.</p>
+      <p className="text-muted-foreground">{t('dashboard.sectionError')}</p>
       <Button type="button" variant="pill" size="sm" onClick={onRetry}>
-        <RefreshCw aria-hidden="true" /> Try again
+        <RefreshCw aria-hidden="true" /> {t('common.tryAgain')}
       </Button>
     </Card>
   )
 }
 
 function ContinueLearning() {
+  const { t } = useTranslation()
   const { data: courses, error, loading, reload } = useAsync(getContinueLearning, [])
 
   if (loading) {
@@ -169,7 +188,7 @@ function ContinueLearning() {
           </div>
         ))}
         <span className="sr-only" role="status">
-          Loading your courses…
+          {t('dashboard.continue.loading')}
         </span>
       </Card>
     )
@@ -179,10 +198,10 @@ function ContinueLearning() {
     return (
       <Card className="flex-1 items-center gap-3 p-6 text-center">
         <Mascot pose="explaining" size={72} title="" aria-hidden="true" />
-        <p className="font-semibold">No course in progress yet</p>
+        <p className="font-semibold">{t('dashboard.continue.empty')}</p>
         <Button asChild variant="pill" size="sm">
           <Link to="/dashboard/courses">
-            Browse courses <ArrowRight aria-hidden="true" />
+            {t('services.courses.cta')} <ArrowRight aria-hidden="true" className="rtl:-scale-x-100" />
           </Link>
         </Button>
       </Card>
@@ -201,8 +220,8 @@ function ContinueLearning() {
             <h3 className="mt-0.5 text-[15px] font-semibold">{c.title}</h3>
           </div>
           <Button asChild variant="pill" size="sm">
-            <Link to={`/dashboard/courses/${c.id}`} aria-label={`Resume ${c.title}`}>
-              Resume <ArrowRight aria-hidden="true" />
+            <Link to={`/dashboard/courses/${c.id}`} aria-label={t('courses.resumeLabel', { title: c.title })}>
+              {t('courses.resume')} <ArrowRight aria-hidden="true" className="rtl:-scale-x-100" />
             </Link>
           </Button>
           <div className="col-span-full flex items-center gap-3">
@@ -212,11 +231,11 @@ function ContinueLearning() {
               aria-valuenow={c.progress}
               aria-valuemin={0}
               aria-valuemax={100}
-              aria-label={`${c.title} progress`}
+              aria-label={t('courses.progressLabel', { title: c.title })}
             >
               <span className="block h-full rounded-full bg-primary" style={{ width: `${c.progress}%` }} />
             </div>
-            <span className="min-w-[38px] text-right text-[13px] font-semibold">{c.progress}%</span>
+            <span className="min-w-[38px] text-end text-[13px] font-semibold">{formatPercent(c.progress)}</span>
           </div>
         </div>
       ))}
@@ -225,6 +244,7 @@ function ContinueLearning() {
 }
 
 function TipOfTheDay() {
+  const { t } = useTranslation()
   const { data: tips, error, loading, reload } = useAsync(getLearningTips, [])
   // Which tip is shown; picked at random once the tips arrive
   const [index, setIndex] = useState(null)
@@ -248,7 +268,7 @@ function TipOfTheDay() {
   return (
     <Card className="relative flex-1 justify-between gap-6 overflow-hidden p-6">
       <Lightbulb
-        className="pointer-events-none absolute -top-3.5 -right-3.5 text-primary opacity-12"
+        className="pointer-events-none absolute -end-3.5 -top-3.5 text-primary opacity-12"
         size={128}
         aria-hidden="true"
       />
@@ -262,7 +282,7 @@ function TipOfTheDay() {
         className="self-start"
         onClick={() => setIndex(randomIndex(tips.length, index))}
       >
-        <RefreshCw aria-hidden="true" /> New tip
+        <RefreshCw aria-hidden="true" /> {t('dashboard.tip.next')}
       </Button>
     </Card>
   )
@@ -270,6 +290,7 @@ function TipOfTheDay() {
 
 // The whole card opens the professor's page (stretched link on the name); so does "Book a class"
 function ProfessorCard({ prof }) {
+  const { t } = useTranslation()
   const profPath = `/dashboard/professors/${prof.id}`
 
   return (
@@ -286,17 +307,17 @@ function ProfessorCard({ prof }) {
           </Link>
         </h3>
         <p className="mt-0.5 text-sm text-muted-foreground">
-          {prof.subject} · {prof.city}
+          {t(`subjects.${prof.subject}`)} · {t(`cities.${prof.city}`)}
         </p>
       </div>
       <p className="flex items-center gap-1.5 text-sm">
         <Star size={16} className="text-highlight" fill="currentColor" aria-hidden="true" />
-        <strong>{prof.rating.toFixed(1)}</strong>
-        <span className="text-[13px] text-muted-foreground">({prof.reviews} reviews)</span>
+        <strong>{formatRating(prof.rating)}</strong>
+        <span className="text-[13px] text-muted-foreground">({t('professors.reviewCount', { count: prof.reviews })})</span>
       </p>
       <Button asChild className="relative z-10 mt-auto w-full">
-        <Link to={profPath} aria-label={`Book a class with ${fullName(prof)}`}>
-          Book a class
+        <Link to={profPath} aria-label={t('professors.bookWith', { name: fullName(prof) })}>
+          {t('professors.book')}
         </Link>
       </Button>
     </MotionCard>
@@ -318,7 +339,9 @@ function TopProfessors() {
 }
 
 export default function Dashboard() {
+  const { t } = useTranslation()
   const { user } = useAuth()
+  usePageTitle(t('nav.dashboard'))
   const entrance = useEntrance()
 
   return (
@@ -336,30 +359,30 @@ export default function Dashboard() {
       </motion.section>
 
       <motion.section variants={fadeUp}>
-        <SectionTitle>Our services</SectionTitle>
+        <SectionTitle>{t('landing.services.title')}</SectionTitle>
         <div className="grid grid-cols-[repeat(auto-fit,minmax(220px,1fr))] gap-4">
           {SERVICES.map((s, i) => (
-            <ServiceCard key={s.title} service={s} number={i + 1} />
+            <ServiceCard key={s.key} service={s} number={i + 1} />
           ))}
         </div>
       </motion.section>
 
       <motion.div variants={fadeUp} className="grid grid-cols-[minmax(0,2fr)_minmax(0,1fr)] gap-6 max-lg:grid-cols-[minmax(0,1fr)]">
         <section className="flex flex-col">
-          <SectionTitle>Continue learning</SectionTitle>
+          <SectionTitle>{t('dashboard.continue.title')}</SectionTitle>
           <ContinueLearning />
         </section>
         <section className="flex flex-col">
-          <SectionTitle>Tip of the day</SectionTitle>
+          <SectionTitle>{t('dashboard.tip.title')}</SectionTitle>
           <TipOfTheDay />
         </section>
       </motion.div>
 
       <motion.section variants={fadeUp}>
         <div className="flex items-baseline justify-between gap-3">
-          <SectionTitle>Top VIP professors</SectionTitle>
+          <SectionTitle>{t('dashboard.topProfessors')}</SectionTitle>
           <Link to="/dashboard/professors" className="inline-flex items-center gap-1 text-sm font-semibold text-primary-text no-underline">
-            See all <ArrowRight size={14} aria-hidden="true" />
+            {t('common.seeAll')} <ArrowRight size={14} aria-hidden="true" className="rtl:-scale-x-100" />
           </Link>
         </div>
         <TopProfessors />

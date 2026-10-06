@@ -3,23 +3,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'motion/react'
 import { Check, Copy, Lightbulb, RefreshCw, Sparkles, ThumbsDown, ThumbsUp } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import { useDirectionSign } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import FormattedText from '@/lib/formatText'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import Mascot from '../../components/Mascot.jsx'
 
-const FOLLOW_UPS = {
-  simpler: 'Can you explain that more simply?',
-  example: 'Can you give me an example?',
-}
+// Follow-up questions sent by the action chips: tutor.followUps.simpler / .example
 
-// Slide in from the side the bubble sits on (only for new messages)
-function useBubbleMotion(fromRight, animate) {
+// Slide in from the side the bubble sits on (only for new messages). The student's bubbles sit on the
+// end side (right, or left in Arabic), the tutor's on the start side.
+function useBubbleMotion(fromEnd, animate) {
   const reduce = useReducedMotion()
+  const dir = useDirectionSign()
   if (!animate || reduce) return {}
   return {
-    initial: { opacity: 0, x: fromRight ? 12 : -12, y: 6 },
+    initial: { opacity: 0, x: (fromEnd ? 12 : -12) * dir, y: 6 },
     animate: { opacity: 1, x: 0, y: 0 },
     transition: { type: 'spring', stiffness: 380, damping: 32 },
   }
@@ -34,12 +35,16 @@ function TutorAvatar({ pose = 'explaining' }) {
 }
 
 export function UserBubble({ message, fresh }) {
+  const { t } = useTranslation()
   const bubbleMotion = useBubbleMotion(true, fresh)
   return (
     <motion.li className="flex justify-end" {...bubbleMotion}>
-      <div className="max-w-[min(80%,36rem)] rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-primary-foreground">
-        <span className="sr-only">You: </span>
-        <p className="break-words whitespace-pre-wrap">{message.text}</p>
+      <div className="max-w-[min(80%,36rem)] rounded-2xl rounded-ee-md bg-primary px-4 py-2.5 text-primary-foreground">
+        <span className="sr-only">{t('tutor.you')} </span>
+        {/* dir="auto": a French question stays left-to-right inside the Arabic interface (and vice versa) */}
+        <p dir="auto" className="break-words whitespace-pre-wrap">
+          {message.text}
+        </p>
       </div>
     </motion.li>
   )
@@ -69,6 +74,7 @@ function ActionButton({ label, onClick, disabled, pressed, children }) {
 }
 
 export function TutorMessage({ message, fresh, isLast, busy, onFollowUp }) {
+  const { t } = useTranslation()
   const reduce = useReducedMotion()
   const bubbleMotion = useBubbleMotion(false, fresh)
   const [copied, setCopied] = useState(false)
@@ -91,24 +97,24 @@ export function TutorMessage({ message, fresh, isLast, busy, onFollowUp }) {
     <motion.li className="flex items-start gap-3" {...bubbleMotion}>
       <TutorAvatar />
       <div className="min-w-0 max-w-[min(100%,42rem)] flex-1">
-        <div className="rounded-2xl rounded-tl-md border border-border bg-card px-4 py-3.5 text-[15px]">
-          <span className="sr-only">tooli: </span>
+        <div className="rounded-2xl rounded-ss-md border border-border bg-card px-4 py-3.5 text-[15px]">
+          <span className="sr-only">{t('tutor.tooli')} </span>
           <FormattedText text={message.text} reveal={fresh && !reduce} />
         </div>
 
         <div className="mt-1.5 flex flex-wrap items-center gap-1">
-          <ActionButton label={copied ? 'Copied!' : 'Copy answer'} onClick={copy}>
+          <ActionButton label={copied ? t('tutor.actions.copied') : t('tutor.actions.copy')} onClick={copy}>
             {copied ? <Check aria-hidden="true" /> : <Copy aria-hidden="true" />}
           </ActionButton>
           <ActionButton
-            label="Good answer"
+            label={t('tutor.actions.good')}
             pressed={rating === 'up'}
             onClick={() => setRating((r) => (r === 'up' ? null : 'up'))}
           >
             <ThumbsUp aria-hidden="true" />
           </ActionButton>
           <ActionButton
-            label="Not helpful"
+            label={t('tutor.actions.bad')}
             pressed={rating === 'down'}
             onClick={() => setRating((r) => (r === 'down' ? null : 'down'))}
           >
@@ -120,11 +126,11 @@ export function TutorMessage({ message, fresh, isLast, busy, onFollowUp }) {
                 type="button"
                 variant="pill"
                 size="sm"
-                className="ml-1 bg-card"
+                className="ms-1 bg-card"
                 disabled={busy}
-                onClick={() => onFollowUp(FOLLOW_UPS.simpler)}
+                onClick={() => onFollowUp(t('tutor.followUps.simpler'))}
               >
-                <Sparkles aria-hidden="true" /> Explain simpler
+                <Sparkles aria-hidden="true" /> {t('tutor.actions.simpler')}
               </Button>
               <Button
                 type="button"
@@ -132,16 +138,16 @@ export function TutorMessage({ message, fresh, isLast, busy, onFollowUp }) {
                 size="sm"
                 className="bg-card"
                 disabled={busy}
-                onClick={() => onFollowUp(FOLLOW_UPS.example)}
+                onClick={() => onFollowUp(t('tutor.followUps.example'))}
               >
-                <Lightbulb aria-hidden="true" /> Give me an example
+                <Lightbulb aria-hidden="true" /> {t('tutor.actions.example')}
               </Button>
             </>
           )}
         </div>
         {copied && (
           <span className="sr-only" role="status">
-            Answer copied
+            {t('tutor.actions.copiedStatus')}
           </span>
         )}
       </div>
@@ -151,6 +157,7 @@ export function TutorMessage({ message, fresh, isLast, busy, onFollowUp }) {
 
 // The mascot thinks while three dots bounce
 export function ThinkingBubble() {
+  const { t } = useTranslation()
   const reduce = useReducedMotion()
 
   return (
@@ -161,7 +168,7 @@ export function ThinkingBubble() {
       role="status"
     >
       <TutorAvatar pose="thinking" />
-      <div className="flex items-center gap-3 rounded-2xl rounded-tl-md border border-border bg-card px-4 py-3.5">
+      <div className="flex items-center gap-3 rounded-2xl rounded-ss-md border border-border bg-card px-4 py-3.5">
         <span className="flex gap-1.5" aria-hidden="true">
           {[0, 1, 2].map((i) => (
             <motion.span
@@ -172,7 +179,7 @@ export function ThinkingBubble() {
             />
           ))}
         </span>
-        <span className="text-sm text-muted-foreground">tooli is thinking…</span>
+        <span className="text-sm text-muted-foreground">{t('tutor.thinking')}</span>
       </div>
     </motion.li>
   )
@@ -180,16 +187,17 @@ export function ThinkingBubble() {
 
 // A question that didn't get an answer
 export function SendError({ message, onRetry }) {
+  const { t } = useTranslation()
   return (
     <motion.li className="flex items-start gap-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} role="alert">
       <span className="grid size-10 shrink-0 place-items-center" aria-hidden="true">
         <Mascot pose="oops" size={36} title="" animated={false} />
       </span>
-      <div className="rounded-2xl rounded-tl-md border border-destructive/40 bg-destructive/8 px-4 py-3">
-        <p className="font-semibold">Oops, I couldn’t answer that.</p>
-        <p className="text-sm text-muted-foreground">{message || 'Check your connection and try again.'}</p>
+      <div className="rounded-2xl rounded-ss-md border border-destructive/40 bg-destructive/8 px-4 py-3">
+        <p className="font-semibold">{t('tutor.sendError')}</p>
+        <p className="text-sm text-muted-foreground">{message || t('tutor.sendErrorText')}</p>
         <Button type="button" variant="outline" size="sm" className="mt-2.5" onClick={onRetry}>
-          <RefreshCw aria-hidden="true" /> Try again
+          <RefreshCw aria-hidden="true" /> {t('common.tryAgain')}
         </Button>
       </div>
     </motion.li>

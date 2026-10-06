@@ -14,7 +14,10 @@
     "all": "All",
     "seeAll": "See all",
     "new": "New",
-    "soon": "Soon"
+    "soon": "Soon",
+    "breadcrumb": "Breadcrumb",
+    "listSeparator": ", ",
+    "saveError": "That didn’t save"
   },
   "nav": {
     "main": "Main",
@@ -304,6 +307,481 @@
       "passwordShort_other": "Almost there: {{count}} more characters needed (at least {{min}}).",
       "firstName": "What should we call you?",
       "lastName": "Please add your last name too."
+    }
+  },
+  "dashboard": {
+    "sectionError": "This part didn’t load. Check your connection and try again.",
+    "topProfessors": "Top VIP professors",
+    "ask": {
+      "title": "Ask tooli anything",
+      "text": "Homework, exams, a tricky concept: get a clear answer in seconds.",
+      "placeholder": "Type your question…",
+      "label": "Your question for tooli",
+      "send": "Send question",
+      "submit": "Ask",
+      "suggestions": {
+        "photosynthesis": "Explain photosynthesis simply",
+        "equation": "How do I solve 2x + 5 = 13?",
+        "english": "Tips to learn English faster"
+      }
+    },
+    "continue": {
+      "title": "Continue learning",
+      "loading": "Loading your courses…",
+      "empty": "No course in progress yet"
+    },
+    "tip": {
+      "title": "Tip of the day",
+      "next": "New tip"
+    },
+    "greeting": {
+      "morning": {
+        "hello": "Good morning, {{name}}",
+        "lines": [
+          "Ready to learn something new?",
+          "A fresh start: what’s first today?",
+          "One small win before lunch?"
+        ]
+      },
+      "afternoon": {
+        "hello": "Good afternoon, {{name}}",
+        "lines": [
+          "Ready to learn something new?",
+          "Perfect time for a quick revision.",
+          "One lesson now, one step closer to the bac."
+        ]
+      },
+      "evening": {
+        "hello": "Good evening, {{name}}",
+        "lines": [
+          "A short session before dinner?",
+          "Review today, remember tomorrow.",
+          "Ready to learn something new?"
+        ]
+      },
+      "night": {
+        "hello": "Good evening, {{name}}",
+        "lines": [
+          "Late study session? Don’t forget to sleep!",
+          "Your brain stores what you learned while you sleep."
+        ]
+      }
+    },
+    "week": {
+      "title": "Your week",
+      "loading": "Loading your week",
+      "error": "Your week didn’t load.",
+      "daysStudied": "Days studied",
+      "soFar_one": "/ {{count}} so far",
+      "soFar_other": "/ {{count}} so far",
+      "daysLabel": "This week, Monday to Sunday",
+      "day": "{{day}}: {{state}}",
+      "todayDay": "{{day}} (today): {{state}}",
+      "state": {
+        "toCome": "still to come",
+        "studied": "studied",
+        "none": "no study"
+      },
+      "questions": "Questions asked",
+      "askAnother": "Ask another",
+      "lessons": "Lessons done",
+      "keepGoing": "Keep going",
+      "nextClass": "Next class",
+      "noClass": "No class booked yet",
+      "with": "with"
+    }
+  },
+  "tutor": {
+    "newChat": "New chat",
+    "placeholder": "Ask tooli anything…",
+    "thinking": "tooli is thinking…",
+    "sendTooltip": "Send (Enter)",
+    "enterToSend": "to send",
+    "shiftEnter": "for a new line",
+    "you": "You:",
+    "tooli": "tooli:",
+    "conversation": "Conversation with tooli",
+    "loadingChat": "Loading the conversation",
+    "newMessage": "New message",
+    "sendError": "Oops, I couldn’t answer that.",
+    "sendErrorText": "Check your connection and try again.",
+    "notFound": {
+      "title": "Chat not found",
+      "text": "This conversation doesn’t exist anymore. Start a new one: tooli is ready!",
+      "back": "Start a new chat"
+    },
+    "followUps": {
+      "simpler": "Can you explain that more simply?",
+      "example": "Can you give me an example?"
+    },
+    "actions": {
+      "copy": "Copy answer",
+      "copied": "Copied!",
+      "copiedStatus": "Answer copied",
+      "good": "Good answer",
+      "bad": "Not helpful",
+      "simpler": "Explain simpler",
+      "example": "Give me an example"
+    },
+    "history": {
+      "label": "Chat history",
+      "title": "Your chats",
+      "search": "Search chats",
+      "searchLabel": "Search your chats",
+      "loading": "Loading your chats",
+      "error": "Your chats didn’t load.",
+      "empty": "No chats yet. Your questions will show up here.",
+      "noMatch": "No chat matches “{{query}}”."
+    },
+    "welcome": {
+      "hi": "Hi {{name}}! I’m your tutor.",
+      "title": "What do you want to learn today?",
+      "text": "Ask me anything. I explain step by step, and you can ask for a simpler version or an example anytime.",
+      "suggested": "Suggested questions",
+      "suggestions": {
+        "maths": {
+          "subject": "Maths",
+          "question": "How do I solve 2x + 5 = 13, step by step?"
+        },
+        "physics": {
+          "subject": "Physics",
+          "question": "What does Newton’s second law really mean?"
+        },
+        "biology": {
+          "subject": "Biology",
+          "question": "Explain photosynthesis like I’m 12."
+        },
+        "languages": {
+          "subject": "Languages",
+          "question": "How can I speak English with more confidence?"
+        },
+        "coding": {
+          "subject": "Coding",
+          "question": "How does a loop work in Python?"
+        },
+        "exams": {
+          "subject": "Exam prep",
+          "question": "Make me a revision plan for the bac."
+        }
+      }
+    }
+  },
+  "filters": {
+    "title": "Filters",
+    "subject": "Subject",
+    "level": "Level",
+    "platform": "Platform",
+    "city": "City",
+    "language": "Language",
+    "price": "Price",
+    "reset": "Reset filters"
+  },
+  "search": {
+    "title": "Search",
+    "subtitle": "Courses, professors and study tips, all at once.",
+    "placeholder": "Search courses, professors…",
+    "bigPlaceholder": "A course, a professor, a city, a study tip…",
+    "label": "Search courses, professors and tips",
+    "intro": "Search everything on tooli at once: partner courses, VIP professors and study tips.",
+    "popular": "Popular subjects",
+    "trySubject": "Or try a subject",
+    "searching": "Searching",
+    "noMatch": "No match for “{{query}}”",
+    "noMatchText": "Try a subject below, or ask the AI tutor: it can explain almost anything, step by step.",
+    "professors": "Professors",
+    "tips": "Study tips",
+    "resultCount_one": "{{count}} result for “{{query}}”",
+    "resultCount_other": "{{count}} results for “{{query}}”"
+  },
+  "courses": {
+    "subtitle": "Hand-picked courses from our e-learning partners. Learn at your own pace, tooli keeps track of your progress.",
+    "all": "All courses",
+    "continueError": "Your courses in progress didn’t load.",
+    "searchPlaceholder": "Search a course, a subject, a platform…",
+    "searchLabel": "Search courses",
+    "sortBy": "Sort by",
+    "sortLabel": "Sort courses: {{sort}}",
+    "sorts": {
+      "popular": "Most popular",
+      "newest": "Newest",
+      "shortest": "Shortest"
+    },
+    "count_one": "{{count}} course",
+    "count_other": "{{count}} courses",
+    "empty": {
+      "title": "No course matches your search",
+      "text": "Try another filter or a different word. New courses arrive every month!"
+    },
+    "resume": "Resume",
+    "resumeLabel": "Resume {{title}}",
+    "progressLabel": "{{title}} progress",
+    "doneLabel": "{{title}}: {{percent}} done",
+    "outOf5": "out of 5,",
+    "start": "Start course",
+    "review": "Review course",
+    "tutorQuestion": "I’m following “{{title}}” on {{platform}}. Can you help me understand “{{lesson}}”?",
+    "tutorQuiz": "I finished “{{title}}” on {{platform}}. Can you quiz me on the main ideas?",
+    "opening": "Opening {{platform}}…",
+    "openingText": "“{{title}}” will open in a new tab.",
+    "details": "Course details",
+    "lessonCount_one": "{{count}} lesson",
+    "lessonCount_other": "{{count}} lessons",
+    "yourProgress": "Your progress: {{percent}}",
+    "notStarted": "Not started yet",
+    "completed": "Course completed, well done!",
+    "lessonsDone_one": "{{done}} of {{count}} lesson done",
+    "lessonsDone_other": "{{done}} of {{count}} lessons done",
+    "firstLesson": "First lesson: {{title}}",
+    "upNextLesson": "Up next: {{title}}",
+    "askTutor": "Ask the AI tutor",
+    "aboutCourse": "about this course",
+    "lessons": "Lessons",
+    "lessonNumber": "Lesson {{n}}",
+    "status": {
+      "done": "Done",
+      "next": "Up next",
+      "locked": "Locked"
+    },
+    "markDone": "Mark “{{title}}” as done",
+    "outcomes": "What you’ll learn",
+    "findNext": "Find your next course",
+    "celebrate": {
+      "completeTitle": "Course completed! 🎓",
+      "completeText_one": "You finished the only lesson of “{{title}}”. Amazing work.",
+      "completeText_other": "You finished all {{count}} lessons of “{{title}}”. Amazing work.",
+      "lessonTitle": "Lesson done, well played!",
+      "lessonText": "“{{title}}” ✓ · {{done}} of {{count}} lessons, {{percent}} of the course."
+    },
+    "notFound": {
+      "title": "Course not found",
+      "text": "This course may have been removed, or the link has a typo.",
+      "back": "See all courses"
+    }
+  },
+  "professors": {
+    "title": "Learn with the best professors in Tunisia",
+    "subtitle": "Private classes with hand-picked, top-rated professors. Pick a time that suits you and book in a few clicks.",
+    "reviewCount_one": "{{count}} review",
+    "reviewCount_other": "{{count}} reviews",
+    "stars_one": "{{count}} out of 5 stars",
+    "stars_other": "{{count}} out of 5 stars",
+    "book": "Book a class",
+    "bookWith": "Book a class with {{name}}",
+    "perHour": "/ hour",
+    "perHourShort": "/ h",
+    "next": "Next: {{when}}",
+    "fullyBooked": "Fully booked this week",
+    "viewProfile": "View profile",
+    "viewProfileOf": "View {{name}}’s profile",
+    "availableWeek": "Available this week",
+    "prices": {
+      "under-40": "Under {{low}}",
+      "40-50": "{{low}} to {{high}}",
+      "over-50": "Over {{high}}"
+    },
+    "count_one": "{{count}} professor",
+    "count_other": "{{count}} professors",
+    "empty": {
+      "title": "No professor matches these filters",
+      "text": "Try another city or language, or turn off “Available this week”."
+    },
+    "details": "Details",
+    "about": "About",
+    "tutorQuestion": "I have a {{subject}} class with {{name}} soon. Can you help me prepare?",
+    "askTutor": "Ask tooli about {{subject}}",
+    "reviewsTitle": "What students say",
+    "loadingReviews": "Loading reviews",
+    "reviewsError": "Reviews didn’t load.",
+    "notFound": {
+      "title": "Professor not found",
+      "text": "This profile may have moved, or the link has a typo.",
+      "back": "See all professors"
+    }
+  },
+  "booking": {
+    "failed": "Booking didn’t go through",
+    "loading": "Loading free times",
+    "error": "The free times didn’t load.",
+    "fullyBooked": "{{name}} is fully booked for the next 7 days. New times open every week, check back soon!",
+    "pickDay": "Pick a day",
+    "freeTimes_zero": "no free time",
+    "freeTimes_one": "{{count}} free time",
+    "freeTimes_other": "{{count}} free times",
+    "chooseTime": "Choose a time · {{day}}",
+    "timeZone": "Times are shown in your time zone ({{zone}}).",
+    "length": "Session length",
+    "lengthShort": "Length",
+    "totalFor": "Total for {{duration}}",
+    "bookThis": "Book this class",
+    "pickTime": "Pick a time to continue",
+    "confirmTitle": "Confirm your class",
+    "confirmText": "Check the details, then confirm. You can cancel up to 24 h before the class.",
+    "professor": "Professor",
+    "when": "When",
+    "price": "Price",
+    "payLater": "You pay the professor after the class. Online payment is coming soon.",
+    "booking": "Booking…",
+    "confirm": "Confirm booking",
+    "success": {
+      "title": "Your class is booked!",
+      "text": "{{name}} is looking forward to seeing you. We added a reminder to your notifications.",
+      "calendarSoon": "Calendar invites are coming soon",
+      "calendarText": "We’ll remind you in your notifications the day before.",
+      "addCalendar": "Add to calendar",
+      "another": "Book another class with {{name}}"
+    }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "subtitle": "Class bookings, new lessons and study tips, all in one place.",
+    "bellUnread_one": "Notifications, {{count}} unread",
+    "bellUnread_other": "Notifications, {{count}} unread",
+    "unreadBadge_one": "{{count}} unread",
+    "unreadBadge_other": "{{count}} unread",
+    "markAll": "Mark all as read",
+    "show": "Show",
+    "unread": "Unread",
+    "unreadItem": "Unread.",
+    "typeLabel": "{{type}} notification.",
+    "types": {
+      "course": "Course",
+      "booking": "Booking",
+      "tip": "Tip",
+      "system": "tooli"
+    },
+    "groups": {
+      "today": "Today",
+      "week": "This week",
+      "earlier": "Earlier"
+    },
+    "loading": "Loading notifications",
+    "caughtUp": "You’re all caught up!",
+    "markError": "Couldn’t mark them as read",
+    "emptyUnread": "No unread notifications. Time for a little study session?",
+    "empty": "New lessons, bookings and tips will show up here.",
+    "showAll": "Show all notifications"
+  },
+  "vip": {
+    "docTitle": "tooli VIP",
+    "title": "Learn faster with tooli VIP",
+    "subtitle": "Private classes with the best professors in Tunisia, a revision plan made for you, and a tutor that never sleeps.",
+    "onPlan": "You’re on {{plan}}.",
+    "onPlanUntil": "You’re on {{plan}} until {{date}}.",
+    "pick": "Pick your plan",
+    "pricesNote": "Prices in Tunisian dinars, per month. Cancel anytime.",
+    "yourPlan": "Your plan",
+    "popular": "Most popular",
+    "perMonth": "/ month",
+    "currentPlan": "Your current plan",
+    "choose": "Choose {{plan}}",
+    "notified": "We’ll notify you",
+    "notifiedText": "You’ll be the first to know when {{plan}} opens.",
+    "faqTitle": "Questions, answered",
+    "faq": {
+      "cancel": {
+        "q": "Can I cancel anytime?",
+        "a": "Yes. Plans are monthly with no commitment: cancel from your settings and you keep VIP until the end of the month you paid for."
+      },
+      "pay": {
+        "q": "How will I pay?",
+        "a": "Online payment is coming soon, by bank card (Tunisian and international) and e-dinar. Until then, you pay VIP professors directly after each class."
+      },
+      "professor": {
+        "q": "What is a VIP professor?",
+        "a": "An experienced teacher hand-picked by tooli for their results and reviews. You book private classes with them at times that suit you."
+      },
+      "refund": {
+        "q": "Can I get a refund?",
+        "a": "If something goes wrong in your first 7 days, contact us and we refund the month, no questions asked. Unused private hours can be moved to the next month."
+      },
+      "parents": {
+        "q": "Are there plans for parents?",
+        "a": "Yes: the Intensive plan sends a weekly progress report to a parent. Family plans for several children are on the way."
+      }
+    },
+    "dialog": {
+      "title": "Online payment is coming soon",
+      "text": "We’re setting up secure payment by card and e-dinar for the {{plan}} plan ({{price}} / month). Leave us a sign and we’ll let you know the day it opens. Until then, you can already book VIP professors and pay them after class.",
+      "notify": "Notify me"
+    }
+  },
+  "settings": {
+    "subtitle": "Your profile, how tooli looks, your language and what we send you.",
+    "tabs": {
+      "profile": "Profile",
+      "appearance": "Appearance & language",
+      "notifications": "Notifications"
+    },
+    "language": {
+      "text": "tooli, its courses and the AI tutor’s answers switch to this language. Arabic reads right to left.",
+      "saveError": "Your language changed, but it wasn’t saved in your profile. It will be next time."
+    },
+    "appearance": {
+      "palette": "Colour palette",
+      "paletteText": "Pick the colour you like: buttons, links and the mascot follow it.",
+      "previewButton": "Start",
+      "mode": "Light or dark",
+      "modeText": "System switches by itself when your phone or computer does.",
+      "modes": {
+        "light": {
+          "label": "Light",
+          "text": "Bright and clear"
+        },
+        "dark": {
+          "label": "Dark",
+          "text": "Easy on the eyes at night"
+        },
+        "system": {
+          "label": "System",
+          "text": "Follows your device"
+        }
+      }
+    },
+    "notifications": {
+      "title": "What we send you",
+      "text": "Changes are saved straight away.",
+      "loading": "Loading your notification settings",
+      "on": "{{label}}: on",
+      "off": "{{label}}: off",
+      "saveError": "That change wasn’t saved",
+      "items": {
+        "courseReminders": {
+          "label": "Course reminders",
+          "text": "A nudge when you haven’t opened a course you started for a few days."
+        },
+        "bookingUpdates": {
+          "label": "Class bookings",
+          "text": "Confirmations, reminders and changes for your classes with professors."
+        },
+        "dailyTip": {
+          "label": "Tip of the day",
+          "text": "One short study tip every morning."
+        },
+        "productNews": {
+          "label": "tooli news",
+          "text": "New features, new partner courses and special offers (about once a month)."
+        }
+      }
+    },
+    "profile": {
+      "loading": "Loading your profile",
+      "firstSave": "Your profile is all set! 🎉",
+      "firstSaveText": "tooli can now suggest courses and professors that fit you.",
+      "saved": "Profile saved",
+      "saveError": "Your changes weren’t saved",
+      "bioTooLong_one": "Keep it under {{count}} character.",
+      "bioTooLong_other": "Keep it under {{count}} characters.",
+      "choose": "Choose…",
+      "yourName": "Your name",
+      "avatar": "Your avatar shows your initials.",
+      "emailHint": "Your login email can’t be changed here yet.",
+      "section": "Section",
+      "school": "School",
+      "bio": "Short bio",
+      "optional": "(optional)",
+      "bioPlaceholder": "What are you studying for? What do you love learning?",
+      "discard": "Discard",
+      "save": "Save changes"
     }
   }
 }

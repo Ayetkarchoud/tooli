@@ -5,8 +5,11 @@ import { useState } from 'react'
 import { motion } from 'motion/react'
 import { BellRing, Check, Crown } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from 'react-i18next'
 import { formatTND } from '@/lib/money'
 import { fadeUp, hoverLift, stagger, useEntrance } from '@/lib/motion'
+import { formatDate } from '@/lib/time'
+import { usePageTitle } from '@/lib/usePageTitle'
 import { useAsync } from '@/lib/useAsync'
 import { cn } from '@/lib/utils'
 import { getVipPlans, getVipStatus, joinVipWaitlist } from '@/services/vip'
@@ -27,30 +30,11 @@ import { ErrorState } from '../components/MascotMessage.jsx'
 import Page from '../components/Page.jsx'
 import { CardGridSkeleton } from '../components/PageLoader.jsx'
 
-const FAQ = [
-  {
-    q: 'Can I cancel anytime?',
-    a: 'Yes. Plans are monthly with no commitment: cancel from your settings and you keep VIP until the end of the month you paid for.',
-  },
-  {
-    q: 'How will I pay?',
-    a: 'Online payment is coming soon, by bank card (Tunisian and international) and e-dinar. Until then, you pay VIP professors directly after each class.',
-  },
-  {
-    q: 'What is a VIP professor?',
-    a: 'An experienced teacher hand-picked by tooli for their results and reviews. You book private classes with them at times that suit you.',
-  },
-  {
-    q: 'Can I get a refund?',
-    a: 'If something goes wrong in your first 7 days, contact us and we refund the month, no questions asked. Unused private hours can be moved to the next month.',
-  },
-  {
-    q: 'Are there plans for parents?',
-    a: 'Yes: the Intensive plan sends a weekly progress report to a parent. Family plans for several children are on the way.',
-  },
-]
+// Questions and answers: vip.faq.<key>.q / .a
+const FAQ = ['cancel', 'pay', 'professor', 'refund', 'parents']
 
 function PlanCard({ plan, isCurrent, onChoose }) {
+  const { t } = useTranslation()
   const featured = plan.highlighted && !isCurrent
   return (
     <motion.li
@@ -65,17 +49,17 @@ function PlanCard({ plan, isCurrent, onChoose }) {
       {(featured || isCurrent) && (
         <Badge
           variant={isCurrent ? 'highlight' : 'default'}
-          className="absolute -top-3 left-6 h-auto px-3 py-1 text-xs font-bold shadow-sm"
+          className="absolute start-6 -top-3 h-auto px-3 py-1 text-xs font-bold shadow-sm"
         >
-          {isCurrent ? 'Your plan' : 'Most popular'}
+          {isCurrent ? t('vip.yourPlan') : t('vip.popular')}
         </Badge>
       )}
 
       <div>
         <h3 className="text-xl font-bold">{plan.name}</h3>
-        <p className="mt-2 flex items-baseline gap-1.5">
-          <span className="text-4xl font-extrabold tracking-tight">{formatTND(plan.pricePerMonth)}</span>
-          <span className="text-muted-foreground">/ month</span>
+        <p className="mt-2 flex flex-wrap items-baseline gap-x-1.5">
+          <span className="text-4xl font-extrabold tracking-tight whitespace-nowrap">{formatTND(plan.pricePerMonth)}</span>
+          <span className="text-muted-foreground">{t('vip.perMonth')}</span>
         </p>
       </div>
 
@@ -92,11 +76,11 @@ function PlanCard({ plan, isCurrent, onChoose }) {
 
       {isCurrent ? (
         <Button variant="outline" size="lg" disabled className="w-full">
-          <Crown aria-hidden="true" /> Your current plan
+          <Crown aria-hidden="true" /> {t('vip.currentPlan')}
         </Button>
       ) : (
         <Button size="lg" variant={featured ? 'default' : 'outline'} className="w-full" onClick={() => onChoose(plan)}>
-          Choose {plan.name}
+          {t('vip.choose', { plan: plan.name })}
         </Button>
       )}
     </motion.li>
@@ -104,6 +88,8 @@ function PlanCard({ plan, isCurrent, onChoose }) {
 }
 
 export default function Vip() {
+  const { t } = useTranslation()
+  usePageTitle(t('vip.docTitle'))
   const plans = useAsync(getVipPlans, [])
   const status = useAsync(getVipStatus, [])
   const [chosen, setChosen] = useState(null)
@@ -113,10 +99,10 @@ export default function Vip() {
     setJoining(true)
     try {
       await joinVipWaitlist(chosen.id)
-      toast.success('We’ll notify you', { description: `You’ll be the first to know when ${chosen.name} opens.` })
+      toast.success(t('vip.notified'), { description: t('vip.notifiedText', { plan: chosen.name }) })
       setChosen(null)
     } catch {
-      toast.error('That didn’t work', { description: 'Check your connection and try again.' })
+      toast.error(t('errors.generic'), { description: t('tutor.sendErrorText') })
     } finally {
       setJoining(false)
     }
@@ -128,7 +114,7 @@ export default function Vip() {
   return (
     <Page>
       <motion.section
-        className="mb-10 flex flex-col items-center gap-6 rounded-3xl border border-border px-6 py-10 text-center [background:radial-gradient(circle_at_85%_10%,var(--color-accent-soft),transparent_45%),var(--color-primary-soft)] md:flex-row md:text-left"
+        className="mb-10 flex flex-col items-center gap-6 rounded-3xl border border-border px-6 py-10 text-center [background:radial-gradient(circle_at_85%_10%,var(--color-accent-soft),transparent_45%),var(--color-primary-soft)] md:flex-row md:text-start"
         variants={stagger(0.08)}
         {...entrance}
       >
@@ -139,14 +125,18 @@ export default function Vip() {
           <Badge variant="highlight" className="mb-3 gap-1 text-xs">
             <Crown aria-hidden="true" /> tooli VIP
           </Badge>
-          <h1 className="text-[clamp(28px,4.4vw,42px)] leading-tight font-extrabold tracking-[-0.02em]">Learn faster with tooli VIP</h1>
+          <h1 className="text-[clamp(28px,4.4vw,42px)] leading-tight font-extrabold tracking-[-0.02em]">{t('vip.title')}</h1>
           <p className="mt-2 max-w-xl text-lg text-muted-foreground">
-            Private classes with the best professors in Tunisia, a revision plan made for you, and a tutor that never sleeps.
+            {t('vip.subtitle')}
           </p>
           {currentPlanId && plans.data && (
             <p className="mt-3 font-semibold" role="status">
-              You’re on <span className="text-primary-text">{plans.data.find((p) => p.id === currentPlanId)?.name}</span>
-              {status.data.renewsOn && <> until {new Date(`${status.data.renewsOn}T00:00:00`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long' })}</>}.
+              {status.data.renewsOn
+                ? t('vip.onPlanUntil', {
+                    plan: plans.data.find((p) => p.id === currentPlanId)?.name,
+                    date: formatDate(status.data.renewsOn),
+                  })
+                : t('vip.onPlan', { plan: plans.data.find((p) => p.id === currentPlanId)?.name })}
             </p>
           )}
         </motion.div>
@@ -154,7 +144,7 @@ export default function Vip() {
 
       <section aria-labelledby="plans-title" className="mb-14">
         <h2 id="plans-title" className="mb-6 text-center text-2xl font-extrabold">
-          Pick your plan
+          {t('vip.pick')}
         </h2>
         {plans.loading && !plans.data ? (
           <CardGridSkeleton count={3} className="h-[420px] rounded-3xl" />
@@ -167,18 +157,22 @@ export default function Vip() {
             ))}
           </motion.ul>
         )}
-        <p className="mt-4 text-center text-sm text-muted-foreground">Prices in Tunisian dinars, per month. Cancel anytime.</p>
+        <p className="mt-4 text-center text-sm text-muted-foreground">{t('vip.pricesNote')}</p>
       </section>
 
       <section aria-labelledby="faq-title" className="mx-auto max-w-3xl">
         <h2 id="faq-title" className="mb-4 text-2xl font-extrabold">
-          Questions, answered
+          {t('vip.faqTitle')}
         </h2>
         <Accordion type="single" collapsible className="rounded-2xl border border-border bg-card px-5">
-          {FAQ.map((item, i) => (
-            <AccordionItem key={item.q} value={`faq-${i}`}>
-              <AccordionTrigger className="py-4 text-left text-base font-semibold hover:no-underline">{item.q}</AccordionTrigger>
-              <AccordionContent className="pb-4 text-[15px] leading-relaxed text-muted-foreground">{item.a}</AccordionContent>
+          {FAQ.map((key) => (
+            <AccordionItem key={key} value={`faq-${key}`}>
+              <AccordionTrigger className="py-4 text-start text-base font-semibold hover:no-underline">
+                {t(`vip.faq.${key}.q`)}
+              </AccordionTrigger>
+              <AccordionContent className="pb-4 text-[15px] leading-relaxed text-muted-foreground">
+                {t(`vip.faq.${key}.a`)}
+              </AccordionContent>
             </AccordionItem>
           ))}
         </Accordion>
@@ -187,18 +181,17 @@ export default function Vip() {
       <Dialog open={Boolean(chosen)} onOpenChange={(open) => !open && setChosen(null)}>
         <DialogContent className="gap-5 p-6 sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold">Online payment is coming soon</DialogTitle>
+            <DialogTitle className="text-xl font-bold">{t('vip.dialog.title')}</DialogTitle>
             <DialogDescription className="text-[15px] leading-relaxed">
-              We’re setting up secure payment by card and e-dinar for the {chosen?.name} plan ({chosen && formatTND(chosen.pricePerMonth)} / month).
-              Leave us a sign and we’ll let you know the day it opens. Until then, you can already book VIP professors and pay them after class.
+              {chosen && t('vip.dialog.text', { plan: chosen.name, price: formatTND(chosen.pricePerMonth) })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="-mx-6 -mb-6 gap-2 rounded-b-2xl p-4 px-6">
             <DialogClose asChild>
-              <Button variant="outline">Close</Button>
+              <Button variant="outline">{t('common.close')}</Button>
             </DialogClose>
             <Button onClick={notifyMe} disabled={joining}>
-              <BellRing aria-hidden="true" /> Notify me
+              <BellRing aria-hidden="true" /> {t('vip.dialog.notify')}
             </Button>
           </DialogFooter>
         </DialogContent>
