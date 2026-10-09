@@ -55,6 +55,7 @@ No Node.js or MongoDB needed on your computer.
   Uncomment it (and `depends_on` in `client`) once `server/` has a Dockerfile that starts Express on port 5000.
 
 More details: [client/README.md](client/README.md). Backend: build the routes described in
+[docs/api.md](docs/api.md). Project rules (stack, colours, languages, UX checklist): [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Route map
 
